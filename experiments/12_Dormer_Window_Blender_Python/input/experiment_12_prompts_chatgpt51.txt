@@ -1,0 +1,168 @@
+ORIGINAL PROMPT
+
+
+
+You are a computational designer. I want you to do the following:
+
+1. Using the provided images as references, describe a way to construct a dormer window using scaled box geometries.
+
+2. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Let's do the following:
+
+1. Introduce slanted roof rafters of the large roof on which the dormer window is placed.
+2. Introduce valley rafters that connect dormer top plates with the ridge at the point where it connects to the large roof.
+3. Introduce vertical side studs connecting dormer top plates and roof rafters.
+4. Introduce horizontal top braces for the dormer rafters.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Analyze the pictures and determine geometric mistakes in the dormer window from your code, then implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Let's do the following:
+
+1. Extend the Dormer_Ridge in -Y direction until it hits the large roof.
+2. Trim the Valley_Rafter elements in at the point where they hit Dormer_Ridge on the large roof. Add a horizontal double header element there that spans the width of the dormer.
+3. Add jack rafters between the Dormer_Ridge and Valley_Rafter elements.
+4. Align large roof rafters with the vertical studs of the dormer, currently they are out of sync. Extend vertical studs of the dormer to the supporting roof rafter below (now aligned).
+5. Trim the roof rafters under the dormer window so there is a gap that allows people to stand and look out of the dormer.
+6. Add a horizontal beam that supports the dormer front part, similar to Dormer_TopPlate_FB_0 but on the lower side.
+7. Shift Dormer_TopBrace elements in Y direction so they don't intersect with dormer rafters.
+8. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Let's continue with refinements to the construction and the code:
+
+1. Reintroduce large roof rafters whose length is trimmed below the dormer window (so they would consist of two parts, lower and upper). Rafters under the dormer should not be completely removed like now. 
+2. Add a horizontal double header element that supports one side of the dormer ridge and crosses multiple roof rafters.
+3. Extend dormer side studs so the go all the way down to large roof rafters.
+4. Dormer_TopBrace elements are shifted too much and are floating now. Shift them back until they connect with the dormer rafters on the side.
+5. Roof rafters that support the dormer should be doubled for strength, just place two of them side by side.
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Let's continue with refinements to the construction and the code:
+
+1. Trimmed roof beams are still not there. Please consult window_dormer_diagram_02.png to see where they have to be added (highlighted in magenta).
+2. Dormer_TopBrace are again intersecting with dormer rafters. Shift them by one profile thickness in -Y direction. Then, trim their length so they stay within the dormer roof volume.
+3. Remove Dormer_Stud_0 and Dormer_Stud_1, they overlap with side studs.
+4. Remove Dormer_TopPlate_FB_1 and Dormer_Gable_Stud_1, they cut too much into the interior space.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Please analyze the picture and register green and magenta markings I made.
+
+1. Magenta shows trimmed roof rafters that you should still add.
+2. Green shows how Dormer_TopBrace elements have to be trimmed in length.
+3. Remove Dormer_BackStud_0/1 elements, they are not necessary.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Let's continue with refinements to the construction and the code:
+
+1. Make Valley_Rafter_Right hit the middle of Dormer_DoubleHeader beam, it is now slightly off center. In a similar way, make Valley_Rafter_Left hit the middle of Dormer_DoubleHeader beam as well. This will change the angle of the dormer roof plane so make sure to adjust Dormer_Jack elements as well.
+2. Extend Trimmed_RafterUpper_2 to hit Valley_Rafter_Right. In a similar way, extend Trimmed_RafterUpper_0 to hit Valley_Rafter_Left.
+3. Dormer_TopBrace elements are still too long. Scale them by 0.45 in X direction so they don't stick out that much.
+4. Remove Dormer_Gable_Stud_0, dormer top braces enough to stiffen the roof.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. It looks like we are very close now, let's do few more adjustments:
+
+1. Trimmed_RafterUpper_2 and Trimmed_RafterUpper_0 are correctly extending to valley rafters, but they should also extend up on the large roof (beyond the Dormer_DoubleHeader beams).
+2. Slightly extend Dormer_Ridge in the Y direction so it sticks out of the roof - no more than two profile thicknesses.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Leave Trimmed_RafterUpper_2 and Trimmed_RafterUpper_0 as they are now, but add a second pair of rafters that go from the valley rafters to dormer double header beam (we had these to in the previous script). Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

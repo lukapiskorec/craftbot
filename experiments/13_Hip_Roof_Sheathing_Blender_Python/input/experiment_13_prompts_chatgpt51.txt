@@ -1,0 +1,87 @@
+
+
+
+ORIGINAL PROMPT
+
+
+
+Here are the screenshots of the Blender model generated for your reference. The roof timber frame seems to be complete, let's now focus on the roof sheathing:
+
+1. Analyze wood_board_roof_sheating.png and study how wood-board roof sheathing (closed method) could be applied to our roof and dormer windows.
+2. Implement the wood-board roof sheathing (closed method) into the Blender Python code. Create a separate collection for timber framing and sheathing boards so we can easily toggle them on/off. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Add how wood-board roof sheathing (closed method) on other parts of the large roof (east and west hip) and on the south roof wing as well (three surfaces).
+2. Correct the sheathing on the dormer windows, it looks like the planes are 90 degrees rotated and boards too spaced out. Consult the experiment_11_chatgpt51_v18.py to see how the dormers are constructed.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+________________________________
+________________________________
+________________________________
+
+
+
+RESTARTED CHAT
+
+
+Here is a PDF that describes construction principles for a Canadian wood-frame house, specifically chapters on roof construction and sheathing. I want you to do the following:
+
+1. Please read the manual I gave you and familiarize yourself with the principles of constructing a timber frame roof.
+2. Study experiment_11_chatgpt51_v18.py and craftbot_lib.py code and explain how they approach generating a timber frame hip roof using Python in Blender.
+3. Devise a similar approach to generate wood-board roof sheathing (closed method) for that same roof. Make sure to cover all hip roof surfaces and the dormer windows.
+4. Translate this construction process into a Python code that can generate the roof sheathing in Blender. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Add quads for the east/west hip triangles and the T-wing so every roof surface is sheathed.
+2. Split the north side sheathing into multiple parts so as to create a gap where the dormer windows are. The gaps are delineated by dormer front support beams, dormer support rafters and dormer valley rafters.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated and the full Python code for your reference. Let's do the following:
+
+1. Add sheathing for the east/west hip triangles and the T-wing so every roof surface is covered.
+2. Cover triangle-shaped parts of the roof above the dormer windows.
+3. Trim sheathing covering dormer windows so it doesn't intersect with the large roof - now the sheathing is entering the interior of the house.
+4. Sheathing slats on the large roof overlap, they need to be scaled down in width. Sheathing on the dormer windows has the correct width.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference (attached to this prompt). Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+

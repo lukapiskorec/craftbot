@@ -1,0 +1,41 @@
+
+
+ORIGINAL PROMPT
+
+
+
+You are a computational designer. I want you to do the following:
+
+1. Using the provided diagram as a reference, describe a way to construct a double-flight staircase for 10 floors with a landing using scaled box geometries.
+
+2. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Analyze them and determine geometric mistakes. Then, let's do the following:
+
+1. One stair flight (F2) needs an offset in -Y to start at the beginning of the landing. It also needs to be shifted one step down relative to the landing.
+2. Trim the floor plates so they don't occupy the space where the staircase passes but keep them on the side opposite to landing.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender mode generated for your reference. Almost perfect, let's do few minor adjustments:
+
+1. Remove steps F1_09 and F2_00 and bring the landing closer to connect with other steps.
+2. There is a slight gap (Y direction) between the stairs and floor board, please close it.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+

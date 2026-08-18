@@ -1,0 +1,298 @@
+ORIGINAL PROMPT
+
+
+Here is a PDF of a construction manual for a prefabricated timber house. I want you to do the following:
+
+1. Please read the manual I gave you and familiarize yourself with the principles of constructing a timber frame house.
+
+2. Describe step-by-step a way to construct simple one-story a living unit using timber frame construction. Think about the load bearing timber frame as well as the cladding made out of plywood boards. Disregard the furniture inside the unit.
+
+3. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Let's update the craftbot_lib.py (new file attached) and use a more powerful version of place_element() function for all future generations. Read the file and familiarize yourself with the function before we proceed.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are Blender screenshots with the output of your script. I want you to do the following: 
+
+1. Identify element overlaps and introduce offsets and dimension adjustments to avoid them.
+2. Where possible, extend the length of load-bearing beams to beyond the center points of adjoining elements - this will increase stability and enable easier joining.
+3. Leave the overall layout the same (the box), focus on articulating construction for now.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference (I updated the new place_element() function in craftbot_lib.py already). Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Already better, let's continue with adding improvements. I want you to do the following: 
+
+1. Ply_E_ext and Ply_N_ext seem to have a wrong offset, thye should be further out (see attached Blender output views).
+2. All Joist elements should extend beyond the center axis of the beam below to improve stability.
+3. Bottom beams intersect with each other - one directions should have a priority and the length of other two should be shortened.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Great, let's continue with adding improvements to the current elements before adding anything new. I want you to do the following:
+
+1. Bearer_Sount and Bearer_North seem to need an additional offset in Y direction to align them to the centers of posts below studs above - please consult the Blender screenshots I've attached.
+2. All joist elements would also need to be extended to match those bearer beam offsets.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Ok, this seemed to fix all the geometry issues with the structure. Now let's continue with the other elements:
+
+1. Confirm that you can still access the PDF manual I gave you. 
+2. In the PDF manual, find relevant info on how to integrate doors and windows into the walls. Then, describe step-by-step a process of integrating openings into this type of timber structure.
+3. Translate this process into Blender Python code that can generate one window on each side of the building and a single door on one side. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Good try with the openings, I think this approach is good. But, I see a lot of the other structure is changed in relation to what we had before. Let's proceed like this:
+
+1. Let's go back to the previous code as the starting point - attached as experiment_04_chatgpt51_v04.py
+2. Integrate openings into that code the same way, by trimming studs and adding window head / sill and door lintel.
+3. Trim plywood walls so they fit the openings. You can do this by splitting the sheet vertically and assembling the wall from more parts - this is a standard construction practice.
+4. Implement these improvements into the Blender Python code. Use experiment_04_chatgpt51_v04.py as a starting reference. Write out the entire code in copy-paste ready form.
+
+I am attaching Blender output views from both versions v04 and v05 as a reference.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Good progress, but there are many geometric glitches that we need to fix. Have a look at the Blender output views I attached. Let's do the following:
+
+1. Stud_S_9 and Stud_N_9 are now split in two but they should continue for the full length to complete their respective window frames.
+2. Window_Sill_E(W) and Window_Head_E(W) are completely in the wrong location (see images) and should be offset to the correct places on the walls.
+3. Create beams for the flat room / ceiling by copying the layout of joist beams in the floor.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Very good, but we have to fix few things. Have a look at the Blender output views I attached. Let's do the following:
+
+1. Studs that hit window head and sill elements and door lintel, are intersecting with them. Make them shorter so there are no collisions.
+2. Roof beams should be extended beyond the central axis of Top_N and Top_S beams that are underneath. We used the same principle for the joist beams in the floor.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Great, I think we can leave this part as it is. Now, let's try to construct a roof. I want you to do the following.
+
+1. Confirm that you can still access the PDF manual I gave you. 
+2. In the PDF manual, find relevant info on how to construct a slanted roof and describe the process of construction in a step-by-step fashion.
+3. Translate this process into Blender Python code. Use the already generated code as a starting point and integrate roof generation. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Good start with the roof. Let's expand by doing the following:
+
+1. Compare the Blender output images (dark background) with the roof structure diagram from the manual (white background). Detect geometric and structural discrepancies.
+2. Articulate the roof structure further according to the manual reference (white background). Describe the construction process step-by-step. Consult the PDF manual if needed.
+3. Move Roof_Slope_S and Roof_Slope_N to the top of the rafter beams - they are currently aligned with their center axes.
+4. Translate this process into Blender Python code. Use the already generated code as a starting point and integrate roof generation. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+It seems the geometry of the roof truss is still incorrect. I am attaching both the Blender output with the isolated roof structure clearly visible, and the reference diagram from the manual (white background with relevant geometry in magenta). Translate this geometry into Blender Python code. Use the already generated code as a starting point. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Excellent implementation of the King Post truss (see attached Blender output screenshots). Can you now try to implement a version of the roof with the Fink truss? Keep the King Post truss version as well and make it available over variable selection - perhaps a simple string that chooses the roof truss type? Also, move Roof_Slope_S and Roof_Slope_N to the top of the rafter beams - they are currently still intersecting with the rafter beams.
+
+Translate this geometry into Blender Python code. Use the already generated code as a starting point - make only the necessary changes and leave everything else the same. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+
+It looks like the code does not construct the correct Fink truss yet. Have a look at the Blender output screenshots (dark background image with truss parts highlighted in orange) and compare with a reference (white background image). Determine geometric differences between the two and describe what adjustments need to be made. Translate this process into Blender Python code. Use the already generated code as a starting point - make only the necessary changes and leave everything else the same. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Again, Fink truss structure is not correct. Please consult the Blender output from the code (dark background, new truss elements in magenta), with the reference image (white background, elements to be added marked in magenta). It seems we have more elements than necessary, we only need four new elements to complete the Fink truss. Here are the descriptions of new elements that we need:
+
+- Fink element 1 - beam from the midpoint of Rafter_S to 1st third of RoofBeam
+- Fink element 2 - beam from the 1st third of RoofBeam to roof ridge point
+- Fink element 3 - beam from the midpoint of Rafter_N to 2nd third of RoofBeam
+- Fink element 4 - beam from the 2nd third of RoofBeam to roof ridge point
+
+Translate this geometry into Blender Python code. Use the already generated code as a starting point - make only the necessary changes and leave everything else the same. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+This is great, Fink truss is finally correct. Can you look through the latest version of the code we generated and see if you can refactor it and make it more efficient / shorter? Maybe there are functions that are not needed anymore, or some functionality can be merged etc. But make sure the output is exactly the same, focus only on refactoring. Leave comments inside and add more if needed, we want to make the code very readable and easy to maintain.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+I want you to write out a prompt that, when given to an AI in a brand-new chat, would generate the entire code from above.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+This is not exactly what I had in mind. I want you to write out a prompt that, when given to an AI in a brand-new chat, would generate the entire Python code from above. Important condition: you are not allowed to use any Python code (except names and parameters of a function) in your constructed prompt. Describe everything in a natural language or pseudo-code.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
