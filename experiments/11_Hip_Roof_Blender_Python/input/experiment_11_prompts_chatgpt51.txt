@@ -1,0 +1,250 @@
+ORIGINAL PROMPT
+
+
+Here is a PDF that describes construction principles for a Canadian wood-frame house, specifically chapters on roof construction and sheathing. I want you to do the following:
+
+1. Please read the manual I gave you and familiarize yourself with the principles of constructing a timber frame roof.
+
+2. Describe step-by-step a way to construct a hip roof using timber frame construction.
+
+3. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. I want you to do the following:
+
+1. Make the roof longer in the X direction. This will give us space to add other elements to it later.
+2. Add jack rafters to all sides of the building.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Good progress. Here are the screenshots of the Blender model generated for your reference. I want you to do the following:
+
+1. Add the "king rafter" on each side of the roof - connecting ridge with the plate board.
+2. Add ceiling joists across the building.
+3. Increase the steepness / height of the roof.
+4. Add another roof wing connecting to this one forming a T roof structure on the south side.
+5. Add a dormer window on the north side of the roof. Use the image in the PDF manual on page 11 as a reference.
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Analyze them and determine geometric mistakes. Then, let's do the following:
+
+1. The south T-wing is rotated 90 degrees from how it should be. Rotate it correctly and connect it to the existing roof. Make sure to model valley rafters and valley jack rafters correctly at the intersection of two roof wings.
+2. Remove current ceiling joists and add those that span the shorter side of the roof (Y direction).
+3. Dormer window on the north side is completely wrong. Please consult the window_dormer_diagram.png, study the listed terms and make a plan on how to construct it before you proceed with the code.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Then, let's do the following:
+
+1. Analyze the pictures and determine geometric mistakes in the dormer window. For example, dormer ridge seems to be turned 90 degrees wrong in relation to the north roof.
+2. Devise a strategy to correct the dormer window and construct it according to the reference diagram from the PDF document (attached to this prompt).
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Dormer window is still wrong, let's focus on getting that right. I attached a photo of a dormer window from outside that we can use as a reference, your generated model looks nothing like that. Analyze the pictures and determine geometric mistakes in the dormer window from your code, then implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Dormer window is still wrong, let's focus on getting that right:
+
+1. Rotate Dormer_Ridge, Dormer_Plate_Front and Dormer_Plate_Back elements 90 degrees around the Z axis, then adjust dormer rafters and other elements accordingly.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+ 
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Let's focus on getting the dormer window right:
+
+1. Dormer_Ridge, Dormer_Plate_Front and Dormer_Plate_Back are now all at the same height. Make Dormer_Ridge higher so to create a sloped roof of the dormer window.
+2. Add vertical side studs between the roof rafter and dormer plate elements.
+3. Currently, Dormer_Valley_Jack and Dormer_Valley elements are in a wrong place. They should be connecting dormer plates with the dormer ridge and the ridge board of the large roof. Check and correct element connectivity.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Let's focus on getting the dormer window right. The file experiment_12_chatgpt51_v10.py contains the correct Blender Python code to generate a dormer window. Go through it and use it to generate the correct dormer window geometry in our code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+ 
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. It looks like we made some progress on the dormer window by integrating the code from the other file, but we need to do more adjustments. Let's do the following.
+
+1. New dormer window is too big for the current roof. Make the large roof larger in size (about 1.5x scale factor) so the dormer window fits. Make sure to trim the roof rafters under the dormer (see diagram).
+2. Extend Wing_Ridge in +Y direction until it connects with the Ridge_Board.
+3. Add jack rafters on the roof wing - between Wing_Ridge and Valley_W and Valley_E respectively.
+4. Remove elements Rafter_S_01 to Rafter_S_09, they seem to not be needed anymore as we already have trimmed rafters that replace them.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Make sure the rafters on the north side of the large roof match the spacing from the rafters on the south side. Scale the dormer window if needed.
+2. Align the dormer window with the roof rafters underneath. Make dormer side studs land on the roof rafters below.
+3. Roof rafters that sit between the two rafters supporting the dormer should be trimmed in the middle of their length so they form a gap beneath the dormer. Upper side should run from the roof ridge to the dormer valley rafters. The lower side should run from the Plate_Long_N to the double header beam below the window - add that one in as well, it should mirror the Dormer_DoubleHeader element but be below the dormer window.
+4. Extend Wing_Ridge in +Y direction until it hits the point where Valley_W and Valley_E cross.
+5. Add one more valley jack rafter between Valley_Jack_W_01 and Valley_Jack_E_01 that extends from the roof ridge to the Wing_Ridge (which will now be extended to that point on the roof).
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. In this version of the code the spacing of the dormer rafters suddenly changed, it seems it got more spaced out and uneven. Switch it back to what we had before, a more even and slightly denser arrangement.
+2. Remove Dormer_LowerHeader_A and Dormer_LowerHeader_B, and extend Dormer_TrimmedBottom_0 and Dormer_TrimmedBottom_1 to the Dormer_FrontSupportBeam.
+3. Add ceiling joist elements on the roof wing running in west-east direction.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Clean up the dormer window framing - remove Dormer_TopPlate_FB_0, Dormer_Window_Header, Dormer_Window_Jamb_0/1,Dormer_Window_Sill.
+2. Add top braces to Dormer_Valley_Jack elements (similar as we did with Dormer_Rafter elements).
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Create two more dormer windows, one on either side of the current one on the north roof side. Make sure to have an even spacing of rafters throughout.
+2. Roof rafters that directly support the dormer window (studs come on top of them) should be doubled. Just place another rafter right next to it.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Space the three dormer windows slightly apart with two roof rafters in between.
+2. New dormer valley top braces should be shifted in the -Y direction for one profile thickness to avoid overlap. Also, scale their lengths down approx. 0.6x, this will make them match closer the other top braces.
+3. Don't forget to add Dormer_TrimmedTop elements above each dormer window like we had before.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Dormer windows are now correctly spaced, but the roof rafter in between are missing. Add one rafter in between the dormer windows.
+2. We are missing some Dormer_TrimmedTop and Dormer_TrimmedBottom elements - D2_Dormer_TrimmedTop_0, D2_Dormer_TrimmedBottom_0, D0_Dormer_TrimmedTop_1 and D0_Dormer_TrimmedBottom_1 are all missing, please add them in.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Turn the roof wing into a hip roof. Add the roof inclination on the south side, hip rafters and jack rafters etc.
+2. Fix the alignment of jack rafters on both sides of Hip_NW and Hip_SW. The alignment is perfect on the east side of the roof so you can use that as a reference. It seems the jack rafters on the north and south side of the large hip roof need to be shifted, and the jack rafters on the west hip roof stay the same.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. You forgot to add jack rafters on the south hip roof, please add them in.
+2. Replace double header elements on all dormer windows with a single beam that resembles the front support beam (single beam, taller profile).
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,114 @@
+
+ORIGINAL PROMPT
+
+
+Have a look at the two images I gave you. They show a 3D model for a timber frame structure. I want you to do the following:
+
+1. Analyze the geometry of the timber frame structure you see from two images given.
+
+2. Describe step-by-step a way to construct such a structure. Focus on assembly sequence and dimensions of elements.
+
+3. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are Blender screenshots with the output of your script. I want you to do the following: 
+
+1. Analyze the output screenshots and detect possible geometric and construction improvements. Cross-reference with the original input images for the timber structure. 
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are Blender screenshots with the output of your script. I want you to do the following: 
+
+1. Analyze the output screenshots and detect possible geometric and construction improvements. Cross-reference with the original input image for the timber structure (I attached the relevant view again to this prompt).
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+It looks like we are not there yet. Here are Blender screenshots with the output of your script. I want you to do the following: 
+
+1. Analyze the output screenshots and detect possible geometric and construction improvements. Cross-reference with the original input image for the timber structure. I attached the relevant views with areas to improve marked in magenta.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Almost there. Here are Blender screenshots with the output of your script. I want you to do the following: 
+
+1. Analyze the output screenshots and detect possible geometric and construction improvements. Cross-reference with the original input image for the timber structure. I attached the relevant views with areas to improve marked in magenta.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+This version has exactly the same problem as the previous one. Please iterate one more time and correct the code.
+
+
+
+____________________________
+
+
+
+It seems we still don't have the correct geometry for the horizontal beam. Now it's just gone, and it should be split in two parts, with the middle section free. Please look at the markings in magenta I made on experiment_02_chatgpt51_v07_blender_view_2_marked.png image. This is what should be added to the structure. Implement these improvements into the Blender Python code and use the already generated code as a reference.
+
+
+
+
+____________________________
+
+
+
+Great, this worked! Now one last thing, let's make sure we repeat the same section four times through the whole structure, not just at the beginning and the end like now. I am attaching the screenshots from the current generation. Please update the code so the sections are repeated also in the middle of the structure.
+
+
+
+____________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

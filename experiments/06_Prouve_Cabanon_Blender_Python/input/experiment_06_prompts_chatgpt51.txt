@@ -1,0 +1,21 @@
+ORIGINAL PROMPT
+
+
+Have a look at the images I gave you. They show a prefabricated living unit with one floor. I want you to do the following:
+
+1. Analyze the architectural layout and structure of this living unit based on given photographs and diagrams.
+
+2. Describe step-by-step a way to construct such a living unit using timber frame construction. Think about the load bearing timber frame as well as the cladding made out of wooden slats.
+
+3. Study the Python code in experiment_04_chatgpt51_v14.py I gave you.The code generates a simple living unit with a timber frame structure and plywood panels in Blender. We can use the code as a reference for the next step. 
+
+4. Translate the construction process from step 2. into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+

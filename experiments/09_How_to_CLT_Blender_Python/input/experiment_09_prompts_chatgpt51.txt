@@ -1,0 +1,225 @@
+ORIGINAL PROMPT
+
+
+Here is a PDF that describes how to build with CLT technology. I want you to do the following:
+
+1. Please read the manual I gave you and familiarize yourself with the principles of constructing a building made with CLT.
+
+2. Describe step-by-step a way to construct a multi-story residential high rise with an elevator/staircase vertical core and a multi-story gable roof. Disregard the furniture inside the building.
+
+3. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Good start. Here are the screenshots of the Blender model generated for your reference. I want you to do the following:
+
+1. Create collections for different elements of the building - north/south walls, east/west walls, interior walls, core, roof...
+2. Add openings to apartments in the building at each floor. Don't align the openings on the facade but make them slightly change position randomly. Use seeded randomness for this so we maintain repeatability.
+3. Add openings to the elevator core.
+4. Add a staircase to the building. Make sure it doesn't intersect with the elevator core and that it reaches all apartments in the building.
+5. Make sure slabs and walls don't intersect. Decide which one should have the priority based on the rules from the PDF.
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Let's focus on floor and core layout and do the following:
+
+1. Improve the staircase so it's double flight and actually works inside the core.
+2. Improve the apartments floorplan - add two slabs in the middle around the core, add extra walls so there is a clear distinction between the access to the core and a closed apartment. Add openings/doors in the interior walls and make sure all rooms are accessible.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Let's focus on floor and core layout and do the following:
+
+1. Continue improving the floorplan layout. Add the missing slabs and extend the existing ones around the core to make them flush with the rest of the floor. Add additional interior walls to separate two apartments from the space that serves as access to the core. Add door openings in all interior walls.
+2. Improve the staircase and make it double-flight with a separate slab for landing.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's focus just on the stairs this time and do the following:
+
+1. Consult image "experiment_09_chatgpt51_v04_blender_view_02.png", this is the Blender output with the staircase shown. Staircase design is completely wrong. Deduce where your geometric reasoning went wrong.
+2. "Screenshot 2026-01-08 235111.png" shows a correct diagram of a double-flight staircase with a landing. Analyze its geometry and determine how to describe it using place_element() function. Use it to generate the correct staircase geometry on every floor of the building.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Analyze them and determine geometric mistakes in the staircase. Then, let's do the following:
+
+1. Look at the experiment_10_chatgpt51_v03.py file I gave you. It includes the code for generating a double-flight staircase with a landing. It uses our Blender Python workflow. Determine how this code could be integrated into our current building code to generate the staircase correctly.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Analyze them and determine geometric mistakes in the staircase. Then, let's do the following:
+
+1. Reposition the staircase to the edge of the core (+X direction) and add a floor slab in the middle that has access both to the staircase and the elevators. There should actually be two landings, one "in the air" and the other that will connect the staircase to the floor slab in the middle of the core.
+2. Double up the elevator shaft so it fills that side of the core.
+3. Add another door to the opposite side of the core, so we have one on each side of the middle floor slab.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. We still need to focus on the staircase and the core layout. Let's do few minor adjustments:
+
+1. Change the layout of the elevator, the middle slab and the staircase according to the diagram on experiment_09_chatgpt51_v07_blender_view_03.png - elevator should be placed on the wall in -X direction to leave more space for the middle slab, and the staircase needs another landing on the floor level.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. We still need to focus on the staircase and the core layout. Let's do the following adjustments:
+
+1. Place another elevator shaft in the north-west corner of the core.
+2. Landing_Floor element is intersecting with the staircase. It looks like the staircase needs more room. Expand the core in the north-south direction to have more room for the staircase.
+3. Align the doors of the core with the central slab (expand and shift).
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+Here are the screenshots of the Blender model generated for your reference. Analyze them and determine geometric mistakes. Then, let's do the following:
+
+1. Shift the staircase to the north wall of the core. This will give you enough space to then shift the Landing_Floor element in -Y direction so it's aligned with the south wall of the core. Dimension stair elements correctly in the plan and leave no gaps.
+2. Add random windows on the west and east outer walls as well (same principle as on the north and south walls).
+3. Add at least two more interior walls that run north-south and delineate the apartments on each floor.
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Staircase is now almost perfect. The last thing you should do is to enlarge/deepen both case landings so the staircase fits snuggly into the core. Currently there is still some unused space on the north side.
+2. Change all interior walls according to the experiment_09_chatgpt51_v10_blender_view_07.png diagram. Remove the old ones and add ones in magenta on the diagram. I indicated where the doors should be.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Staircase is now perfect, let's leave it as it is and do the following adjustments on the interior walls:
+
+1. Interior walls you added are wrong and not following the diagram. Please analyze the new diagram shown on experiment_09_chatgpt51_v11_blender_view_03.png I attached. Walls running east-west through the middle have no openings. Walls running north-south attach to the core and have two sets of openings, each for one apartment.
+2. Make windows on the outer east and west walls smaller. Also make sure no window is in the middle of the wall as that's where the interior wall is attaching.
+3. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Interior walls now place correctly, great job. One final adjustment - wall segments running north-south need to be shifted for one wall thickness towards the middle of the building to align with core's east and west walls.
+2. Ground floor (the very lowest one above the podium) seems to be missing a staircase, please add it.
+3. Cut the elevator shafts into segments for each floor, make them as four walls rather than a single volume, and add a door opening for each floor.
+4. We are missing a top staircase landing on the very top floor - it will be in the level of the very last slabs.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are the screenshots of the Blender model generated for your reference. Let's do the following:
+
+1. Elevator shaft openings should be facing east. Make the opening more like a door narrower than the width of the shaft.
+2. Add a small floor slab between two elevator shafts so there is no hole there.
+3. At the very top floor you added Landing_Floor at the wrong place. Currently it's a copied and vertically translated version of Landing_Mid below, while in fact it should be a copied and vertically translated version of Landing_Floor below.
+4. Randomize the positions of the windows on the east and west walls as well, but only slightly. Make sure they don't cross the middle where the interior wall is.
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Excellent, it seems we are done here. Here are the screenshots of the Blender model generated for your reference. Finally, check the entire code and see if there are any redundancies. Perform cleanup and refactoring if necessary but leave all the functionality the same. Leave the comments in. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

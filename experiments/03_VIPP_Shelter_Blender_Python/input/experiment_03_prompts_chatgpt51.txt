@@ -1,0 +1,131 @@
+
+ORIGINAL PROMPT
+
+
+Have a look at the images I gave you. They show a prefabricated living unit with two floors. I want you to do the following:
+
+1. Analyze the architectural layout of this living unit. Cross-reference photos of the exterior and interior with the plan drawings.
+
+2. Describe step-by-step a way to construct such a living unit using timber frame construction. Think about the load bearing timber frame as well as the cladding made out of plywood boards. Disregard the furniture inside the unit.
+
+3. Translate this construction process into a Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry - element_placement_template.py is just an example script that shows how this could be done.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are Blender screenshots with the output of your script (images with gray background). I want you to do the following: 
+
+1. Develop the timber frame structure for all the house parts further (walls, ceilings, roof with skylight etc.) Use the attached diagrams (images with white background) to get an idea on how to do this - use balloon frame method as the starting point.
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Here are Blender screenshots with the output of your script (I turned off some exterior shell elements so it's easier to see the inner timber structure). I want you to do the following: 
+
+1. Analyze the output screenshots and detect possible geometric and construction improvements. Cross-reference with the original input images for the living unit and make sure to include all elements - large window openings, two skylights with their volumes sticking from the roof (one housing a platform for sleeping, the other one free).
+2. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Not bad, but the skylights are completely off. Here are Blender screenshots with the output of your script (I turned off some exterior shell elements so it's easier to see the inner timber structure). I want you to do the following: 
+
+1. Analyze the output screenshots and cross-reference with the skylight volumes in the original input images for the living unit (attached as the last image). Describe step-by-step how such skylight volumes could be constructed using a balloon frame method.
+2. Implement these skylight improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Please consult the floorplan for the upper floor of the unit where the skylights are (attached drawing) and dimension them properly. I am also attaching Blender screenshots with the output of your script (dark background images) for reference, with various wall panels and slabs turned off for better visibility. Implement these skylight improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Ok now we made some progress. Let's add the interior walls for the bathroom and a wall volume for storage + kitchen elements (see attached plan drawing, with needed changes marked in magenta). I am also attaching Blender screenshots with the output of your script (dark background images) for reference, with various wall panels and slabs turned off for better visibility. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+
+Let's go back to the skylights. It seems your sizing is off by a lot; here are the correct parameters:
+
+- there are two skylights equal in size (currently they are different sizes)
+- each skylight is slightly less than half the width and depth of the house ground floor (currently they are about a third of the width and depth, so too small)
+- they should be placed symmetrically on top of the house (currently they have some random offsets)
+- height of the skylights is more than half the height of ground floor (currently they are lower than this and also have different heights) and their heights should be the same
+
+Additionally, let's also add:
+
+- defined timber frame corners on the ground level as well as in the skylights (currently we have no timber frame elements in the corners, just the shell boards meeting)
+
+I am attaching Blender screenshots with the output of your current script as a reference. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Let's do some final adjustments still:
+
+- skylights should be aligned to one side of the building (side that is in positive Y direction) rather than in the middle like now
+- skylights should have an open top side and closed four sides with panels, the opposite of what is now
+- there is an element called Loft_Deck with supporting beams that is not needed, please remove it
+
+I am attaching Blender screenshots with the output of your current script as a reference. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

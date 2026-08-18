@@ -1,0 +1,207 @@
+ORIGINAL PROMPT
+
+
+You are a computational designer and deconstructivist architect inspired by Frank Gehry. I want you to do the following:
+
+1. Study the Python code in experiment_04_chatgpt51_v14.py I gave you. The code generates a simple living unit with a timber frame structure and plywood panels in Blender (Blender output screenshot attached). We can use the code as a reference for the next step.
+
+2. Imagine how such a simple house "box" can be "deconstructed" using principles of deconstructionism pioneered by Frank Gehry. Modify the design of the living unit so it includes ruled surfaces, fractured openings and a more dynamic space layout. Use attached photographs from Gehry residence as your inspiration.
+
+3. Translate this geometry into Python code that can generate the same structure in Blender. Use two Python files I gave you as a reference. Use the place_element() function from craftbot_lib.py to build the geometry. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+I am attaching Blender output screenshots of the code for your reference. Let's do the following:
+
+1. Instead of just adding deconstructed elements, let's CHANGE the existing house structure. Think of how to change all four walls of the house and the roof to align with deconstructivist design philosophy. 
+
+2. Let's not build the "simple" house from the module at all. I commented out the build_house() function inside experiment_04_chatgpt51_v14.py, and I renamed the file to experiment_04_chatgpt51_v14_lib.py so it's clearer we will be importing it as a module. You can import it like before with "import experiment_04_chatgpt51_v14_lib as base" 
+
+3. Gehry's architecture features ruled surfaces. Investigate how ruled surfaces are used in architecture and apply those geometric and constructive principles to modify the walls and the roof of the house.
+
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+This is a great start, I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further:
+
+1. Roof as a hyperbolic-paraboloid works great, let's leave it like that but increase the curvature even more.
+
+2. Increase the curvature of the walls - make them go further in and out in relation to the house.
+
+3. For now, let's not introduce any openings, so leave all studs in place.
+
+4. Studs from two walls meeting in the corners should be matched in size and rotation. This will make the walls fit better together.
+
+5. Leave the "curved" top of the walls as is, we can improve on that geometry later. 
+
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+Let's continue modifying the structure further:
+
+1. Corner studs still don't work that well (they are not aligned). I think the best way to align corners studs from two walls is to keep them vertical and square in profile. Make sure the same corner studs are "shared" by the two adjoining walls.
+
+2. Studs on the west and east wall should be rotated round their length axis 90 degrees so they match the orientation the studs on north and south wall have.
+
+3. In the corners where the hyperbolic-paraboloid roof comes down, corner studs should be lower, and where it comes up, they should be higher. This will prevent the overlap.
+
+4. Let's create tessellation plates that close the gap between the walls and the roof. These plates should connect chord elements (top of the wall) to the roof beam that is on the edge. Make them in segments.
+
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+
+I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further:
+
+
+1. Still issues with the corner studs - the walls don't meet well there and there are gaps. Make sure that the "wave" of the wall always starts and ends with a vertical member matching the length of the corresponding corner stud.
+
+2. Tessellation elements on west and east wall (Tess_E and Tess_W) should be rotated 90 degrees around their axes. Additionally, all tessellation elements should be narrower to match the width of the studs below.
+
+3. Create plywood plate covers for the facade. Use similar approach like in experiment_04_chatgpt51_v14_lib.py, but split the plates vertically so they are really narrow, like boards. This will make them easier to cover the walls that are ruled surfaces. Make sure to cover the lower part of the wall (where the studs are) as well as the upper part (where the Tess elements are).
+
+4. In a similar fashion to step 3. create a tessellated cover for the roof.
+
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+
+Good progress. I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further:
+
+1. Wall cladding elements are in the correct place but need to be rotated 90 degrees around their stud axis.
+
+2. Bring back short stud elements between the walls and the roof. They should be there together with the cladding elements.
+
+3. On the south wall we have some studs hitting into the roof - make that "wave" a bit lower.
+
+4. To increase variety, make the stud wave of the west wall lean outwards rather than inwards.
+
+5. Overall, increase the amplitude of the wall waves so they lean more outwards / inwards.
+
+6. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further:
+
+1. Turn Clad elements from a single large plate into a series of narrow slats. They should span the distance between two studs and be arranged vertically similar to a ladder or the way you would use shingles on a facade. For this you will have to calculate a series of division points along the axis of every stud and then connect these points with slats.
+
+2. To help organize the file, let's group timber structure and cladding slats into separate layers / collections so we can easily turn then on and off in Blender.
+
+3. base.PLY_THICK does not exist in the module, we have to use base.PLY_THICK_EXT
+
+4. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+____________________________
+
+
+FOLLOW UP IN THE SAME CONTEXT / CHAT
+
+
+I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further:
+
+1. Make the height of cladding slats variable - apparent vertical height is calculated as the length of the stud divided by the slat count. This will close all the gaps between slats.
+
+2. For the part between the wall and the roof, we can just close it with a single panel between the studs, no need for more subdivision. Currently these Tess elements are too narrow, the width is the width of the stud for some reason. If the width is increased it will close the area between the studs and resemble a glass panel. Also, these should be in the Cladding collection.
+
+3. Increase the width of the cladding elements on the roof so they cover it better.
+
+4. Let's introduce back the openings. Have a look at the experiment_04_chatgpt51_v14_lib.py (attached) to see how the doors and windows are done there. Replicate the same strategy for this house, but adapt to the ruled wall typology.
+
+5. Implement these improvements into the Blender Python code. Use the already generated code as a reference. Write out the entire code in copy-paste ready form.
+
+
+
+
+------------------------------
+
+
+
+Ok, let's try again with a new prompt. I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further: 
+
+1. Make the height of cladding slats variable - apparent vertical height is calculated as the length of the stud divided by the slat count. This will close all the gaps between slats.
+
+2. For the part between the wall and the roof, we can just close it with a single panel between the studs, no need for more subdivision. Currently these Tess elements are too narrow, the width is the width of the stud for some reason. If the width is increased it will close the area between the studs and resemble a glass panel. Also, these should be in the Cladding collection.
+
+3. Increase the width of the cladding elements on the roof so they cover it better.
+
+4. Let's introduce back the openings adapted to the ruled wall typology. Every door and window will have a lintel beam above, and windows will also have a sill below. 
+
+5. Implement these improvements into the Blender Python code. Use the already generated code above as a reference (V07). Write out the entire code in copy-paste ready form.
+
+
+
+
+------------------------------
+
+
+
+Ok, let's try again with a new prompt. I am attaching Blender output screenshots of the code for your reference. Let's continue modifying the structure further: 
+
+1. Make the height of cladding slats variable - apparent vertical height is calculated as the length of the stud divided by the slat count. This will close all the gaps between slats.
+
+2. For the part between the wall and the roof, we can just close it with a single panel between the studs, no need for more subdivision. Currently these Tess elements are too narrow, the width is the width of the stud for some reason. If the width is increased it will close the area between the studs and resemble a glass panel. Also, these should be in the Cladding collection.
+
+3. Increase the width of the cladding elements on the roof so they cover it better.
+
+4. Implement these improvements into the Blender Python code. Use the already generated code above as a reference (V07). Write out the entire code in copy-paste ready form.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

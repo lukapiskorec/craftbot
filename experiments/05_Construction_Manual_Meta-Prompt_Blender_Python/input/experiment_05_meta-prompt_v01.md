@@ -1,0 +1,486 @@
+You are a Python and Blender expert.
+Your task is to write a single Python script for Blender that **exactly** follows the specification below.
+The script builds a small timber-frame house on posts, with floor joists, walls with door and window openings, interior/exterior plywood sheets trimmed around openings, and a gable roof with either a king-post or Fink truss.
+
+Important meta-rules:
+
+* Output **only one** Python code block containing the entire script.
+* Do not add explanations, comments outside the script, or any additional text.
+* Inside the script you should include extensive comments as described below.
+* Use the function `craftbot.place_element(...)` from a module named `craftbot_lib` (imported as `craftbot`) exactly as required.
+
+Below is the complete specification of the script structure and behaviour.
+Match the variable names, function names, and numerical values as closely as possible.
+
+---
+
+### 1. Imports and module header
+
+1. At the top, write a multi-line comment header describing:
+
+   * That this is “CRAFT BOT – EXPERIMENT 04 – CHATGPT 5.1 – V15 (refactored)”.
+   * That it builds a “TIMBER FRAME WITH DOOR & WINDOWS, TRIMMED PLYWOOD, GABLE ROOF”.
+   * That the roof can use “KING-POST or FINK TRUSS (select via ROOF_TRUSS_TYPE)”.
+   * A short note that this is a pure refactor of V14 and that geometry and element names are identical, only structure and comments changed.
+
+2. Then import, in this order:
+
+   * Blender Python API module (name: `bpy`).
+   * `importlib`.
+   * `math`.
+   * The module `craftbot_lib` under the alias `craftbot`.
+
+3. Immediately after importing `craftbot_lib`, reload it using `importlib.reload(...)` so the latest version is used in Blender.
+
+---
+
+### 2. Global constants
+
+Define a small numeric tolerance constant named `EPS` with value `1e-5`.
+
+Define all of the following global parameters (all in metres) with exactly these names and numeric values:
+
+* `HOUSE_LEN` = 7.32
+* `HOUSE_WID` = 5.40
+
+Platform and posts:
+
+* `PLATFORM_HEIGHT` = 0.70
+* `POST_SIZE` = 0.12   (square post 120 x 120)
+
+Bearers:
+
+* `BEARER_DEPTH` = 0.197  (vertical thickness)
+* `BEARER_WIDTH` = 0.06   (horizontal width, used as the beam width when running along X)
+
+Joists (floor and roof/ceiling joists share section):
+
+* `JOIST_DEPTH` = 0.145  (vertical)
+* `JOIST_WIDTH` = 0.047  (horizontal)
+* `JOIST_SPACING` = 0.61 (centre spacing)
+
+Floor boarding:
+
+* `FLOOR_THICK` = 0.022
+
+Wall frame:
+
+* `WALL_STUD_HEIGHT` = 2.745  (distance between plates)
+* `STUD_WIDTH` = 0.047        (minor dimension)
+* `STUD_DEPTH` = 0.097        (major dimension / wall thickness)
+* `STUD_SPACING` = 0.61
+
+Plates:
+
+* `BOTTOM_PLATE_DEPTH` = `STUD_DEPTH`
+* `BOTTOM_PLATE_THICK` = `STUD_WIDTH`
+* `TOP_PLATE_DEPTH` = `STUD_DEPTH`
+* `TOP_PLATE_THICK` = `STUD_WIDTH`
+
+Plywood:
+
+* `PLY_THICK_EXT` = 0.009
+* `PLY_THICK_INT` = 0.006
+
+Roof sheeting:
+
+* `ROOF_THICK` = 0.02
+
+Door and windows (rough opening sizes from finished floor level):
+
+* `DOOR_WIDTH`  = 0.84
+* `DOOR_HEIGHT` = 2.10
+* `WINDOW_WIDTH`  = 1.22
+* `WINDOW_HEIGHT` = 1.22
+* `WINDOW_SILL_HEIGHT` = 0.90
+
+Roof pitch:
+
+* `ROOF_PITCH_DEG` = 30.0
+
+Truss selection constant:
+
+* A string variable `ROOF_TRUSS_TYPE` set to `"king_post"` by default.
+* Leave a commented-out alternative assignment with the value `"fink"` to switch truss type manually.
+
+---
+
+### 3. Small helper functions
+
+Define these helper functions in the following conceptual order.
+
+All geometry is built by calling `craftbot.place_element(name=..., loc=(...), axis=(...), angle=..., scale=(...))`.
+Use axis vectors and angles exactly as described.
+
+1. `half(x)`
+
+   * Returns `0.5 * x`.
+
+2. `add_post(name, x, y, base_z, height, size=POST_SIZE)`
+
+   * Places a vertical square post.
+   * Use `craftbot.place_element` with:
+
+     * `loc` = `(x, y, base_z + half(height))`.
+     * `axis` = `(0.0, 0.0, 1.0)` and `angle` = `0.0`.
+     * `scale` = `(half(size), half(size), half(height))`.
+
+3. `add_beam_x(name, x0, x1, y, z, width, depth)`
+
+   * Places a horizontal rectangular beam running along X.
+   * Length is absolute difference of `x1 - x0`. If length is smaller than or equal to `EPS`, return without placing anything.
+   * Centre X is average of `x0` and `x1`.
+   * `loc` uses that centre X, the given Y, and Z.
+   * `axis` is vertical `(0,0,1)` with zero angle.
+   * `scale` is `(half(length), half(width), half(depth))`.
+
+4. `add_beam_y(name, x, y0, y1, z, width, depth)`
+
+   * Same as `add_beam_x` but running along Y.
+   * Length is absolute difference of `y1 - y0`.
+   * `loc` uses centre Y and the given X and Z.
+   * `scale` is `(half(width), half(length), half(depth))`.
+
+5. `add_slab(name, x0, x1, y0, y1, z, thick)`
+
+   * Used for flat horizontal floor slab.
+   * Compute X and Y lengths from the extents; if any is smaller than or equal to `EPS`, return.
+   * Place a box with centre at midpoint in X and Y and at Z, oriented flat (axis `(0,0,1)`, angle 0).
+   * `scale` is half length in each dimension.
+
+6. `add_stud_segment(name, x, y, z0, z1)`
+
+   * Places a vertical stud section between z0 and z1.
+   * If height `z1 - z0` is less than or equal to `EPS`, return.
+   * `loc` uses `(x, y, z0 + half(height))`.
+   * `scale` uses half of `STUD_DEPTH` in X and Y and half of segment height in Z.
+
+7. `add_plywood_wall_x(name, x0, x1, y, base_z, height, thickness)`
+
+   * Wall segment whose main length axis is X.
+   * If length or height is too small (≤ EPS) return.
+   * Place a vertically oriented box with:
+
+     * centre X as midpoint,
+     * Y offset by `+ half(thickness)` from the reference Y,
+     * Z at `base_z + half(height)`.
+   * Use thickness in Y, height in Z, and span in X for scales.
+
+8. `add_plywood_wall_y(name, x, y0, y1, base_z, height, thickness)`
+
+   * Similar to above but running along Y; the thickness offsets X.
+
+9. Interval utilities for trimming:
+
+   * `merge_intervals(intervals)` that:
+
+     * Takes a list of `[a, b]` pairs.
+     * Returns a list of merged intervals where overlapping ranges are combined.
+     * Sort by start, then merge when the next start is less than or equal to previous end plus `EPS`.
+
+   * `complement_intervals(z_min, z_max, open_intervals)` that:
+
+     * Treats `[z_min, z_max]` as the full solid range.
+     * `open_intervals` are z-intervals where material is removed (e.g., openings).
+     * Merge open intervals, then compute and return the list of remaining “solid” segments in ascending order, ignoring segments shorter than or equal to tolerance.
+
+---
+
+### 4. Platform construction
+
+Define `build_platform()` that:
+
+1. Defines footprint extents: `x0=0`, `x1=HOUSE_LEN`, `y0=0`, `y1=HOUSE_WID`.
+
+2. **Posts**
+
+   * Base Z is `0`.
+   * Height is `PLATFORM_HEIGHT`.
+   * Post positions: four corners plus one at the mid of each long side (centre of south and centre of north).
+   * Use `add_post` for each, names like `"Post_0"`, `"Post_1"`, etc.
+
+3. **Bearers**
+
+   * Z centre of bearers is `PLATFORM_HEIGHT + half(BEARER_DEPTH)`.
+   * Place two bearers along X: one at south side (Y = y0) and one at north side (Y = y1).
+   * Each bearer runs slightly beyond the posts along X: from `x0 - half(POST_SIZE)` to `x1 + half(POST_SIZE)`.
+   * Width is `BEARER_WIDTH`, depth is `BEARER_DEPTH`.
+   * Name them `"Bearer_South"` and `"Bearer_North"`.
+
+4. **Floor joists**
+
+   * Z centre of joists is `bearer_z + half(BEARER_DEPTH) + half(JOIST_DEPTH)`.
+   * Number of joists: integer part of `HOUSE_LEN / JOIST_SPACING` plus 1.
+   * Joists run along Y, positioned along X at multiples of spacing from x0, with last one clamped to x1.
+   * Joists extend slightly beyond bearer centres in Y: from `south_bearer_y - 0.5 * BEARER_WIDTH` to `north_bearer_y + 0.5 * BEARER_WIDTH`.
+   * Use `add_beam_y` with width = `JOIST_WIDTH` and depth = `JOIST_DEPTH`; name pattern `"Joist_{index}"`.
+
+5. **Floor deck**
+
+   * Floor top Z centre is joist centre plus half joist depth plus half floor thickness.
+   * Use `add_slab` to create a single floor slab from x0..x1 and y0..y1.
+   * Name `"Floor"`.
+
+6. Return the Z centre of the floor slab (not the top).
+
+---
+
+### 5. Walls, openings, and plywood
+
+Define `build_walls(floor_z)` that:
+
+1. Sets wall extents: west X = 0, east X = HOUSE_LEN, south Y = 0, north Y = HOUSE_WID.
+
+2. Compute finished floor top Z as `floor_z + half(FLOOR_THICK)`.
+
+3. Bottom plate:
+
+   * Centre Z = floor top + half `BOTTOM_PLATE_DEPTH`.
+   * Top of bottom plate Z = floor top + `BOTTOM_PLATE_DEPTH`.
+
+4. Stud base Z = top of bottom plate.
+   Stud height = `WALL_STUD_HEIGHT`.
+   Stud top Z = base + height.
+
+5. Top plate centre Z = stud top Z + half `TOP_PLATE_DEPTH`.
+   Total wall height is bottom plate depth + stud height + top plate depth.
+   Wall top Z = top plate centre Z + half `TOP_PLATE_DEPTH`.
+   Function should return that wall top Z at the end.
+
+6. **Plates along X** (`Bottom_S`, `Bottom_N`, `Top_S`, `Top_N`):
+
+   * They run from `x_w - half(STUD_DEPTH)` to `x_e + half(STUD_DEPTH)` at Y = south or north.
+   * Use bottom and top plate centre Z’s, with plate thickness parameters.
+
+7. **Plates along Y** (`Bottom_W`, `Bottom_E`, `Top_W`, `Top_E`):
+
+   * They butt into the X-plates: their Y extents are reduced so they run between south and north inner faces.
+   * For bottom plates along Y, Y extents are from `y_s + half(BOTTOM_PLATE_THICK)` to `y_n - half(BOTTOM_PLATE_THICK)`. Same idea for top plates.
+   * Use `add_beam_y`.
+
+8. **Door and window positions in plan** (all centred on walls):
+
+   * South wall door centre at 1.5 stud spacings from west: `door_center_s = x_w + 1.5 * STUD_SPACING`.
+     Door span from this centre ± half `DOOR_WIDTH`.
+   * South wall window centre: mid of wall length along X. Window width around that centre.
+   * North wall window: same X centre and width.
+   * West and East windows: positioned along Y at mid-span of Y-direction walls, each with width `WINDOW_WIDTH`.
+
+9. **Vertical extents for openings**:
+
+   * Door bottom Z is maximum of floor top and stud base.
+   * Door top Z is minimum of floor top + `DOOR_HEIGHT` and stud top.
+   * Window sill Z is maximum of floor top plus `WINDOW_SILL_HEIGHT` and stud base.
+   * Window head Z is minimum of sill + `WINDOW_HEIGHT` and stud top.
+
+10. Horizontal member dimensions for lintels, sills and heads:
+
+    * Depth = `STUD_WIDTH`.
+    * Thickness = `STUD_WIDTH`.
+
+    Compute their centre and bounding Z’s so that:
+
+    * Door lintel centre is at door top plus half that depth; its top Z is door top plus full depth.
+    * Window sill is just below the actual sill Z: centre at sill minus half depth, bottom at sill minus full depth.
+    * Window head is above head Z similarly.
+
+    Define door clear Z interval from door bottom to minimum of lintel top and stud top.
+    Define window clear Z interval from max(window sill bottom, stud base) to min(window head top, stud top).
+
+11. Define clear X/Y spans (between inner faces of jamb studs):
+
+    * For the door and south window on south wall, compute `*_clear_x0` and `*_clear_x1` by adding/subtracting half stud depth from opening edges.
+    * Same for north window along X, and for west/east windows along Y.
+
+12. **Segmented studs**
+
+    Make a local helper inside `build_walls`, named something like `place_segmented_stud(name_prefix, index, x, y, open_ranges)`, that:
+
+    * Uses `complement_intervals` with `stud_base_z`, `stud_top_z` and the list of “open_ranges” in Z (this can be empty).
+    * For each resulting solid segment, calls `add_stud_segment` with a name composed from prefix, index and segment index.
+
+13. **South and North wall stud positions**:
+
+    * Start from X positions at multiples of `STUD_SPACING` across length, plus final one at east.
+    * Add extra X positions explicitly for jambs: door_x0, door_x1, south window x0/x1, north window x0/x1.
+    * Sort and deduplicate to a list of unique positions (round to 4 decimals to help dedup).
+
+    For each X:
+
+    * For south wall: build a list of open Z ranges: door clear range if X is strictly between door clear x0/x1, and window clear range if X is between the south window clear x0/x1.
+      Call `place_segmented_stud` with prefix `"Stud_S"` and Y = south (y_s).
+    * For north wall: similar but only apply north window clear range.
+
+14. **West and East wall studs**:
+
+    * Build Y positions analogous to X: multiples of stud spacing plus Y edges, plus jamb positions for both west and east windows.
+    * Deduplicate and sort.
+
+    For each Y:
+
+    * For west wall: open range if Y between west window clear y0/y1.
+    * For east wall: open range if Y between east window clear y0/y1.
+    * Call `place_segmented_stud` with prefix `"Stud_W"` or `"Stud_E"` at X = west or east.
+
+15. **Horizontal elements (door lintel, window sills, window heads)**:
+
+    * Use `add_beam_x` for south and north door/window elements (running along X), and `add_beam_y` for west/east window parts (running along Y).
+    * Ensure each uses the correct span, correct Y or X location, Z centre for lintel/head/sill, and section dimensions described above.
+    * Names should be exactly:
+
+      * `"Door_Lintel_S"`,
+      * `"Window_Sill_S"`, `"Window_Head_S"`,
+      * `"Window_Sill_N"`, `"Window_Head_N"`,
+      * `"Window_Sill_W"`, `"Window_Head_W"`,
+      * `"Window_Sill_E"`, `"Window_Head_E"`.
+
+16. **Plywood sheathing**
+
+    * Compute `ply_base_z` = floor top Z, `ply_height` = total wall height, `ply_top_z` = base + height.
+
+    * Create two local helper functions similar in spirit to stud segmentation:
+
+      a) For X-walls (`build_ply_wall_x`):
+
+      * Takes: wall name prefix, sheet Y position, sheet thickness, and a list of opening definitions.
+      * Opening definitions are dict-like objects with:
+
+        * `"span"` = (x0, x1) where an opening exists,
+        * `"vspan"` = (z0, z1) vertical opening range.
+      * Build a sorted list of all boundary X positions: start/end of wall (`x_w`, `x_e`) plus each opening span start/end.
+      * For each consecutive pair (xa, xb), skip if width ≤ EPS.
+      * Evaluate at midpoint whether this vertical strip passes through each opening; collect all relevant vertical open intervals.
+      * Use `complement_intervals` with `ply_base_z`, `ply_top_z` and those open intervals.
+      * For each solid segment, call `add_plywood_wall_x` with name prefix plus segment indices, and height = segment height.
+
+      b) For Y-walls (`build_ply_wall_y`):
+
+      * Works identically but along Y with boundaries between `y_s` and `y_n`.
+
+    * Build lists of openings for each wall using clear spans and actual door / window Z extents (without extra lintel/sill thickness), e.g.:
+
+      * South wall: one opening for the door (door clear X span and door bottom/top Z), and one for south window (clear x span and window sill/head Z).
+      * North wall: only its window.
+      * West and East walls: their windows.
+
+    * Use those helpers to create:
+
+      * Exterior ply on south, north, west, east walls. Use external thickness `PLY_THICK_EXT`.
+        Offset Y or X outward by half stud depth plus this thickness.
+        Names: `"Ply_S_ext"`, `"Ply_N_ext"`, `"Ply_W_ext"`, `"Ply_E_ext"` with `_seg<i>_<j>` suffixes added inside helper.
+
+      * Interior ply similarly but offset inside the wall by half stud depth minus internal thickness, using `PLY_THICK_INT`.
+        Names: `"Ply_S_int"`, `"Ply_N_int"`, `"Ply_W_int"`, `"Ply_E_int"` plus segment suffixes.
+
+17. At the end of `build_walls`, return `wall_top_z` (top of plates).
+
+---
+
+### 6. Roof: trusses and sheeting
+
+Define helpers first, then the main `build_roof(wall_top_z)`.
+
+1. `add_rafter(name, x, y_low, y_mid, wall_top_z, rise, width, depth)`
+
+   * Creates a sloped beam from the wall top at y_low up to a ridge at y_mid.
+   * Works in the YZ plane with rotation around X.
+   * Compute horizontal span in Y and total length using rise and span.
+   * Angle around X is `atan2(rise, span)` in radians converted to degrees, sign positive if slope goes from low to higher Y, negative otherwise.
+   * Centre Y is midpoint of y_low and y_mid; centre Z is wall_top_z plus half rise.
+   * Use those in `loc` and the given width/depth for scales.
+
+2. `add_roof_plane(name, x0, x1, y_low, y_mid, wall_top_z, rise, thick)`
+
+   * Represents sloped rectangular roof sheathing.
+   * Compute slope length (distance along roof), centre in X and Y, and slope angle as for rafters.
+   * Determine the rafter centre Z (`wall_top_z + 0.5 * rise`).
+   * Place the roof plane so that its **bottom surface** sits on top of the rafters:
+
+     * Use cos(theta) to offset from rafter centre by half joist depth plus half sheet thickness plus a small clearance (e.g. 0.005 m) along the local “up” normal.
+   * Use axis around X, same sign convention, scales with half plan length in X, half sloped length in Y, half thickness in Z.
+
+3. `add_vertical_member(name, x, y, z0, z1, width)`
+
+   * Vertical web member for king-post; similar pattern to `add_stud_segment` but width in X and Y both equal to `width`.
+
+4. `add_diagonal_member(name, x, y0, z0, y1, z1, width)`
+
+   * Diagonal web member entirely in YZ plane:
+   * Compute length as hypotenuse of dy and dz.
+   * Angle around X from horizontal is `atan2(dz, dy)` in degrees.
+   * Centre at midpoints of Y and Z.
+   * Place with axis around X and box scaled with width in X and Z and length along Y.
+
+5. `z_on_rafter(y, y_s, y_n, wall_top_z, roof_rise)`
+
+   * For a symmetric gable with given total rise, compute Z on the rafter line at a given Y between eaves.
+   * Use mid-Y and half-span in Y to derive slope angle, then linear relation with tan.
+
+6. `build_truss_webs_king_post(j, x, y_s, y_n, y_mid, chord_top_z, ridge_z, roof_rise, wall_top_z)`
+
+   * Implements king-post truss webs at section index j:
+   * Place one vertical king-post at bottom chord centre (y = y_mid) from chord top Z up to ridge Z.
+   * Compute midpoints of rafters left and right (mid between y_s and y_mid, and mid between y_mid and y_n), find their Z via `z_on_rafter`.
+   * Add two diagonal struts from bottom chord centre to those midpoints.
+   * Use width = `JOIST_WIDTH` for all webs.
+
+7. `build_truss_webs_fink(j, x, y_s, y_n, y_mid, chord_top_z, ridge_z, roof_rise, wall_top_z)`
+
+   * Implements Fink truss webs with *exactly four* members as in the latest design:
+   * Compute total Y span (`y_n - y_s`), then first and second thirds along bottom chord (y_third_1, y_third_2).
+   * Z at those thirds along bottom chord is simply chord_top_z.
+   * Compute midpoints of each rafter (one between y_s and y_mid, another between y_mid and y_n), and use `z_on_rafter` to get their Z coordinates.
+   * Four diagonals:
+
+     1. From mid south rafter down to first bottom-third.
+     2. From first bottom-third up to ridge.
+     3. From mid north rafter down to second bottom-third.
+     4. From second bottom-third up to ridge.
+   * Names `"Fink_1_{j}"` through `"Fink_4_{j}"`, width again `JOIST_WIDTH`.
+
+8. `build_roof(wall_top_z)` itself:
+
+   * Local extents: x0 = 0, x1 = HOUSE_LEN, y_s = 0, y_n = HOUSE_WID, y_mid = middle.
+   * For **ceiling joists / bottom chords**:
+
+     * They run along Y with ends slightly beyond top plates: from south top plate centre minus half plate thickness to north top plate centre plus half.
+     * Bottom of joist sits on wall_top_z; joist centre Z is `wall_top_z + half(JOIST_DEPTH)`.
+     * Chord top Z is that centre plus half JOIST_DEPTH.
+     * Place joists along X with same spacing as floor joists, indices `"RoofBeam_{j}"`.
+   * For the **rafters and webs**:
+
+     * Compute `span_half` = half of (y_n - y_s).
+     * Convert roof pitch degrees to radians and compute `roof_rise` = span_half * tan(angle).
+     * Ridge Z = wall_top_z + roof_rise.
+     * For each index j and joist X position:
+
+       * Add two rafters (south and north) using `add_rafter`, from each eave up to ridge.
+       * If `ROOF_TRUSS_TYPE` equals `"fink"`, call the Fink webs builder; otherwise call king-post webs builder.
+   * Finally, add two roof planes:
+
+     * One named `"Roof_Slope_S"` from south eave to ridge,
+     * One named `"Roof_Slope_N"` from north eave to ridge.
+     * Use `add_roof_plane` with the parameters so the planes sit on top of rafters (not intersecting).
+
+---
+
+### 7. Main entry point
+
+1. Define function `build_house()` that:
+
+   * Calls `build_platform()` and stores the returned floor Z.
+   * Passes that to `build_walls()` and stores returned wall top Z.
+   * Calls `build_roof()` with that wall top Z.
+
+2. After defining all functions, call `build_house()` at module level so that running the script in Blender immediately builds the full structure.
+
+
+
+
+
+
+
+
+
+
+
