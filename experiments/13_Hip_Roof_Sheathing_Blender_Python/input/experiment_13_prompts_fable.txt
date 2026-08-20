@@ -1,0 +1,32 @@
+
+
+I want to redo experiment 13 but with a new workflow:
+- create a new folder inside experiments\13_Hip_Roof_Sheathing_Blender_Python\ called Fable, this is where we will put all our outputs for this new run
+- analyze the contents of the experiments\13_Hip_Roof_Sheathing_Blender_Python\input folder and study how wood-board roof sheathing (closed method) could be applied to our roof and dormer windows from the experiment_11_chatgpt51_v18.py script
+- implement the wood-board roof sheathing (closed method) into the Blender Python code
+- create a separate collection for timber framing and sheathing boards so we can easily toggle them on/off
+- use the already generated code as a reference
+- use the headless Blender execution to generate screenshots of the model at each iteration - code variants and screenshots should be saved in the Fable folder following the convention from ChatGPT 5.1 folder (previous workflow)
+- if you need more information, generate additional screenshots from different angles with some layers hidden to aid visibility
+- make sure to display the model as shaded with edge lines visible, so two surfaces that are coplanar are distinguishable
+- iterate until the model is completed and there are no geometric inconsistencies, but use maximum 10 model iterations
+- work with as much autonomy as possible and minimize prompting me - for design and construction questions consult the extracted manuals and images in input/ folder 
+- make sure this whole conversation is saved so we can archive it later
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
