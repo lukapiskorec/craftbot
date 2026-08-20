@@ -219,3 +219,6 @@ __marimo__/
 
 # CraftBot headless render outputs
 outputs/
+
+# Claude
+CLAUDE.md
