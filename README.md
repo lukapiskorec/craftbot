@@ -1,6 +1,12 @@
 # CraftBot
 
-CraftBot is a research project exploring whether large language models can participate meaningfully in architectural design when constrained to operate through executable CAD code. Instead of producing meshes or images, the LLM writes Python scripts that construct architectural geometry in Blender, refined through an iterative loop of code generation, execution, visual feedback, and revision.
+![CraftBot Experiment 08 Blender model and physical model visualization](visuals/craftbot_fig_02.png)
+
+*Blender model generated with the Python code output of Experiment 08 (left), and its physical model visualization (right). The input for generation was a 27-page PDF "The Segal Method", a special issue of The Architect's Journal from 1986.*
+
+CraftBot is an architect AI agent. It interprets design briefs, grounds its thinking in domain knowledge through ingesting documents, images and other references, and outputs Python code that procedurally defines a building design. Instead of producing meshes or images, CraftBot writes scripts that construct architectural geometry in Blender. From there, it can produce a range of industry standard representations - floorplans, sections, elevations, BIM models, bills of quantities etc. It can work in a fully automated iterative loop of code generation, execution, visual feedback, and revision. More broadly, CraftBot is a research project exploring whether large language models can participate meaningfully in architectural design when constrained to operate through executable CAD code.
+
+This repo hosts code files, iteration steps, references and outputs from previous experiments, enabling anyone to build upon CraftBot with minimal friction by pointing their own agent to it. Python and Blender were specifically chosen to facilitate ease of access; both are open-source, well-maintained, have a large community of users, and are free for commercial use. 
 
 A draft paper describing the project is in [`papers/`](papers/):
 
