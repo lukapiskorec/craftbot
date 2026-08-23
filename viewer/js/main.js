@@ -6,6 +6,7 @@ import { buildModelGroup } from "./scene.js";
 import { makeViews } from "./views.js";
 import { makePanel, fmtBytes } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
+import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -31,7 +32,13 @@ grid.rotation.x = Math.PI / 2; // XY ground plane (Z-up scene)
 scene.add(grid);
 
 const views = makeViews(renderer, canvas);
-const styles = makeStyles(renderer, scene, grid);
+const anims = makeAnimations();
+const styles = makeStyles(renderer, scene, grid, {
+  onMaterials: (fill, line) => {
+    anims.patchMaterial(fill);
+    anims.patchMaterial(line);
+  },
+});
 
 let sceneApi = null;
 let currentModel = null;
@@ -55,6 +62,7 @@ async function loadModel(file) {
     for (let li = 0; li < LAYERS.length; li++) sceneApi.setLayerVisible(li, layerVisible[li]);
     scene.add(sceneApi.group);
     styles.apply(currentStyle, sceneApi, model);
+    anims.play(model, sceneApi);
     views.fit(sceneApi.bounds);
     const size = sceneApi.bounds.getSize(new THREE.Vector3());
     const span = Math.ceil(Math.max(size.x, size.y) * 1.6) || 10;
@@ -89,6 +97,15 @@ const styleButtons = secStyle.addButtons(STYLES, (name) => {
   currentStyle = name;
   if (sceneApi) styles.apply(name, sceneApi, currentModel);
 }, { radio: true, active: currentStyle });
+
+const secAnim = panel.section("ANIMATION");
+const selAnim = secAnim.addSelect("Entry", ANIMS.map((a) => ({ value: a, label: a })),
+  (v) => anims.setAnim(v));
+const selOrder = secAnim.addSelect("Order", ORDERS.map((o) => ({ value: o, label: o })),
+  (v) => anims.setOrder(v));
+secAnim.addButtons(["replay"], () => {
+  if (currentModel) anims.play(currentModel, sceneApi);
+});
 
 let index = null;
 const pick = { exp: null, agent: null, v: null };
@@ -175,7 +192,9 @@ function resize() {
 }
 new ResizeObserver(resize).observe(canvas);
 
+const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
+  anims.tick(Math.min(clock.getDelta(), 0.1));
   views.tick();
   styles.render(views.camera);
 });
@@ -186,6 +205,18 @@ const requested = bootParams.get("model");
 if (STYLES.includes(bootParams.get("style"))) {
   currentStyle = bootParams.get("style");
   styleButtons.setActive(currentStyle);
+}
+if (ANIMS.includes(bootParams.get("anim"))) {
+  anims.setAnim(bootParams.get("anim"));
+  selAnim.set(anims.anim);
+}
+if (ORDERS.includes(bootParams.get("order"))) {
+  anims.setOrder(bootParams.get("order"));
+  selOrder.set(anims.order);
+}
+const freezeAt = parseFloat(bootParams.get("freeze"));
+if (!Number.isNaN(freezeAt)) {
+  document.addEventListener("craftbot:model", () => anims.freeze(freezeAt));
 }
 fetch("models/index.json")
   .then((r) => r.json())
