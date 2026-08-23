@@ -1,9 +1,11 @@
-// CraftBot viewer entry point: wiring, model loading, render loop.
+// CraftBot viewer entry point: wiring, model loading, GUI, render loop.
 
 import * as THREE from "three";
-import { parseModel } from "./model-data.js";
+import { parseModel, computeStats, LAYERS, LAYER_COLORS } from "./model-data.js";
 import { buildModelGroup } from "./scene.js";
 import { makeViews } from "./views.js";
+import { makePanel, fmtBytes } from "./gui.js";
+import { makeStyles, STYLES } from "./styles.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -29,16 +31,19 @@ grid.rotation.x = Math.PI / 2; // XY ground plane (Z-up scene)
 scene.add(grid);
 
 const views = makeViews(renderer, canvas);
+const styles = makeStyles(renderer, scene, grid);
 
 let sceneApi = null;
 let currentModel = null;
+let currentStyle = "solid";
+const layerVisible = LAYERS.map(() => true);
 
 function showError(msg) {
   banner.textContent = msg;
   banner.hidden = false;
 }
 
-export async function loadModel(file) {
+async function loadModel(file) {
   try {
     const res = await fetch(file);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -47,9 +52,10 @@ export async function loadModel(file) {
     if (sceneApi) sceneApi.dispose();
     currentModel = model;
     sceneApi = buildModelGroup(model);
+    for (let li = 0; li < LAYERS.length; li++) sceneApi.setLayerVisible(li, layerVisible[li]);
     scene.add(sceneApi.group);
+    styles.apply(currentStyle, sceneApi, model);
     views.fit(sceneApi.bounds);
-    // Ground grid sized/positioned under the model
     const size = sceneApi.bounds.getSize(new THREE.Vector3());
     const span = Math.ceil(Math.max(size.x, size.y) * 1.6) || 10;
     grid.scale.setScalar(span / 40);
@@ -59,6 +65,9 @@ export async function loadModel(file) {
       sceneApi.bounds.min.z - 0.01,
     );
     banner.hidden = true;
+    const url = new URL(location);
+    url.searchParams.set("model", file);
+    history.replaceState(null, "", url);
     document.dispatchEvent(new CustomEvent("craftbot:model", {
       detail: { model, sceneApi, file },
     }));
@@ -66,6 +75,99 @@ export async function loadModel(file) {
     showError(`Failed to load ${file}: ${err.message}`);
   }
 }
+
+// ------------------------------------------------------------------
+// GUI
+// ------------------------------------------------------------------
+
+const panel = makePanel(document.getElementById("gui"));
+const secModel = panel.section("MODEL");
+const secStyle = panel.section("STYLE");
+const secLayers = panel.section("LAYERS");
+
+const styleButtons = secStyle.addButtons(STYLES, (name) => {
+  currentStyle = name;
+  if (sceneApi) styles.apply(name, sceneApi, currentModel);
+}, { radio: true, active: currentStyle });
+
+let index = null;
+const pick = { exp: null, agent: null, v: null };
+
+function currentRuns() {
+  return index.experiments.find((e) => e.id === pick.exp)?.runs ?? [];
+}
+function currentVersions() {
+  return currentRuns().find((r) => r.agent === pick.agent)?.versions ?? [];
+}
+function currentEntry() {
+  return currentVersions().find((x) => x.v === pick.v) ?? null;
+}
+
+const selExp = secModel.addSelect("Model", [], (v) => {
+  pick.exp = v;
+  pick.agent = currentRuns()[0]?.agent ?? null;
+  refreshPickers();
+  loadPicked();
+});
+const selAgent = secModel.addSelect("Agent", [], (v) => {
+  pick.agent = v;
+  refreshPickers();
+  loadPicked();
+});
+const selVersion = secModel.addSelect("Version", [], (v) => {
+  pick.v = v;
+  loadPicked();
+});
+const modelInfo = secModel.addInfo();
+
+function refreshPickers() {
+  selExp.setOptions(index.experiments.map((e) => ({ value: e.id, label: e.title })), pick.exp);
+  selAgent.setOptions(currentRuns().map((r) => ({ value: r.agent, label: r.agent })), pick.agent);
+  const versions = currentVersions();
+  if (!versions.some((x) => x.v === pick.v)) pick.v = versions[versions.length - 1]?.v ?? null;
+  selVersion.setOptions(versions.map((x) => ({ value: x.v, label: x.v })), pick.v);
+}
+
+function loadPicked() {
+  const entry = currentEntry();
+  if (!entry) return;
+  modelInfo.set(`<b>${entry.elements}</b> elements &middot; <b>${fmtBytes(entry.bytes)}</b>`);
+  loadModel(`models/${entry.file}`);
+}
+
+// LAYERS section
+const layerToggles = LAYERS.map((name, li) =>
+  secLayers.addToggle(name, true, (on) => {
+    layerVisible[li] = on;
+    if (sceneApi) sceneApi.setLayerVisible(li, on);
+    refreshStats();
+  }, `#${LAYER_COLORS[li].toString(16).padStart(6, "0")}`),
+);
+const statsTable = secLayers.addTable(["layer", "n", "len m", "m³", "kg"]);
+
+function refreshStats() {
+  if (!currentModel) return;
+  const rows = computeStats(currentModel, layerVisible);
+  const shown = rows.filter((r) => r.count > 0);
+  const total = shown.reduce((a, r) => ({
+    count: a.count + r.count, lengthM: a.lengthM + r.lengthM,
+    volumeM3: a.volumeM3 + r.volumeM3, weightKg: a.weightKg + r.weightKg,
+  }), { count: 0, lengthM: 0, volumeM3: 0, weightKg: 0 });
+  statsTable.set([
+    ...shown.map((r) => ({
+      cells: [r.layer, r.count, r.lengthM.toFixed(1), r.volumeM3.toFixed(2),
+        r.weightKg.toFixed(0)],
+    })),
+    { cells: ["total", total.count, total.lengthM.toFixed(1),
+      total.volumeM3.toFixed(2), total.weightKg.toFixed(0)], total: true },
+  ]);
+}
+
+document.addEventListener("craftbot:model", refreshStats);
+
+// ------------------------------------------------------------------
+// Render loop + boot
+// ------------------------------------------------------------------
 
 function resize() {
   renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
@@ -75,25 +177,41 @@ new ResizeObserver(resize).observe(canvas);
 
 renderer.setAnimationLoop(() => {
   views.tick();
-  renderer.render(scene, views.camera);
+  styles.render(views.camera);
 });
 resize();
 
-// Boot: load model from ?model= or the first index entry
-const params = new URLSearchParams(location.search);
-const requested = params.get("model");
-if (requested) {
-  loadModel(requested);
-} else {
-  fetch("models/index.json")
-    .then((r) => r.json())
-    .then((idx) => {
-      const first = idx.experiments[0].runs[0].versions[0].file;
-      loadModel(`models/${first}`);
-    })
-    .catch((e) => showError(`Failed to load models/index.json: ${e.message}`));
+const bootParams = new URLSearchParams(location.search);
+const requested = bootParams.get("model");
+if (STYLES.includes(bootParams.get("style"))) {
+  currentStyle = bootParams.get("style");
+  styleButtons.setActive(currentStyle);
 }
+fetch("models/index.json")
+  .then((r) => r.json())
+  .then((idx) => {
+    index = idx;
+    // Resolve the requested file back to picker state, else first entry
+    let found = null;
+    for (const e of idx.experiments) {
+      for (const r of e.runs) {
+        for (const x of r.versions) {
+          if (requested && `models/${x.file}` === requested) found = { e, r, x };
+        }
+      }
+    }
+    const e = found?.e ?? idx.experiments[0];
+    const r = found?.r ?? e.runs[0];
+    const x = found?.x ?? r.versions[r.versions.length - 1];
+    pick.exp = e.id; pick.agent = r.agent; pick.v = x.v;
+    refreshPickers();
+    loadPicked();
+  })
+  .catch((e) => {
+    showError(`Failed to load models/index.json: ${e.message}`);
+    if (requested) loadModel(requested);
+  });
 
-export { renderer, scene, views, grid };
+export { renderer, scene, views, grid, loadModel };
 export function getSceneApi() { return sceneApi; }
 export function getModel() { return currentModel; }
