@@ -24,9 +24,10 @@ os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
 # Start from an empty scene (factory startup has default cube/camera/light)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
-# Run the experiment script as __main__ (same pattern as run_experiment_headless.py)
+# Run the experiment script as __main__ (same pattern as run_experiment_headless.py;
+# __file__ is defined because some generated scripts reference it)
 exec(compile(open(experiment_path).read(), experiment_path, "exec"),
-     {"__name__": "__main__"})
+     {"__name__": "__main__", "__file__": os.path.abspath(experiment_path)})
 
 
 def collection_path(obj):
