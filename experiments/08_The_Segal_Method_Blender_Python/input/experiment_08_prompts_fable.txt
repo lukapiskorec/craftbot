@@ -1,0 +1,35 @@
+
+
+
+
+I want to redo experiment 8 but with a new workflow:
+- create a new folder inside experiments\08_The_Segal_Method_Blender_Python\ called Fable, this is where we will put all our outputs for this new run
+- analyze the contents of the experiments\08_The_Segal_Method_Blender_Python\input and experiments\08_The_Segal_Method_Blender_Python\references folders and study how a timber frame house could be built - main reference document is segal_method_extracted.md
+- you are not allowed to look into Python files in experiments\08_The_Segal_Method_Blender_Python\ChatGPT 5.1 - we want the two experiment runs to be non-partial
+- implement the design of a double-floor timber frame house into the Blender Python code - two floors with double-height spaces inside, raised on stilts, covered patio, large windows, slanted roof surfaces with skylights, timber frame structure fully articulated with cladding made out of plywood boards on exterior and interior
+- create separate collections for different parts of the model if necessary and relevant - structure, facade, floors etc.
+- use the element_placement_template.py and craftbot_lib.py as a reference
+- use the headless Blender execution to generate screenshots of the model at each iteration - code variants and screenshots should be saved in the Fable folder following the convention from ChatGPT 5.1 folder (previous workflow)
+- if you need more information, generate additional screenshots from different angles with some layers hidden to aid visibility
+- make sure to display the model as shaded with edge lines visible, so two surfaces that are coplanar are distinguishable - use experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\render_fable.py as a style reference
+- iterate until the model is completed and there are no geometric inconsistencies or intersections
+- work with as much autonomy as possible and minimize prompting me - for design and construction questions consult the extracted manuals (if available) and images in input\ folder 
+- make sure this whole conversation is saved so we can archive it later
+- at the end produce a design rationale document similar in structure to experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\experiment_13_fable_design_rationale.md
+
+
+
+
+
+
+Now do the following:
+- compare the last model generation with the images of a finished house on the first page of "THE SEGAL METHOD - color" PDF in input\ folder
+- think about the ways the two buildings are different and what can be done to make your generated model more in line with the reference - plan layout, connection details, element dimensions and positions etc.
+- think about the generated structure independently from the reference - are there improvements that could be introduced so it performs better as a timber structure?
+- implement these design considerations in the Python script in an iterative process - script writing -> model generation -> screenshotting -> visual evaluation -> design revision -> script writing (repeat)
+- iterate until the model is completed and there are no geometric inconsistencies or intersections
+- work with as much autonomy as possible and minimize prompting me - for design and construction questions consult the extracted manuals (if available) and images in input\ and references\ folder 
+- make sure this whole conversation is saved so we can archive it later
+- at the end produce a design rationale document similar in structure to experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\experiment_13_fable_design_rationale.md
+
+

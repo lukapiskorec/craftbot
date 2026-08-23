@@ -1,0 +1,32 @@
+
+
+
+
+I want to redo experiment 11 but with a new workflow:
+- create a new folder inside experiments\11_Hip_Roof_Blender_Python\ called Fable, this is where we will put all our outputs for this new run
+- analyze the contents of the experiments\11_Hip_Roof_Blender_Python\input and experiments\11_Hip_Roof_Blender_Python\references folders and study the principles of constructing hip roof - main reference document is canadian_wood_frame_roof_extracted.md
+- you are not allowed to look into Python files in experiments\11_Hip_Roof_Blender_Python\ChatGPT 5.1 - we want the two experiment runs to be non-partial
+- implement the design of T-shaped hip roof into the Blender Python code - T-shape hip roof with a fully articulated timber structure, dormer windows on all sides, wood-board sheathing (closed method)
+- create separate collections for different parts of the model if necessary and relevant - structure, facade, floors etc.
+- use the element_placement_template.py and craftbot_lib.py as a reference
+- use the headless Blender execution to generate screenshots of the model at each iteration - code variants and screenshots should be saved in the Fable folder following the convention from ChatGPT 5.1 folder (previous workflow)
+- if you need more information, generate additional screenshots from different angles with some layers hidden to aid visibility
+- make sure to display the model as shaded with edge lines visible, so two surfaces that are coplanar are distinguishable - use experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\render_fable.py as a style reference
+- iterate until the model is completed and there are no geometric inconsistencies or intersections
+- work with as much autonomy as possible and minimize prompting me - for design and construction questions consult the extracted manuals (if available) and images in input\ folder 
+- make sure this whole conversation is saved so we can archive it later
+- at the end produce a design rationale document similar in structure to experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\experiment_13_fable_design_rationale.md
+
+
+
+
+
+Now do the following:
+- compare the last model generation with the images from the "Canadian Wood-Frame House Construction - Chapters 11-12" PDF in input\ folder
+- think about the ways to bring your generated model more in line with the references - plan layout, connection details, element dimensions and positions etc.
+- think about the generated structure independently from the reference - are there improvements that could be introduced so it performs better as a timber structure?
+- implement these design considerations in the Python script in an iterative process - script writing -> model generation -> screenshotting -> visual evaluation -> design revision -> script writing (repeat)
+- iterate until the model is completed and there are no geometric inconsistencies or intersections
+- work with as much autonomy as possible and minimize prompting me - for design and construction questions consult the extracted manuals (if available) and images in input\ and references\ folder 
+- make sure this whole conversation is saved so we can archive it later
+- at the end produce a design rationale document similar in structure to experiments\13_Hip_Roof_Sheathing_Blender_Python\Fable\experiment_13_fable_design_rationale.md
