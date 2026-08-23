@@ -7,6 +7,7 @@ import { makeViews, VIEWS } from "./views.js";
 import { makePanel, fmtBytes } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
 import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
+import { makeSections } from "./sections.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -33,10 +34,12 @@ scene.add(grid);
 
 const views = makeViews(renderer, canvas);
 const anims = makeAnimations();
+const sections = makeSections();
 const styles = makeStyles(renderer, scene, grid, {
   onMaterials: (fill, line) => {
     anims.patchMaterial(fill);
     anims.patchMaterial(line);
+    sections.refresh();
   },
 });
 
@@ -64,6 +67,7 @@ async function loadModel(file) {
     for (let li = 0; li < LAYERS.length; li++) sceneApi.setLayerVisible(li, layerVisible[li]);
     scene.add(sceneApi.group);
     styles.apply(currentStyle, sceneApi, model);
+    sections.refresh(sceneApi, sceneApi.bounds);
     anims.play(model, sceneApi);
     views.fit(sceneApi.bounds);
     const size = sceneApi.bounds.getSize(new THREE.Vector3());
@@ -107,6 +111,23 @@ const selOrder = secAnim.addSelect("Order", ORDERS.map((o) => ({ value: o, label
   (v) => anims.setOrder(v));
 secAnim.addButtons(["replay"], () => {
   if (currentModel) anims.play(currentModel, sceneApi);
+});
+
+const secSection = panel.section("SECTION", false);
+const cutToggles = [];
+for (let axis = 0; axis < 3; axis++) {
+  const name = ["X", "Y", "Z"][axis];
+  cutToggles.push(secSection.addToggle(`cut ${name}`, false,
+    (on) => sections.set(axis, { enabled: on })));
+  secSection.addSlider(name, 0, 1, 1, (t) => {
+    sections.set(axis, { t, enabled: true });
+    cutToggles[axis].set(true);
+  });
+}
+secSection.addButtons(["flip x", "flip y", "flip z", "reset"], (label) => {
+  if (label === "reset") { sections.reset(); return; }
+  const axis = { "flip x": 0, "flip y": 1, "flip z": 2 }[label];
+  sections.set(axis, { flip: !sections.getState(axis).flip });
 });
 
 const secView = panel.section("VIEW");
@@ -235,6 +256,12 @@ if (VIEWS.includes(viewParam)) {
     else views.setPreset(viewParam);
     viewButtons.setActive(viewParam);
   });
+}
+// Testing: ?cut=axis,t e.g. cut=1,0.5 sections the model on load
+const cutParam = (bootParams.get("cut") || "").split(",");
+if (cutParam.length === 2) {
+  document.addEventListener("craftbot:model", () =>
+    sections.set(parseInt(cutParam[0], 10), { t: parseFloat(cutParam[1]), enabled: true }));
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
