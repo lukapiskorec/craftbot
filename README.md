@@ -53,6 +53,27 @@ Example (Windows):
 "C:\Program Files\Blender Foundation\Blender 5.1\blender.exe" --background --python tools\run_experiment_headless.py -- "experiments\01_Carport_Assembly_Blender_Python\ChatGPT 5.1\experiment_01_chatgpt51_v01.py" "experiments\01_Carport_Assembly_Blender_Python\input"
 ```
 
+## Web viewer
+
+A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to GitHub Pages. Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
+
+Features: model/agent/iteration picker, six render styles (plaster, solid, random, blueprint, 1-bit dither, pixel), GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), layer toggles with material takeoff (length, volume, weight), section planes on three axes, orthographic view presets with a 4-view mode, and hover/click element inspection with dimensions.
+
+Run locally:
+
+```
+python -m http.server -d viewer 8123
+```
+
+Re-export models after adding or changing experiment scripts (uses headless Blender):
+
+```
+python tools/export_all_models.py            # everything
+python tools/export_all_models.py --only 08  # one experiment / pattern
+```
+
+Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`. One-time repo setting: *Settings → Pages → Source: GitHub Actions*.
+
 ## Notes
 
 - Original ChatGPT conversation logs are not yet included; they may be added later.
