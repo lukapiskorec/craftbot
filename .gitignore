@@ -227,3 +227,6 @@ CLAUDE.md
 # Images under input/ and references/ are inputs, not outputs, and stay tracked.
 experiments/*/ChatGPT 5.1/**/*.png
 experiments/*/Fable/**/*.png
+
+# Claude working documents (specs, plans) - kept local only
+docs/
