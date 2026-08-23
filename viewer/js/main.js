@@ -3,7 +3,7 @@
 import * as THREE from "three";
 import { parseModel, computeStats, LAYERS, LAYER_COLORS } from "./model-data.js";
 import { buildModelGroup } from "./scene.js";
-import { makeViews } from "./views.js";
+import { makeViews, VIEWS } from "./views.js";
 import { makePanel, fmtBytes } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
 import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
@@ -49,6 +49,8 @@ function showError(msg) {
   banner.textContent = msg;
   banner.hidden = false;
 }
+window.addEventListener("error", (e) => showError(`Error: ${e.message}`));
+window.addEventListener("unhandledrejection", (e) => showError(`Error: ${e.reason}`));
 
 async function loadModel(file) {
   try {
@@ -106,6 +108,18 @@ const selOrder = secAnim.addSelect("Order", ORDERS.map((o) => ({ value: o, label
 secAnim.addButtons(["replay"], () => {
   if (currentModel) anims.play(currentModel, sceneApi);
 });
+
+const secView = panel.section("VIEW");
+const viewButtons = secView.addButtons(["top", "front", "side", "axo", "quad"], (name) => {
+  if (name === "quad") {
+    views.setQuad(!views.quad);
+    viewButtons.setActive(views.quad ? "quad" : "axo");
+  } else {
+    views.setQuad(false);
+    views.setPreset(name);
+    viewButtons.setActive(name);
+  }
+}, { active: "axo" });
 
 let index = null;
 const pick = { exp: null, agent: null, v: null };
@@ -196,7 +210,7 @@ const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
   anims.tick(Math.min(clock.getDelta(), 0.1));
   views.tick();
-  styles.render(views.camera);
+  views.render(styles.render);
 });
 resize();
 
@@ -213,6 +227,14 @@ if (ANIMS.includes(bootParams.get("anim"))) {
 if (ORDERS.includes(bootParams.get("order"))) {
   anims.setOrder(bootParams.get("order"));
   selOrder.set(anims.order);
+}
+const viewParam = bootParams.get("view");
+if (VIEWS.includes(viewParam)) {
+  document.addEventListener("craftbot:model", () => {
+    if (viewParam === "quad") views.setQuad(true);
+    else views.setPreset(viewParam);
+    viewButtons.setActive(viewParam);
+  });
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
