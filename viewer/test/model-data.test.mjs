@@ -81,3 +81,11 @@ test("computeSpawnTimes: layers mode builds foundations before roof", () => {
   // element 2 = Footing (foundations), 1 = Roof_Beam (roof), 0 = Post (frame)
   assert.ok(t[2] < t[0] && t[0] < t[1]);
 });
+
+test("elementForFace maps triangles to elements", async () => {
+  const { elementForFace } = await import("../js/model-data.js");
+  const map = Uint32Array.from([5, 5, 7, 7, 7, 9]);
+  assert.equal(elementForFace(map, 0), 5);
+  assert.equal(elementForFace(map, 4), 7);
+  assert.equal(elementForFace(map, 5), 9);
+});

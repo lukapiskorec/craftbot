@@ -8,6 +8,7 @@ import { makePanel, fmtBytes } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
 import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
 import { makeSections } from "./sections.js";
+import { makePicking, makeInspector } from "./picking.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -46,7 +47,18 @@ const styles = makeStyles(renderer, scene, grid, {
 let sceneApi = null;
 let currentModel = null;
 let currentStyle = "solid";
+let inspector = null;
 const layerVisible = LAYERS.map(() => true);
+
+const picking = makePicking(canvas, () => views.camera, () => sceneApi,
+  () => currentModel, (eid) => {
+    if (!inspector) return;
+    if (eid === null) inspector.hide();
+    else inspector.show(eid);
+  });
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && inspector) inspector.hide();
+});
 
 function showError(msg) {
   banner.textContent = msg;
@@ -69,6 +81,9 @@ async function loadModel(file) {
     styles.apply(currentStyle, sceneApi, model);
     sections.refresh(sceneApi, sceneApi.bounds);
     anims.play(model, sceneApi);
+    picking.resetAfterModelChange();
+    if (inspector) inspector.destroy();
+    inspector = makeInspector(model);
     views.fit(sceneApi.bounds);
     const size = sceneApi.bounds.getSize(new THREE.Vector3());
     const span = Math.ceil(Math.max(size.x, size.y) * 1.6) || 10;
@@ -231,7 +246,9 @@ const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
   anims.tick(Math.min(clock.getDelta(), 0.1));
   views.tick();
+  picking.tick();
   views.render(styles.render);
+  if (inspector) inspector.render(clock.elapsedTime);
 });
 resize();
 
@@ -262,6 +279,11 @@ const cutParam = (bootParams.get("cut") || "").split(",");
 if (cutParam.length === 2) {
   document.addEventListener("craftbot:model", () =>
     sections.set(parseInt(cutParam[0], 10), { t: parseFloat(cutParam[1]), enabled: true }));
+}
+// Testing: ?select=elementId opens the inspector on load
+const selectParam = parseInt(bootParams.get("select"), 10);
+if (!Number.isNaN(selectParam)) {
+  document.addEventListener("craftbot:model", () => inspector.show(selectParam));
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
