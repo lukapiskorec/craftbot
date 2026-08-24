@@ -82,6 +82,37 @@ export function makeViews(renderer, canvas) {
       controls.update();
     },
 
+    // Look at the model from an arbitrary unit direction (view cube widget).
+    setDirection(dir) {
+      const d = dir.clone().normalize();
+      // Straight down/up has no meaningful +Z up vector - fall back to +Y
+      camera.up.set(0, 0, 1);
+      if (Math.abs(d.z) > 0.999) camera.up.set(0, 1, 0);
+      camera.position.copy(center).addScaledVector(d, radius * 4);
+      camera.lookAt(center);
+      controls.target.copy(center);
+      controls.update();
+    },
+
+    // Camera direction from the model centre, for the view cube to mirror.
+    getDirection(out) {
+      return out.copy(camera.position).sub(controls.target).normalize();
+    },
+
+    // Orbit the interactive camera by screen-space drag deltas (radians).
+    orbitBy(dAzimuth, dPolar) {
+      const offset = camera.position.clone().sub(controls.target);
+      const spherical = new THREE.Spherical().setFromVector3(
+        new THREE.Vector3(offset.x, offset.z, -offset.y));
+      spherical.theta -= dAzimuth;
+      spherical.phi = Math.max(1e-4, Math.min(Math.PI - 1e-4, spherical.phi - dPolar));
+      const v = new THREE.Vector3().setFromSpherical(spherical);
+      camera.up.set(0, 0, 1);
+      camera.position.copy(controls.target).add(new THREE.Vector3(v.x, -v.z, v.y));
+      camera.lookAt(controls.target);
+      controls.update();
+    },
+
     setQuad(on) {
       quad = on;
       if (quadLines) quadLines.classList.toggle("on", on);

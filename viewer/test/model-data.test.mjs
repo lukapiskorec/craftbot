@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  classifyLayer, parseModel, computeStats, computeSpawnTimes,
+  classifyLayer, classifyGlass, parseModel, computeStats, computeSpawnTimes,
   LAYERS, TIMBER_DENSITY,
 } from "../js/model-data.js";
 
@@ -29,6 +29,26 @@ test("classifyLayer: name keywords", () => {
   assert.equal(LAYERS[classifyLayer("Roof_Beam_01", "")], "roof");
   assert.equal(LAYERS[classifyLayer("Footing_01", "")], "foundations");
   assert.equal(LAYERS[classifyLayer("Mystery_01", "")], "other");
+});
+
+test("classifyGlass: only glazing, not the timber around an opening", () => {
+  assert.equal(classifyGlass("Glass_S_L1_1.35", ""), 1);
+  assert.equal(classifyGlass("Window_S0_1_Glass", ""), 1);
+  assert.equal(classifyGlass("Pane_04", "Openings/Glazing"), 1);
+  assert.equal(classifyGlass("Window_Sill_S", ""), 0);
+  assert.equal(classifyGlass("DN1_WindowHeader", "Roof_Framing/RF_Dormers"), 0);
+  assert.equal(classifyGlass("Jamb_2", "Facade/FA_Windows"), 0);
+  assert.equal(classifyGlass("Post_01", "Timber_Framing/Posts"), 0);
+});
+
+test("parseModel: isGlass flags follow element order", () => {
+  const m = parseModel({
+    ...M,
+    collections: ["", "Openings/Glazing"],
+    boxes: [["Pane_01", 1, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5],
+      ["Post_02", 0, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5]],
+  });
+  assert.deepEqual([...m.isGlass], [1, 0, 0]);
 });
 
 test("parseModel: counts, dims, volumes", () => {

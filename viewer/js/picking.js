@@ -5,9 +5,7 @@
 import * as THREE from "three";
 import { LAYERS, TIMBER_DENSITY } from "./model-data.js";
 
-const HIGHLIGHT = new THREE.Color(0x33ff66);
-
-export function makePicking(canvas, getCamera, getSceneApi, getModel, onSelect) {
+export function makePicking(canvas, getCamera, getSceneApi, getStyles, onSelect) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let hovered = null;
@@ -30,7 +28,7 @@ export function makePicking(canvas, getCamera, getSceneApi, getModel, onSelect) 
     if (hovered !== null) api.highlight(hovered, null);
     hovered = eid;
     if (eid !== null) {
-      api.highlight(eid, HIGHLIGHT);
+      api.highlight(eid, getStyles().hoverColor);
       canvas.style.cursor = "pointer";
     } else {
       canvas.style.cursor = "";
@@ -62,6 +60,12 @@ export function makePicking(canvas, getCamera, getSceneApi, getModel, onSelect) 
     tick,
     clearHover() { setHover(null); },
     resetAfterModelChange() { hovered = null; },
+    // Re-tint the hovered element after a style change
+    refreshHover() {
+      const eid = hovered;
+      hovered = null;
+      setHover(eid);
+    },
   };
 }
 
@@ -69,7 +73,7 @@ export function makePicking(canvas, getCamera, getSceneApi, getModel, onSelect) 
 // Element inspector
 // ------------------------------------------------------------------
 
-export function makeInspector(model) {
+export function makeInspector(model, theme) {
   let root = document.getElementById("inspector");
   if (root) root.remove();
   root = document.createElement("div");
@@ -82,8 +86,8 @@ export function makeInspector(model) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0e120e);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x445544, 1.2));
+  scene.background = new THREE.Color(theme.bg);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x556066, 1.2));
   const dl = new THREE.DirectionalLight(0xffffff, 1.4);
   dl.position.set(2, -3, 4);
   scene.add(dl);
@@ -157,7 +161,7 @@ export function makeInspector(model) {
     const geom = new THREE.BufferGeometry();
     geom.setAttribute("position", new THREE.BufferAttribute(Float32Array.from(pts), 3));
     const lines = new THREE.LineSegments(geom,
-      new THREE.LineBasicMaterial({ color: 0x33ff66 }));
+      new THREE.LineBasicMaterial({ color: theme.accent }));
     group.add(lines);
     for (const anchor of dimAnchors) {
       const el = document.createElement("div");
@@ -174,11 +178,11 @@ export function makeInspector(model) {
       const { geom, dims } = buildGeometry(eid);
       group = new THREE.Group();
       const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
-        color: 0xe8e4dc, roughness: 0.9,
+        color: 0xd8d5cd, roughness: 0.9,
       }));
       group.add(mesh);
       group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 10),
-        new THREE.LineBasicMaterial({ color: 0x234a2e })));
+        new THREE.LineBasicMaterial({ color: theme.ink })));
       addDimLines(dims);
       scene.add(group);
 
@@ -217,6 +221,15 @@ export function makeInspector(model) {
         labels[i].style.top = `${rect.top + (-v.y * 0.5 + 0.5) * rect.height}px`;
         labels[i].style.display = v.z < 1 ? "block" : "none";
       }
+    },
+
+    // Follow the active style without rebuilding the panel
+    setTheme(t) {
+      theme = t;
+      scene.background = new THREE.Color(t.bg);
+      group?.traverse((o) => {
+        if (o.isLineSegments) o.material.color.set(t.accent);
+      });
     },
 
     destroy() {

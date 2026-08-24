@@ -1,14 +1,15 @@
 // CraftBot viewer entry point: wiring, model loading, GUI, render loop.
 
 import * as THREE from "three";
-import { parseModel, computeStats, LAYERS, LAYER_COLORS } from "./model-data.js";
+import { parseModel, computeStats, LAYERS } from "./model-data.js";
 import { buildModelGroup } from "./scene.js";
 import { makeViews, VIEWS } from "./views.js";
-import { makePanel, fmtBytes } from "./gui.js";
+import { makePanel, makeTable, fmtBytes } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
 import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
 import { makeSections } from "./sections.js";
 import { makePicking, makeInspector } from "./picking.js";
+import { makeViewCube } from "./viewcube.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -20,7 +21,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.localClippingEnabled = true;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xdfe6ea);
+scene.background = new THREE.Color(0xd3d5d3);
 
 const hemi = new THREE.HemisphereLight(0xffffff, 0x666a70, 1.1);
 hemi.position.set(0, 0, 1);
@@ -29,36 +30,51 @@ const dir = new THREE.DirectionalLight(0xffffff, 1.6);
 dir.position.set(3, -2, 6);
 scene.add(dir);
 
-const grid = new THREE.GridHelper(40, 40, 0x8899aa, 0xb8c4cc);
-grid.rotation.x = Math.PI / 2; // XY ground plane (Z-up scene)
-scene.add(grid);
-
 const views = makeViews(renderer, canvas);
 const anims = makeAnimations();
 const sections = makeSections();
-const styles = makeStyles(renderer, scene, grid, {
-  onMaterials: (fill, line) => {
-    anims.patchMaterial(fill);
-    anims.patchMaterial(line);
-    sections.refresh();
-  },
-});
 
 let sceneApi = null;
 let currentModel = null;
 let currentStyle = "solid";
 let inspector = null;
+let selected = null;
 const layerVisible = LAYERS.map(() => true);
 
+const styles = makeStyles(renderer, scene, {
+  onMaterials: (mats) => {
+    for (const m of mats) anims.patchMaterial(m);
+    sections.refresh();
+    if (selected !== null && sceneApi) sceneApi.setSelected(selected, styles.selectColor);
+    picking.refreshHover();
+  },
+  onTheme: (theme) => {
+    viewCube.setTheme(theme);
+    if (inspector) inspector.setTheme(theme);
+  },
+});
+
 const picking = makePicking(canvas, () => views.camera, () => sceneApi,
-  () => currentModel, (eid) => {
+  () => styles, (eid) => {
     if (!inspector) return;
-    if (eid === null) inspector.hide();
-    else inspector.show(eid);
+    selected = eid;
+    if (eid === null) {
+      inspector.hide();
+      if (sceneApi) sceneApi.setSelected(null);
+    } else {
+      inspector.show(eid);
+      if (sceneApi) sceneApi.setSelected(eid, styles.selectColor);
+    }
   });
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && inspector) inspector.hide();
+  if (e.key === "Escape" && inspector) {
+    inspector.hide();
+    selected = null;
+    if (sceneApi) sceneApi.setSelected(null);
+  }
 });
+
+const viewCube = makeViewCube(views);
 
 function showError(msg) {
   banner.textContent = msg;
@@ -75,24 +91,20 @@ async function loadModel(file) {
     const model = parseModel(json);
     if (sceneApi) sceneApi.dispose();
     currentModel = model;
+    selected = null;
     sceneApi = buildModelGroup(model);
+    sceneApi.setOutlineResolution(canvas.clientWidth, canvas.clientHeight);
     for (let li = 0; li < LAYERS.length; li++) sceneApi.setLayerVisible(li, layerVisible[li]);
     scene.add(sceneApi.group);
+    const sphere = sceneApi.bounds.getBoundingSphere(new THREE.Sphere());
+    styles.setSceneRadius(sphere.radius);
     styles.apply(currentStyle, sceneApi, model);
     sections.refresh(sceneApi, sceneApi.bounds);
     anims.play(model, sceneApi);
     picking.resetAfterModelChange();
     if (inspector) inspector.destroy();
-    inspector = makeInspector(model);
+    inspector = makeInspector(model, styles.theme);
     views.fit(sceneApi.bounds);
-    const size = sceneApi.bounds.getSize(new THREE.Vector3());
-    const span = Math.ceil(Math.max(size.x, size.y) * 1.6) || 10;
-    grid.scale.setScalar(span / 40);
-    grid.position.set(
-      (sceneApi.bounds.min.x + sceneApi.bounds.max.x) / 2,
-      (sceneApi.bounds.min.y + sceneApi.bounds.max.y) / 2,
-      sceneApi.bounds.min.z - 0.01,
-    );
     banner.hidden = true;
     const url = new URL(location);
     url.searchParams.set("model", file);
@@ -114,12 +126,15 @@ const secModel = panel.section("MODEL");
 const secStyle = panel.section("STYLE");
 const secLayers = panel.section("LAYERS");
 
+// Clicking the active style again advances its mode (mono/wireframe) or
+// re-seeds the palette (random).
 const styleButtons = secStyle.addButtons(STYLES, (name) => {
+  const advance = name === currentStyle;
   currentStyle = name;
-  if (sceneApi) styles.apply(name, sceneApi, currentModel);
+  styles.apply(name, sceneApi, currentModel, { advance });
 }, { radio: true, active: currentStyle });
 
-const secAnim = panel.section("ANIMATION");
+const secAnim = panel.section("ANIMATION", false);
 const selAnim = secAnim.addSelect("Entry", ANIMS.map((a) => ({ value: a, label: a })),
   (v) => anims.setAnim(v));
 const selOrder = secAnim.addSelect("Order", ORDERS.map((o) => ({ value: o, label: o })),
@@ -145,18 +160,6 @@ secSection.addButtons(["flip x", "flip y", "flip z", "reset"], (label) => {
   sections.set(axis, { flip: !sections.getState(axis).flip });
 });
 
-const secView = panel.section("VIEW");
-const viewButtons = secView.addButtons(["top", "front", "side", "axo", "quad"], (name) => {
-  if (name === "quad") {
-    views.setQuad(!views.quad);
-    viewButtons.setActive(views.quad ? "quad" : "axo");
-  } else {
-    views.setQuad(false);
-    views.setPreset(name);
-    viewButtons.setActive(name);
-  }
-}, { active: "axo" });
-
 let index = null;
 const pick = { exp: null, agent: null, v: null };
 
@@ -169,10 +172,11 @@ function currentVersions() {
 function currentEntry() {
   return currentVersions().find((x) => x.v === pick.v) ?? null;
 }
+const last = (arr) => arr[arr.length - 1];
 
 const selExp = secModel.addSelect("Model", [], (v) => {
   pick.exp = v;
-  pick.agent = currentRuns()[0]?.agent ?? null;
+  pick.agent = last(currentRuns())?.agent ?? null;
   refreshPickers();
   loadPicked();
 });
@@ -191,7 +195,7 @@ function refreshPickers() {
   selExp.setOptions(index.experiments.map((e) => ({ value: e.id, label: e.title })), pick.exp);
   selAgent.setOptions(currentRuns().map((r) => ({ value: r.agent, label: r.agent })), pick.agent);
   const versions = currentVersions();
-  if (!versions.some((x) => x.v === pick.v)) pick.v = versions[versions.length - 1]?.v ?? null;
+  if (!versions.some((x) => x.v === pick.v)) pick.v = last(versions)?.v ?? null;
   selVersion.setOptions(versions.map((x) => ({ value: x.v, label: x.v })), pick.v);
 }
 
@@ -202,15 +206,17 @@ function loadPicked() {
   loadModel(`models/${entry.file}`);
 }
 
-// LAYERS section
-const layerToggles = LAYERS.map((name, li) =>
+// LAYERS section - visibility only; the takeoff numbers live in #stats
+LAYERS.forEach((name, li) =>
   secLayers.addToggle(name, true, (on) => {
     layerVisible[li] = on;
     if (sceneApi) sceneApi.setLayerVisible(li, on);
     refreshStats();
-  }, `#${LAYER_COLORS[li].toString(16).padStart(6, "0")}`),
-);
-const statsTable = secLayers.addTable(["layer", "n", "len m", "m³", "kg"]);
+  }));
+
+// Always-visible material takeoff, top of the screen next to the panel
+const statsTable = makeTable(document.getElementById("stats"),
+  ["layer", "n", "len m", "m³", "kg"]);
 
 function refreshStats() {
   if (!currentModel) return;
@@ -239,6 +245,7 @@ document.addEventListener("craftbot:model", refreshStats);
 function resize() {
   renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   views.onResize();
+  if (sceneApi) sceneApi.setOutlineResolution(canvas.clientWidth, canvas.clientHeight);
 }
 new ResizeObserver(resize).observe(canvas);
 
@@ -248,6 +255,7 @@ renderer.setAnimationLoop(() => {
   views.tick();
   picking.tick();
   views.render(styles.render);
+  viewCube.render();
   if (inspector) inspector.render(clock.elapsedTime);
 });
 resize();
@@ -258,6 +266,8 @@ if (STYLES.includes(bootParams.get("style"))) {
   currentStyle = bootParams.get("style");
   styleButtons.setActive(currentStyle);
 }
+// Testing: ?mode=1 picks the second variant of a two-mode style
+const modeParam = parseInt(bootParams.get("mode"), 10);
 if (ANIMS.includes(bootParams.get("anim"))) {
   anims.setAnim(bootParams.get("anim"));
   selAnim.set(anims.anim);
@@ -269,9 +279,19 @@ if (ORDERS.includes(bootParams.get("order"))) {
 const viewParam = bootParams.get("view");
 if (VIEWS.includes(viewParam)) {
   document.addEventListener("craftbot:model", () => {
-    if (viewParam === "quad") views.setQuad(true);
-    else views.setPreset(viewParam);
-    viewButtons.setActive(viewParam);
+    if (viewParam === "quad") {
+      views.setQuad(true);
+      viewCube.setQuadActive(true);
+    } else {
+      views.setPreset(viewParam);
+    }
+  });
+}
+if (!Number.isNaN(modeParam) && modeParam > 0) {
+  document.addEventListener("craftbot:model", () => {
+    for (let i = 0; i < modeParam; i++) {
+      styles.apply(currentStyle, sceneApi, currentModel, { advance: true });
+    }
   });
 }
 // Testing: ?cut=axis,t e.g. cut=1,0.5 sections the model on load
@@ -283,7 +303,11 @@ if (cutParam.length === 2) {
 // Testing: ?select=elementId opens the inspector on load
 const selectParam = parseInt(bootParams.get("select"), 10);
 if (!Number.isNaN(selectParam)) {
-  document.addEventListener("craftbot:model", () => inspector.show(selectParam));
+  document.addEventListener("craftbot:model", () => {
+    selected = selectParam;
+    inspector.show(selectParam);
+    sceneApi.setSelected(selectParam, styles.selectColor);
+  });
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
@@ -293,7 +317,7 @@ fetch("models/index.json")
   .then((r) => r.json())
   .then((idx) => {
     index = idx;
-    // Resolve the requested file back to picker state, else first entry
+    // Resolve the requested file back to picker state, else newest of the last agent
     let found = null;
     for (const e of idx.experiments) {
       for (const r of e.runs) {
@@ -303,8 +327,8 @@ fetch("models/index.json")
       }
     }
     const e = found?.e ?? idx.experiments[0];
-    const r = found?.r ?? e.runs[0];
-    const x = found?.x ?? r.versions[r.versions.length - 1];
+    const r = found?.r ?? last(e.runs);
+    const x = found?.x ?? last(r.versions);
     pick.exp = e.id; pick.agent = r.agent; pick.v = x.v;
     refreshPickers();
     loadPicked();
@@ -314,6 +338,6 @@ fetch("models/index.json")
     if (requested) loadModel(requested);
   });
 
-export { renderer, scene, views, grid, loadModel };
+export { renderer, scene, views, loadModel };
 export function getSceneApi() { return sceneApi; }
 export function getModel() { return currentModel; }

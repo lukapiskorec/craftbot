@@ -58,22 +58,18 @@ export function makePanel(root, title = "CRAFTBOT VIEWER") {
         return api;
       },
 
-      addToggle(label, checked, onChange, swatch) {
-        const r = row(null);
+      // The whole row is a <label>, so the name toggles the box too.
+      addToggle(label, checked, onChange) {
+        const r = document.createElement("label");
+        r.className = "gui-row gui-toggle";
+        body.appendChild(r);
         const box = document.createElement("input");
         box.type = "checkbox";
         box.checked = checked;
         box.addEventListener("change", () => onChange(box.checked));
-        r.appendChild(box);
-        if (swatch) {
-          const sw = document.createElement("span");
-          sw.className = "swatch";
-          sw.style.background = swatch;
-          r.appendChild(sw);
-        }
         const span = document.createElement("span");
         span.textContent = label;
-        r.appendChild(span);
+        r.append(box, span);
         return { set(v) { box.checked = v; }, get value() { return box.checked; } };
       },
 
@@ -118,26 +114,30 @@ export function makePanel(root, title = "CRAFTBOT VIEWER") {
         return { set(html) { div.innerHTML = html; } };
       },
 
-      addTable(headers) {
-        const t = document.createElement("table");
-        t.className = "stats";
-        const thead = document.createElement("thead");
-        thead.innerHTML = `<tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>`;
-        const tbody = document.createElement("tbody");
-        t.append(thead, tbody);
-        body.appendChild(t);
-        return {
-          set(rows) { // rows: [{cells: [..], total?: bool}]
-            tbody.innerHTML = rows.map((r) =>
-              `<tr${r.total ? ' class="total"' : ""}>${r.cells.map((c) => `<td>${c}</td>`).join("")}</tr>`,
-            ).join("");
-          },
-        };
-      },
+      addTable(headers) { return makeTable(body, headers); },
     };
   }
 
   return { section };
+}
+
+// Standalone stats table - used both inside a section and in the always-visible
+// takeoff block at the top of the screen.
+export function makeTable(root, headers) {
+  const t = document.createElement("table");
+  t.className = "stats";
+  const thead = document.createElement("thead");
+  thead.innerHTML = `<tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>`;
+  const tbody = document.createElement("tbody");
+  t.append(thead, tbody);
+  root.appendChild(t);
+  return {
+    set(rows) { // rows: [{cells: [..], total?: bool}]
+      tbody.innerHTML = rows.map((r) =>
+        `<tr${r.total ? ' class="total"' : ""}>${r.cells.map((c) => `<td>${c}</td>`).join("")}</tr>`,
+      ).join("");
+    },
+  };
 }
 
 export function fmtBytes(n) {

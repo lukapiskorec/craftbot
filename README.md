@@ -57,7 +57,7 @@ Example (Windows):
 
 A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to GitHub Pages. Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
 
-Features: model/agent/iteration picker, six render styles (plaster, solid, random, blueprint, 1-bit dither, pixel), GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), layer toggles with material takeoff (length, volume, weight), section planes on three axes, orthographic view presets with a 4-view mode, and hover/click element inspection with dimensions.
+Features: model/agent/iteration picker, eight render styles (plaster, solid, random, mono, wireframe, blueprint, 1-bit dither, pixel) — mono and wireframe each have a light and a dark mode, and re-clicking random re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style. Also: GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), layer toggles with an always-visible material takeoff (length, volume, weight), section planes on three axes, a Blender-style navigation cube with a 4-view mode, and hover/click element inspection with dimensions.
 
 Run locally:
 

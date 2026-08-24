@@ -3,8 +3,22 @@
 // No DOM or three.js imports - unit-tested with `node --test viewer/test/`.
 
 export const LAYERS = ["foundations", "floors", "frame", "roof", "cladding", "other"];
-export const LAYER_COLORS = [0x8a7f72, 0xc9b48a, 0xc97b4a, 0x9a4a3a, 0x7a8a5a, 0x9a9aa5];
+// Desaturated warm greys/tans matching the Blender Workbench OBJECT colours
+// used by the headless renders (see experiments/*/Fable/render_fable.py).
+export const LAYER_COLORS = [0xa3a39c, 0xd0b98f, 0xb08d63, 0xc2a173, 0x8c8c85, 0xb4b4ac];
 export const TIMBER_DENSITY = 500; // kg/m3
+
+// Elements whose name or collection matches these are drawn semi-transparent.
+// Deliberately NOT "window": the exports name the timber around an opening
+// Window_Sill / Window_Head / FA_Windows, and those are solid members. The
+// Blender scripts name the pane itself Glass_* or file it under a Glazing
+// collection, which is what actually wants to be see-through.
+const GLASS_KEYWORDS = ["glass", "glaz"];
+
+export function classifyGlass(name, collectionPath) {
+  const t = `${collectionPath || ""} ${name || ""}`.toLowerCase();
+  return GLASS_KEYWORDS.some((kw) => t.includes(kw)) ? 1 : 0;
+}
 
 // Order matters: first match wins ("Roof_Beam" is roof, not frame).
 // Collection path is checked before the element name.
@@ -48,8 +62,9 @@ function triangulate(face, out) {
  * Element order: all boxes (creation order), then all meshes (creation order);
  * this is the construction sequence used by entry animations.
  *
- * Returns {count, names, collections, layer, kinds, dims, centers, volumes,
- *          boxes: {elementIds, matrices}, meshes: [{elementId, name, verts, index}]}
+ * Returns {count, names, collections, layer, kinds, isGlass, dims, centers,
+ *          volumes, boxes: {elementIds, matrices},
+ *          meshes: [{elementId, name, verts, index}]}
  */
 export function parseModel(json) {
   if (json.format !== "craftbot-model" || json.version !== 1) {
@@ -63,6 +78,7 @@ export function parseModel(json) {
   const names = new Array(count);
   const layer = new Uint8Array(count);
   const kinds = new Uint8Array(count); // 0 = box, 1 = mesh
+  const isGlass = new Uint8Array(count); // 1 = drawn semi-transparent
   const dims = new Float32Array(3 * count);
   const centers = new Float32Array(3 * count);
   const volumes = new Float32Array(count);
@@ -79,6 +95,7 @@ export function parseModel(json) {
     const o = 2;
     names[b] = name;
     layer[b] = classifyLayer(name, coll);
+    isGlass[b] = classifyGlass(name, coll);
     kinds[b] = 0;
     elementIds[b] = b;
     // Column-major 4x4 for three.js instanceMatrix
@@ -103,6 +120,7 @@ export function parseModel(json) {
     const e = nb + j;
     names[e] = src.name;
     layer[e] = classifyLayer(src.name, colls[src.collection]);
+    isGlass[e] = classifyGlass(src.name, colls[src.collection]);
     kinds[e] = 1;
     const verts = Float32Array.from(src.verts);
     const idx = [];
@@ -136,7 +154,7 @@ export function parseModel(json) {
   }
 
   return {
-    count, names, collections: colls, layer, kinds, dims, centers, volumes,
+    count, names, collections: colls, layer, kinds, isGlass, dims, centers, volumes,
     boxes: { elementIds, matrices }, meshes,
   };
 }
