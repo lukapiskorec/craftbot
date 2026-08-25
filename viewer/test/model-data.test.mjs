@@ -1,34 +1,37 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  classifyLayer, classifyGlass, parseModel, computeStats, computeSpawnTimes,
-  orientedBox, LAYERS, TIMBER_DENSITY,
+  classifyGlass, parseModel, computeStats, computeSpawnTimes, matchElements,
+  orientedBox, LAYERS, STATIC_SPAWN, TIMBER_DENSITY,
 } from "../js/model-data.js";
 
 const M = {
   format: "craftbot-model", version: 1, source: "s",
   collections: ["", "Timber_Framing/Posts"],
+  layers: ["frame", "roof", "foundations"], // baked by tools/layers.py
   boxes: [
-    ["Post_01", 1, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5], // 0.1x0.1x3.0 post
-    ["Roof_Beam_01", 0, 1, 0, 0, 0, 0, 0.1, 0, 0, 0, 0, 0.1, 3.2],
+    ["Post_01", 1, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5, 0], // 0.1x0.1x3.0 post
+    ["Roof_Beam_01", 0, 1, 0, 0, 0, 0, 0.1, 0, 0, 0, 0, 0.1, 3.2, 1],
   ],
   meshes: [
     {
-      name: "Footing_01", collection: 0,
+      name: "Footing_01", collection: 0, layer: 2,
       verts: [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
       faces: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
     },
   ],
 };
 
-test("classifyLayer: collection wins over name", () => {
-  assert.equal(LAYERS[classifyLayer("Roof_Beam_01", "Timber_Framing/Posts")], "frame");
+test("parseModel: baked layer names map onto LAYERS, unknown names -> other", () => {
+  const m = parseModel(M);
+  assert.deepEqual([...m.layer].map((i) => LAYERS[i]), ["frame", "roof", "foundations"]);
+  const odd = parseModel({ ...M, layers: ["frame", "gizmos", "foundations"] });
+  assert.equal(LAYERS[odd.layer[1]], "other");
 });
 
-test("classifyLayer: name keywords", () => {
-  assert.equal(LAYERS[classifyLayer("Roof_Beam_01", "")], "roof");
-  assert.equal(LAYERS[classifyLayer("Footing_01", "")], "foundations");
-  assert.equal(LAYERS[classifyLayer("Mystery_01", "")], "other");
+test("parseModel: rejects a model without baked layers", () => {
+  const { layers, ...unbaked } = M;
+  assert.throws(() => parseModel(unbaked), /tools\/layers\.py/);
 });
 
 test("classifyGlass: only glazing, not the timber around an opening", () => {
@@ -80,12 +83,12 @@ test("parseModel: rejects unknown format", () => {
 
 test("computeStats: totals and visibility", () => {
   const m = parseModel(M);
-  const all = computeStats(m, [true, true, true, true, true, true]);
+  const all = computeStats(m, LAYERS.map(() => true));
   const frame = all.find((r) => r.layer === "frame");
   assert.equal(frame.count, 1);
   assert.ok(Math.abs(frame.lengthM - 3.0) < 1e-3);
   assert.ok(Math.abs(frame.weightKg - 0.03 * TIMBER_DENSITY) < 1e-2);
-  const none = computeStats(m, [false, false, false, false, false, false]);
+  const none = computeStats(m, LAYERS.map(() => false));
   assert.equal(none.reduce((s, r) => s + r.count, 0), 0);
 });
 
@@ -101,6 +104,44 @@ test("computeSpawnTimes: layers mode builds foundations before roof", () => {
   const t = computeSpawnTimes(m, "layers", 3.0);
   // element 2 = Footing (foundations), 1 = Roof_Beam (roof), 0 = Post (frame)
   assert.ok(t[2] < t[0] && t[0] < t[1]);
+});
+
+test("computeSpawnTimes: kept elements are static, the rest staggered", () => {
+  const m = parseModel(M);
+  const kept = Uint8Array.from([1, 0, 0]);
+  const t = computeSpawnTimes(m, "sequence", 3.0, kept);
+  assert.equal(t[0], STATIC_SPAWN);
+  assert.equal(t[1], 0);
+  assert.ok(Math.abs(t[2] - 2.4) < 1e-5);
+  const one = computeSpawnTimes(m, "sequence", 3.0, Uint8Array.from([1, 1, 0]));
+  assert.equal(one[2], 0);
+});
+
+test("matchElements: pairs unchanged elements, drops moved/renamed, new ones are -1", () => {
+  const prev = parseModel(M);
+  const moved = [...M.boxes[1]];
+  moved[13] = 3.5; // Roof_Beam_01 raised
+  const next = parseModel({ ...M, boxes: [
+    ["Post_01", 1, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5, 0],
+    moved,
+    ["Post_02", 1, 0.05, 0, 0, 2, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5, 0], // new
+  ] });
+  const map = matchElements(prev, next);
+  assert.deepEqual([...map], [0, -1, -1, 2]); // Post_01, moved beam, new post, footing
+});
+
+test("matchElements: duplicate keys pair one-to-one", () => {
+  const twin = ["Post_01", 1, 0.05, 0, 0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 1.5, 0];
+  const prev = parseModel({ ...M, boxes: [twin, twin] });
+  const next = parseModel({ ...M, boxes: [twin, twin, twin] });
+  assert.deepEqual([...matchElements(prev, next)].slice(0, 3), [0, 1, -1]);
+});
+
+test("matchElements: an unchanged mesh is kept, a reshaped one is not", () => {
+  const prev = parseModel(M);
+  assert.equal(matchElements(prev, parseModel(M))[2], 2);
+  const shaved = { ...M.meshes[0], verts: M.meshes[0].verts.map((v, i) => (i === 14 ? 0.5 : v)) };
+  assert.equal(matchElements(prev, parseModel({ ...M, meshes: [shaved] }))[2], -1);
 });
 
 test("elementForFace maps triangles to elements", async () => {
@@ -161,7 +202,7 @@ test("parseModel: mesh dims are oriented, box frames match matrix columns", () =
   const { verts, index } = rotatedMember();
   const faces = [];
   for (let i = 0; i < index.length; i += 3) faces.push([index[i], index[i + 1], index[i + 2]]);
-  const m = parseModel({ ...M, meshes: [{ name: "Rafter_01", collection: 0,
+  const m = parseModel({ ...M, meshes: [{ name: "Rafter_01", collection: 0, layer: 0,
     verts: Array.from(verts), faces }] });
   const e = 2;
   assert.ok(Math.abs(m.dims[e * 3] - 3.0) < 1e-3);

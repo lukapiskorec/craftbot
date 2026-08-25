@@ -78,15 +78,19 @@ export function makeAnimations() {
       mat.customProgramCacheKey = () => "craftbot-anim";
     },
 
-    play(model, sceneApi) {
-      if (anim === "none" || !model) {
+    // kept (Uint8Array, optional): elements that stay in place - only the
+    // rest animate in (iteration switch; see matchElements in model-data.js)
+    play(model, sceneApi, { kept = null } = {}) {
+      let animated = model ? model.count : 0;
+      if (kept) for (let e = 0; e < model.count; e++) if (kept[e]) animated--;
+      if (anim === "none" || animated === 0) {
         uniforms.uMode.value = 0;
         uniforms.uTime.value = 1e9;
         playing = false;
         return;
       }
-      const total = Math.min(6, Math.max(2, model.count * 0.004));
-      sceneApi.setSpawnTimes(computeSpawnTimes(model, order, total));
+      const total = Math.min(6, Math.max(2, animated * 0.004));
+      sceneApi.setSpawnTimes(computeSpawnTimes(model, order, total, kept));
       const size = sceneApi.bounds.getSize(new THREE.Vector3());
       uniforms.uDrop.value = Math.max(size.z * 1.2, 4);
       sceneApi.bounds.getCenter(uniforms.uFocus.value);

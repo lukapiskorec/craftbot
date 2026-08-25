@@ -7,6 +7,11 @@
 # ------------------------------------------------------------------
 
 import json
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import layers
 import re
 
 # The unit cube emitted by craftbot_lib.place_element (2x2x2, centred at
@@ -94,7 +99,7 @@ def build_model_dict(source, records):
                 "verts": [rnd(x) for x in rec["verts"]],
                 "faces": orient_outward(rec["verts"], rec["faces"]),
             })
-    return {
+    model = {
         "format": "craftbot-model",
         "version": 1,
         "source": source,
@@ -102,6 +107,8 @@ def build_model_dict(source, records):
         "boxes": boxes,
         "meshes": meshes,
     }
+    # Viewer layer per element (box row[14] / mesh["layer"], names in "layers")
+    return layers.bake_dict(model, layers.experiment_of(source))
 
 
 def dump_compact(d, path):
@@ -123,10 +130,12 @@ def _experiment_title(exp_id):
 def build_index(entries):
     """
     Build index.json dict from flat export entries:
-      {"experiment", "agent", "v", "file", "elements", "bytes", "rationale"?}
+      {"experiment", "agent", "v", "file", "elements", "bytes",
+       "rationale"?, "callouts"?}
     Experiments sorted by id, agents sorted by name ("ChatGPT 5.1" first),
     versions sorted by version string. A run carries "rationale" (relative
-    path of the design rationale markdown) when any of its entries has one.
+    path of the design rationale markdown) and "callouts" (its callouts
+    json) when any of its entries has one.
     """
     by_exp = {}
     for e in entries:
@@ -143,10 +152,10 @@ def build_index(entries):
                               "elements": e["elements"], "bytes": e["bytes"]}
                              for e in versions],
             }
-            rationale = next((e["rationale"] for e in versions
-                              if e.get("rationale")), None)
-            if rationale:
-                run["rationale"] = rationale
+            for key in ("rationale", "callouts"):
+                value = next((e[key] for e in versions if e.get(key)), None)
+                if value:
+                    run[key] = value
             runs.append(run)
         experiments.append({
             "id": exp_id,

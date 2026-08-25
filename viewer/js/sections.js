@@ -15,11 +15,12 @@ export function makeSections() {
   const planes = [0, 1, 2].map(() => new THREE.Plane());
   let bounds = null;
   let sceneApi = null;
+  let active = []; // planes currently clipping
 
   function update() {
     if (!bounds || !sceneApi) return;
     const min = bounds.min, max = bounds.max;
-    const active = [];
+    active = [];
     for (let axis = 0; axis < 3; axis++) {
       const s = state[axis];
       if (!s.enabled) continue;
@@ -59,5 +60,8 @@ export function makeSections() {
     },
 
     getState(axis) { return { ...state[axis] }; },
+
+    // Planes in effect (for picking: hits on the clipped side are not visible)
+    activePlanes() { return active; },
   };
 }

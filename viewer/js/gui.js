@@ -106,10 +106,11 @@ export function makePanel(root, title = "CRAFTBOT VIEWER", { exclusive = false }
       },
 
       // The whole row is a <label>, so the name toggles the box too.
-      addToggle(label, checked, onChange) {
+      // host = row to share with other controls (the SECTION sliders).
+      addToggle(label, checked, onChange, host = null) {
         const r = document.createElement("label");
-        r.className = "gui-row gui-toggle";
-        body.appendChild(r);
+        r.className = host ? "gui-toggle" : "gui-row gui-toggle";
+        (host ?? body).appendChild(r);
         const box = document.createElement("input");
         box.type = "checkbox";
         box.checked = checked;
@@ -120,9 +121,10 @@ export function makePanel(root, title = "CRAFTBOT VIEWER", { exclusive = false }
         return { set(v) { box.checked = v; }, get value() { return box.checked; } };
       },
 
-      // readout(value) -> text shown after the slider (omit for none)
-      addSlider(label, min, max, value, onChange, { step = "any", readout = null } = {}) {
-        const r = row(label);
+      // readout(value) -> text shown after the slider (omit for none);
+      // host = row to share with other controls (label is then ignored)
+      addSlider(label, min, max, value, onChange, { step = "any", readout = null, host = null } = {}) {
+        const r = host ?? row(label);
         const input = document.createElement("input");
         input.type = "range";
         input.min = min; input.max = max; input.value = value;

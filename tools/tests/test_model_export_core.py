@@ -58,8 +58,11 @@ class TestBuildModel(unittest.TestCase):
         self.assertEqual(d["format"], "craftbot-model")
         self.assertEqual(d["version"], 1)
         self.assertEqual(d["collections"], ["", "Frame"])
-        self.assertEqual(d["boxes"], [["Post_01", 1, 1, 0, 0, 0.5, 0, 1, 0, 0, 0, 0, 2, 1]])
+        # row[14] = viewer layer index (Frame collection -> "frame")
+        self.assertEqual(d["boxes"], [["Post_01", 1, 1, 0, 0, 0.5, 0, 1, 0, 0, 0, 0, 2, 1, 0]])
+        self.assertEqual(d["layers"][0], "frame")
         self.assertEqual(d["meshes"][0]["collection"], 0)
+        self.assertEqual(d["layers"][d["meshes"][0]["layer"]], "cladding ext")
 
     def test_dump_compact(self):
         d = core.build_model_dict("s", self.records())
@@ -110,12 +113,15 @@ class TestIndexRationale(unittest.TestCase):
         base = {"experiment": "01_X", "file": "f", "elements": 1, "bytes": 1}
         idx = core.build_index([
             dict(base, agent="Fable", v="v01", rationale=None),
-            dict(base, agent="Fable", v="v02", rationale="01_X/fable_rationale.md"),
+            dict(base, agent="Fable", v="v02", rationale="01_X/fable_rationale.md",
+                 callouts="01_X/fable_callouts.json"),
             dict(base, agent="ChatGPT 5.1", v="v01", rationale=None),
         ])
         runs = {r["agent"]: r for r in idx["experiments"][0]["runs"]}
         self.assertEqual(runs["Fable"]["rationale"], "01_X/fable_rationale.md")
+        self.assertEqual(runs["Fable"]["callouts"], "01_X/fable_callouts.json")
         self.assertNotIn("rationale", runs["ChatGPT 5.1"])
+        self.assertNotIn("callouts", runs["ChatGPT 5.1"])
 
 
 class TestWinding(unittest.TestCase):

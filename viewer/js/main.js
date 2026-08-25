@@ -1,7 +1,7 @@
 // CraftBot viewer entry point: wiring, model loading, GUI, render loop.
 
 import * as THREE from "three";
-import { parseModel, computeStats, LAYERS } from "./model-data.js";
+import { parseModel, computeStats, matchElements, LAYERS } from "./model-data.js";
 import { buildModelGroup } from "./scene.js";
 import { makeViews, VIEWS } from "./views.js";
 import { makePanel, makeTable, fmtBytes, isMobile } from "./gui.js";
@@ -11,6 +11,7 @@ import { makeSections } from "./sections.js";
 import { makePicking, makeInspector } from "./picking.js";
 import { makeViewCube } from "./viewcube.js";
 import { makeDocPanel } from "./rationale.js";
+import { makeCallouts } from "./callouts.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -67,7 +68,7 @@ const picking = makePicking(canvas, (x, y) => views.pickCamera(x, y), () => scen
       inspector.show(eid);
       if (sceneApi) sceneApi.setSelected(eid, styles.selectColor);
     }
-  });
+  }, { getModel: () => currentModel, getClipPlanes: () => sections.activePlanes() });
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && inspector) {
     inspector.hide();
@@ -87,7 +88,9 @@ window.addEventListener("unhandledrejection", (e) => showError(`Error: ${e.reaso
 
 let loadSeq = 0; // the iteration slider can fire faster than fetches land
 
-// keepView: keep the camera where it is (another iteration of the same model)
+// keepView: another iteration of the same model - keep the camera, keep the
+// unchanged elements in place (only changed ones animate in) and carry the
+// selection over if its element survived.
 async function loadModel(file, { keepView = false } = {}) {
   const seq = ++loadSeq;
   try {
@@ -96,6 +99,17 @@ async function loadModel(file, { keepView = false } = {}) {
     const json = await res.json();
     if (seq !== loadSeq) return; // a newer load superseded this one
     const model = parseModel(json);
+    let kept = null;
+    let carried = null;
+    if (keepView && currentModel) {
+      const map = matchElements(currentModel, model);
+      kept = new Uint8Array(model.count);
+      for (let e = 0; e < model.count; e++) {
+        if (map[e] < 0) continue;
+        kept[e] = 1;
+        if (map[e] === selected) carried = e;
+      }
+    }
     if (sceneApi) sceneApi.dispose();
     currentModel = model;
     selected = null;
@@ -107,11 +121,16 @@ async function loadModel(file, { keepView = false } = {}) {
     styles.setSceneRadius(sphere.radius);
     styles.apply(currentStyle, sceneApi, model);
     sections.refresh(sceneApi, sceneApi.bounds);
-    anims.play(model, sceneApi);
+    anims.play(model, sceneApi, { kept });
     picking.resetAfterModelChange();
     if (inspector) inspector.destroy();
     inspector = makeInspector(model, styles.theme,
       { getSceneApi: () => sceneApi, styles, renderer, mainCanvas: canvas });
+    if (carried !== null) {
+      selected = carried;
+      inspector.show(carried);
+      sceneApi.setSelected(carried, styles.selectColor);
+    }
     views.fit(sceneApi.bounds, { keepView });
     banner.hidden = true;
     const url = new URL(location);
@@ -155,12 +174,13 @@ const secSection = panel.section("SECTION", false);
 const cutToggles = [];
 for (let axis = 0; axis < 3; axis++) {
   const name = ["X", "Y", "Z"][axis];
+  const cutRow = secSection.addRow(); // toggle and slider share one line
   cutToggles.push(secSection.addToggle(`cut ${name}`, false,
-    (on) => sections.set(axis, { enabled: on })));
-  secSection.addSlider(name, 0, 1, 1, (t) => {
+    (on) => sections.set(axis, { enabled: on }), cutRow));
+  secSection.addSlider(null, 0, 1, 1, (t) => {
     sections.set(axis, { t, enabled: true });
     cutToggles[axis].set(true);
-  });
+  }, { host: cutRow });
 }
 secSection.addButtons(["flip x", "flip y", "flip z", "reset"], (label) => {
   if (label === "reset") { sections.reset(); return; }
@@ -203,6 +223,9 @@ const iterSlider = secModel.addSlider("Iteration", 1, 1, 1, (i) => {
   loadPicked();
 }, { step: 1, readout: (i) => currentVersions()[i - 1]?.v ?? "" });
 const modelInfo = secModel.addInfo();
+// Rationale callouts follow the DESIGN RATIONALE panel (open = shown) but
+// can be switched independently.
+const calloutToggle = secModel.addToggle("callouts", false, (on) => callouts.setVisible(on));
 
 function refreshPickers() {
   selExp.setOptions(index.experiments.map((e) => ({ value: e.id, label: e.title })), pick.exp);
@@ -217,10 +240,27 @@ function loadPicked() {
   const entry = currentEntry();
   if (!entry) return;
   modelInfo.set(`<b>${entry.elements}</b> elements &middot; <b>${fmtBytes(entry.bytes)}</b>`);
-  const rationale = currentRun()?.rationale;
-  docPanel.show(rationale ? `models/${rationale}` : null);
+  loadRunDocs(currentRun());
   loadModel(`models/${entry.file}`, { keepView: loadedExp === pick.exp });
   loadedExp = pick.exp;
+}
+
+// Rationale document + its callouts for a run (Fable runs only)
+let docSeq = 0;
+async function loadRunDocs(run) {
+  const seq = ++docSeq;
+  let data = null;
+  if (run?.callouts) {
+    try {
+      const res = await fetch(`models/${run.callouts}`);
+      if (res.ok) data = await res.json();
+    } catch (err) {
+      console.warn(`callouts: ${run.callouts}: ${err.message}`);
+    }
+  }
+  if (seq !== docSeq) return; // another run was picked meanwhile
+  callouts.setData(data);
+  docPanel.show(run?.rationale ? `models/${run.rationale}` : null, data);
 }
 
 // LAYERS section - visibility only; the takeoff numbers live in #stats
@@ -233,7 +273,17 @@ LAYERS.forEach((name, li) =>
 
 // Always-visible material takeoff, top of the screen next to the panel
 const statsTable = makeTable(document.getElementById("stats"),
-  ["layer", "n", "len m", "m³", "kg"]);const docPanel = makeDocPanel(document.body);
+  ["layer", "n", "len m", "m³", "kg"]);
+const docPanel = makeDocPanel(document.body);
+const callouts = makeCallouts(document.body, {
+  views, canvas, getSceneApi: () => sceneApi, getStyles: () => styles, docPanel,
+});
+docPanel.onToggle((open) => {
+  calloutToggle.set(open);
+  callouts.setVisible(open);
+});
+docPanel.onSectionHover((section) => callouts.highlightSection(section));
+document.addEventListener("craftbot:model", (ev) => callouts.setModel(ev.detail.model));
 
 function refreshStats() {
   if (!currentModel) return;
@@ -271,6 +321,7 @@ renderer.setAnimationLoop(() => {
   anims.tick(Math.min(clock.getDelta(), 0.1));
   views.tick();
   picking.tick();
+  callouts.tick();
   views.render(styles.render);
   viewCube.render();
   if (inspector) inspector.render(clock.elapsedTime);
@@ -327,6 +378,12 @@ if (!Number.isNaN(selectParam)) {
     inspector.show(selectParam);
     sceneApi.setSelected(selectParam, styles.selectColor);
   });
+}
+// Testing: ?hover=elementId shows the hover tag at the canvas centre
+const hoverParam = parseInt(bootParams.get("hover"), 10);
+if (!Number.isNaN(hoverParam)) {
+  document.addEventListener("craftbot:model", () =>
+    picking.debugHover(hoverParam, canvas.clientWidth / 2, canvas.clientHeight / 2));
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {

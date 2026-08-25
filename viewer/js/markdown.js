@@ -1,6 +1,8 @@
 // Small Markdown -> HTML renderer for the design rationale documents. Covers
 // what those files use: ATX headings, paragraphs, nested -/1. lists, pipe
 // tables, fenced code, blockquotes, rules, and inline code/bold/italic/links.
+// Numbered headings get data-section="5.1"; \u0001id\u0002...\u0003 markers
+// (callout-data.js markQuotes) become <mark data-callout="id">.
 // No DOM - unit-tested with `node --test viewer/test/*.test.mjs`.
 
 function escapeHtml(s) {
@@ -18,7 +20,15 @@ export function inline(text) {
   s = s.replace(/(^|[^_\w])_([^_\n]+)_(?!\w)/g, "$1<em>$2</em>");
   s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
+  s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
+  return s.replace(/\u0001([\w-]+)\u0002/g, '<mark class="ref" data-callout="$1">')
+    .replace(/\u0003/g, "</mark>");
+}
+
+// "5.1 Truss members" -> "5.1", "5b. Structural" -> "5b", else null
+function sectionOf(text) {
+  const m = /^(\d+[a-z]?(?:\.\d+)*)\.?\s/.exec(text);
+  return m ? m[1] : null;
 }
 
 const LIST_RE = /^(\s*)([-*+]|\d+\.)\s+(.*)$/;
@@ -73,7 +83,9 @@ export function renderMarkdown(md) {
     const h = /^(#{1,6})\s+(.*?)\s*#*\s*$/.exec(line);
     if (h) {
       flush();
-      out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);
+      const section = sectionOf(h[2]);
+      const attr = section ? ` data-section="${section}"` : "";
+      out.push(`<h${h[1].length}${attr}>${inline(h[2])}</h${h[1].length}>`);
       i++;
       continue;
     }

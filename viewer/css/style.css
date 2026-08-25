@@ -77,6 +77,8 @@ button, select { text-shadow: none; }
 
 /* Layer / cut rows: the whole row is the hit area */
 .gui-toggle { cursor: pointer; padding: 1px 3px; margin: 2px -3px; }
+/* Cut toggle sharing a row with its slider: takes the label column */
+.gui-row > .gui-toggle { flex: 0 0 5rem; margin: 0 0 0 -3px; display: flex; align-items: center; gap: 0.4rem; }
 .gui-toggle:hover { color: var(--accent); }
 .gui-toggle:hover input[type=checkbox] { border-color: var(--accent); }
 
@@ -98,6 +100,7 @@ button.active { background: var(--accent); color: var(--bg); border-color: var(-
 input[type=checkbox] {
   appearance: none; width: 0.7rem; height: 0.7rem; flex: 0 0 0.7rem;
   border: 1px solid var(--ink); background: var(--bg); cursor: pointer;
+  box-shadow: 3px 3px 0 var(--bg); /* same bitmap shadow as the type */
 }
 input[type=checkbox]:checked { background: var(--accent); border-color: var(--accent); }
 
@@ -158,6 +161,16 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   color: var(--accent); font-size: 0.8rem; transform: translate(-50%, -50%);
 }
 
+/* ---- hover tag: element name + layer next to the cursor ---- */
+#hover-tag {
+  position: fixed; z-index: 11; pointer-events: none; user-select: none;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink);
+  padding: 0.2rem 0.5rem; font-size: 0.85rem; line-height: 1.3; white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--bg);
+}
+#hover-tag[hidden] { display: none; }
+#hover-tag b { color: var(--accent); font-weight: normal; }
+
 /* ---- design rationale panel (Fable runs only): column under the view cube ---- */
 #doc {
   position: fixed; top: 180px; right: 12px; z-index: 10;
@@ -211,6 +224,23 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 .md blockquote { border-left: 2px solid var(--accent); padding-left: 0.6em; margin: 0.4em 0; }
 .md strong { background: var(--ink); color: var(--bg); font-weight: normal; padding: 0 0.2em; }
 .md em { color: var(--accent); font-style: normal; }
+/* Callout targets: numbered headings (hover = show the callouts) and quotes */
+.md [data-section]:hover { text-decoration: underline; }
+.md mark.ref { background: none; color: inherit; border-bottom: 2px solid var(--accent); }
+.md .flash, .md mark.ref.flash { background: var(--accent); color: var(--bg); }
+
+/* ---- rationale callouts: tags pointing at passages of the document ---- */
+#callout-lines { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
+#callout-lines line { stroke: var(--ink); stroke-width: 1; }
+#callout-lines circle { fill: var(--accent); }
+.callout {
+  position: fixed; z-index: 10; transform: translate(-50%, -50%);
+  max-width: 14rem; padding: 0.2rem 0.5rem; font-size: 0.8rem; line-height: 1.3;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink);
+  cursor: pointer; user-select: none; box-shadow: 3px 3px 0 var(--bg);
+}
+.callout[hidden] { display: none; }
+.callout:hover, .callout.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
 /* ---- footer ---- */
 #footer {

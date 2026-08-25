@@ -1,4 +1,5 @@
-// Hover highlight + element selection. Selection opens an inspector panel:
+// Hover highlight (tint + name/layer tag at the cursor) and element
+// selection. Selection opens an inspector panel:
 // the isolated element auto-rotating in a viewport of the main canvas (so it
 // is drawn by the active style, AO/dither included), dimension lines with
 // DOM labels, and the element's numbers.
@@ -7,11 +8,29 @@ import * as THREE from "three";
 import { LAYERS, TIMBER_DENSITY } from "./model-data.js";
 
 // getPickCamera(clientX, clientY) -> {camera, x, y} (NDC in that camera's viewport)
-export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSelect) {
+// getModel() -> parsed model (names/layers for the hover tag)
+// getClipPlanes() -> active section planes; hits on their clipped side are skipped
+export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSelect,
+  { getModel, getClipPlanes }) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let hovered = null;
   let queued = null;
+
+  // Name + layer next to the cursor while an element is hovered
+  const tag = document.createElement("div");
+  tag.id = "hover-tag";
+  tag.hidden = true;
+  document.body.appendChild(tag);
+
+  function placeTag(ev) {
+    const pad = 16;
+    const w = tag.offsetWidth, h = tag.offsetHeight;
+    const x = ev.clientX + pad + w > window.innerWidth ? ev.clientX - pad - w : ev.clientX + pad;
+    const y = ev.clientY + pad + h > window.innerHeight ? ev.clientY - pad - h : ev.clientY + pad;
+    tag.style.left = `${x}px`;
+    tag.style.top = `${y}px`;
+  }
 
   function pick(ev) {
     const api = getSceneApi();
@@ -20,7 +39,12 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
     pointer.set(x, y);
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(api.pickables(), false);
-    return hits.length ? api.elementOf(hits[0]) : null;
+    const planes = getClipPlanes();
+    // Nearest hit that is not cut away by a section plane
+    for (const hit of hits) {
+      if (planes.every((p) => p.distanceToPoint(hit.point) >= 0)) return api.elementOf(hit);
+    }
+    return null;
   }
 
   function setHover(eid) {
@@ -31,8 +55,14 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
     if (eid !== null) {
       api.highlight(eid, getStyles().hoverColor);
       canvas.style.cursor = "pointer";
+      const model = getModel();
+      const name = document.createElement("b");
+      name.textContent = model.names[eid];
+      tag.replaceChildren(name, document.createElement("br"), LAYERS[model.layer[eid]]);
+      tag.hidden = false;
     } else {
       canvas.style.cursor = "";
+      tag.hidden = true;
     }
   }
 
@@ -40,9 +70,14 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
   canvas.addEventListener("pointermove", (ev) => {
     queued = ev;
   });
+  canvas.addEventListener("pointerleave", () => {
+    queued = null;
+    setHover(null);
+  });
   function tick() {
     if (queued) {
       setHover(pick(queued));
+      if (hovered !== null) placeTag(queued);
       queued = null;
     }
   }
@@ -60,7 +95,9 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
   return {
     tick,
     clearHover() { setHover(null); },
-    resetAfterModelChange() { hovered = null; },
+    resetAfterModelChange() { hovered = null; tag.hidden = true; },
+    // Testing: ?hover=eid - hover an element with the tag at a client position
+    debugHover(eid, clientX, clientY) { setHover(eid); placeTag({ clientX, clientY }); },
     // Re-tint the hovered element after a style change
     refreshHover() {
       const eid = hovered;

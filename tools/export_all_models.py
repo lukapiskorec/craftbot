@@ -8,7 +8,8 @@
 #
 # Fable runs also ship their design rationale: experiments/<exp>/Fable/
 # experiment_NN_fable_design_rationale.md is copied next to the models as
-# viewer/models/<exp>/fable_rationale.md and linked from index.json.
+# viewer/models/<exp>/fable_rationale.md and linked from index.json; likewise
+# experiment_NN_fable_callouts.json -> fable_callouts.json (see tools/callouts.py).
 #
 # Blender path resolution: --blender arg > CRAFTBOT_BLENDER env > known installs.
 
@@ -119,19 +120,25 @@ def main():
         print(f"\n--- FAILED {rel}\n{safe}")
 
 
-def sync_rationale(exp_id):
-    """Copy the Fable design rationale of an experiment next to its models;
-    returns the index-relative path, or None if the experiment has none."""
-    found = glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, "Fable",
-                                   "experiment_*_design_rationale.md"))
+def sync_fable_doc(exp_id, pattern, dst_name):
+    """Copy a Fable-run document (rationale md, callouts json) next to the
+    experiment's models; returns the index-relative path, or None."""
+    found = glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, "Fable", pattern))
     if not found:
         return None
-    rel = f"{exp_id}/fable_rationale.md"
-    dst = os.path.join(MODELS_DIR, exp_id, "fable_rationale.md")
+    dst = os.path.join(MODELS_DIR, exp_id, dst_name)
     src = sorted(found)[0]
     if not os.path.isfile(dst) or open(src, "rb").read() != open(dst, "rb").read():
         shutil.copyfile(src, dst)
-    return rel
+    return f"{exp_id}/{dst_name}"
+
+
+def sync_rationale(exp_id):
+    return sync_fable_doc(exp_id, "experiment_*_design_rationale.md", "fable_rationale.md")
+
+
+def sync_callouts(exp_id):
+    return sync_fable_doc(exp_id, "experiment_*_callouts.json", "fable_callouts.json")
 
 
 def rebuild_index():
@@ -140,6 +147,7 @@ def rebuild_index():
     import json
     agents_by_slug = {slug: agent for agent, slug in AGENT_DIRS.items()}
     rationales = {}
+    callouts = {}
     entries = []
     for path in glob.glob(os.path.join(MODELS_DIR, "*", "*.json")):
         rel = os.path.relpath(path, MODELS_DIR).replace(os.sep, "/")
@@ -152,6 +160,7 @@ def rebuild_index():
         agent = agents_by_slug.get(slug, slug)
         if exp_id not in rationales:
             rationales[exp_id] = sync_rationale(exp_id)
+            callouts[exp_id] = sync_callouts(exp_id)
         entries.append({
             "experiment": exp_id,
             "agent": agent,
@@ -160,6 +169,7 @@ def rebuild_index():
             "elements": len(model["boxes"]) + len(model["meshes"]),
             "bytes": os.path.getsize(path),
             "rationale": rationales[exp_id] if agent == "Fable" else None,
+            "callouts": callouts[exp_id] if agent == "Fable" else None,
         })
     os.makedirs(MODELS_DIR, exist_ok=True)
     core.dump_compact(core.build_index(entries),

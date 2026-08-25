@@ -1,11 +1,17 @@
 // Pure model-data logic for the CraftBot viewer: parsing the craftbot-model
-// JSON, layer classification, material stats, spawn ordering.
+// JSON (layers baked by tools/layers.py), material stats, spawn ordering,
+// element matching across iterations.
 // No DOM or three.js imports - unit-tested with `node --test viewer/test/`.
 
-export const LAYERS = ["foundations", "floors", "frame", "roof", "cladding", "other"];
+// Layer set of the viewer. Elements carry a layer index baked by
+// tools/layers.py (model JSON "layers" names the baked set; parseModel maps
+// those names onto this list, so the two may be reordered independently).
+export const LAYERS = ["frame", "cladding ext", "cladding int", "interior", "roof",
+  "floors", "foundations", "fixtures", "other"];
 // Desaturated warm greys/tans matching the Blender Workbench OBJECT colours
 // used by the headless renders (see experiments/*/Fable/render_fable.py).
-export const LAYER_COLORS = [0xa3a39c, 0xd0b98f, 0xb08d63, 0xc2a173, 0x8c8c85, 0xb4b4ac];
+export const LAYER_COLORS = [0xb08d63, 0x8c8c85, 0x9c9a8e, 0xb9b3a4, 0xc2a173,
+  0xd0b98f, 0xa3a39c, 0x7d8a8f, 0xb4b4ac];
 export const TIMBER_DENSITY = 500; // kg/m3
 
 // Elements whose name or collection matches these are drawn semi-transparent.
@@ -20,34 +26,13 @@ export function classifyGlass(name, collectionPath) {
   return GLASS_KEYWORDS.some((kw) => t.includes(kw)) ? 1 : 0;
 }
 
-// Order matters: first match wins ("Roof_Beam" is roof, not frame).
-// Collection path is checked before the element name.
-const RULES = [
-  ["foundations", ["found", "footing", "pad", "pier", "plinth", "podium", "ground"]],
-  ["floors", ["floor", "slab", "deck", "joist", "ceiling", "landing", "stair", "tread"]],
-  ["roof", ["roof", "rafter", "ridge", "hip", "purlin", "eave", "fascia", "dormer", "sheath", "batten"]],
-  ["cladding", ["clad", "board", "siding", "panel", "wall", "window", "door", "glaz"]],
-  ["frame", ["frame", "post", "beam", "column", "stud", "brace", "truss", "girt",
-    "plate", "sill", "lintel", "chord", "strut", "king", "collar"]],
-];
-
-function matchRules(text) {
-  const t = text.toLowerCase();
-  for (let i = 0; i < RULES.length; i++) {
-    for (const kw of RULES[i][1]) {
-      if (t.includes(kw)) return LAYERS.indexOf(RULES[i][0]);
-    }
+// Baked layer index -> viewer layer index (unknown names -> "other")
+function layerIndexMap(names) {
+  if (!Array.isArray(names)) {
+    throw new Error("model has no baked layers - run python tools/layers.py --bake");
   }
-  return -1;
-}
-
-export function classifyLayer(name, collectionPath) {
-  if (collectionPath) {
-    const m = matchRules(collectionPath);
-    if (m >= 0) return m;
-  }
-  const m = matchRules(name || "");
-  return m >= 0 ? m : LAYERS.indexOf("other");
+  const other = LAYERS.indexOf("other");
+  return names.map((n) => { const i = LAYERS.indexOf(n); return i >= 0 ? i : other; });
 }
 
 // Fan-triangulate a polygon face into `out` (array of vertex indices).
@@ -137,8 +122,8 @@ export function orientedBox(verts, index) {
  * matching unit axes (row-major 3x3 per element) so the element can be shown
  * axis-aligned. centers is the oriented-box centre.
  *
- * Returns {count, names, collections, layer, kinds, isGlass, dims, frames,
- *          centers, volumes, boxes: {elementIds, matrices},
+ * Returns {count, names, collections, collection (index per element), layer,
+ *          kinds, isGlass, dims, frames, centers, volumes, boxes: {elementIds, matrices},
  *          meshes: [{elementId, name, verts, index}]}
  */
 export function parseModel(json) {
@@ -146,11 +131,13 @@ export function parseModel(json) {
     throw new Error(`Unsupported model format: ${json.format} v${json.version}`);
   }
   const colls = json.collections;
+  const toLayer = layerIndexMap(json.layers);
   const nb = json.boxes.length;
   const nm = json.meshes.length;
   const count = nb + nm;
 
   const names = new Array(count);
+  const collection = new Uint16Array(count);
   const layer = new Uint8Array(count);
   const kinds = new Uint8Array(count); // 0 = box, 1 = mesh
   const isGlass = new Uint8Array(count); // 1 = drawn semi-transparent
@@ -170,7 +157,8 @@ export function parseModel(json) {
     const m = row;
     const o = 2;
     names[b] = name;
-    layer[b] = classifyLayer(name, coll);
+    collection[b] = row[1];
+    layer[b] = toLayer[row[14]];
     isGlass[b] = classifyGlass(name, coll);
     kinds[b] = 0;
     elementIds[b] = b;
@@ -205,7 +193,8 @@ export function parseModel(json) {
     const src = json.meshes[j];
     const e = nb + j;
     names[e] = src.name;
-    layer[e] = classifyLayer(src.name, colls[src.collection]);
+    collection[e] = src.collection;
+    layer[e] = toLayer[src.layer];
     isGlass[e] = classifyGlass(src.name, colls[src.collection]);
     kinds[e] = 1;
     const verts = Float32Array.from(src.verts);
@@ -240,15 +229,16 @@ export function parseModel(json) {
   }
 
   return {
-    count, names, collections: colls, layer, kinds, isGlass, dims, frames, centers, volumes,
+    count, names, collections: colls, collection, layer, kinds, isGlass, dims, frames,
+    centers, volumes,
     boxes: { elementIds, matrices }, meshes,
   };
 }
 
 /**
  * Per-layer material stats for the currently visible layers.
- * visible: bool[6] indexed like LAYERS. Length = element's oriented length.
- * Returns [{layer, count, lengthM, volumeM3, weightKg}] for all 6 layers.
+ * visible: bool[] indexed like LAYERS. Length = element's oriented length.
+ * Returns [{layer, count, lengthM, volumeM3, weightKg}] for every layer.
  */
 export function computeStats(model, visible) {
   const rows = LAYERS.map((layer) => ({ layer, count: 0, lengthM: 0, volumeM3: 0, weightKg: 0 }));
@@ -265,30 +255,77 @@ export function computeStats(model, visible) {
 }
 
 // Layer build order for the "layers" spawn mode.
-const BUILD_ORDER = ["foundations", "floors", "frame", "roof", "cladding", "other"];
+const BUILD_ORDER = ["foundations", "frame", "floors", "roof", "cladding ext",
+  "cladding int", "interior", "fixtures", "other"];
+
+// Spawn time that keeps an element in place (see the vertex patch in animations.js)
+export const STATIC_SPAWN = -1e9;
 
 /**
  * Per-element spawn times (seconds) for entry animations.
  * orderMode "sequence": element order (construction sequence).
- * orderMode "layers": foundations -> floors -> frame -> roof -> cladding -> other,
- * elements staggered within each layer.
+ * orderMode "layers": BUILD_ORDER, elements staggered within each layer.
+ * kept (optional Uint8Array): elements flagged 1 stay static; only the rest
+ * are staggered over the duration.
  */
-export function computeSpawnTimes(model, orderMode, totalDuration = 3.0) {
+export function computeSpawnTimes(model, orderMode, totalDuration = 3.0, kept = null) {
   const n = model.count;
   const times = new Float32Array(n);
   const span = totalDuration * 0.8;
-  if (n <= 1) return times;
+  let order = [];
   if (orderMode === "layers") {
-    const order = [];
     for (const name of BUILD_ORDER) {
       const li = LAYERS.indexOf(name);
       for (let e = 0; e < n; e++) if (model.layer[e] === li) order.push(e);
     }
-    for (let i = 0; i < order.length; i++) times[order[i]] = (i / (n - 1)) * span;
   } else {
-    for (let e = 0; e < n; e++) times[e] = (e / (n - 1)) * span;
+    for (let e = 0; e < n; e++) order.push(e);
   }
+  if (kept) {
+    order = order.filter((e) => !kept[e]);
+    for (let e = 0; e < n; e++) if (kept[e]) times[e] = STATIC_SPAWN;
+  }
+  const m = order.length;
+  for (let i = 0; i < m; i++) times[order[i]] = m > 1 ? (i / (m - 1)) * span : 0;
   return times;
+}
+
+// Identity of an element across iterations of one model: name, kind and its
+// placement/size (rounded so re-exports of unchanged code match exactly).
+function elementKey(model, e, nb) {
+  const r = (v, s) => Math.round(v * s) / s + 0; // + 0 folds -0 into 0
+  const parts = [model.names[e], model.kinds[e]];
+  for (let k = 0; k < 3; k++) parts.push(r(model.centers[e * 3 + k], 1e4), r(model.dims[e * 3 + k], 1e4));
+  for (let k = 0; k < 9; k++) parts.push(r(model.frames[e * 9 + k], 1e3));
+  if (model.kinds[e] === 1) {
+    const v = model.meshes[e - nb].verts;
+    let sum = 0;
+    for (let i = 0; i < v.length; i++) sum += v[i];
+    parts.push(v.length, r(sum, 1e3));
+  }
+  return parts.join("|");
+}
+
+/**
+ * Pair the elements of `next` with unchanged elements of `prev`.
+ * Returns Int32Array(next.count): previous element id, or -1 when the
+ * element is new or moved. Equal keys pair one-to-one in element order.
+ */
+export function matchElements(prev, next) {
+  const pool = new Map(); // key -> queue of prev ids
+  const pnb = prev.boxes.elementIds.length;
+  for (let e = 0; e < prev.count; e++) {
+    const k = elementKey(prev, e, pnb);
+    if (!pool.has(k)) pool.set(k, []);
+    pool.get(k).push(e);
+  }
+  const map = new Int32Array(next.count).fill(-1);
+  const nnb = next.boxes.elementIds.length;
+  for (let e = 0; e < next.count; e++) {
+    const ids = pool.get(elementKey(next, e, nnb));
+    if (ids && ids.length) map[e] = ids.shift();
+  }
+  return map;
 }
 
 // Element id for a triangle of the merged mesh geometry (used by picking).
