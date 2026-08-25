@@ -10,7 +10,7 @@ class ClassifyTests(unittest.TestCase):
     def test_structure_members_are_frame_whatever_the_collection(self):
         self.assertEqual(L.classify("04_x", "Ceiling", "Ceiling_Nog_3"), "frame")
         self.assertEqual(L.classify("04_x", "Structure/Roof_Framing", "Truss_2_Web"), "frame")
-        self.assertEqual(L.classify("08_x", "Facade/South/South_Windows", "CanopyStrut"), "frame")
+        self.assertEqual(L.classify("11_x", "Walls", "Beam_WingOpening_2"), "frame")
 
     def test_roof_is_covering_not_framing(self):
         self.assertEqual(L.classify("04_x", "Roof/Roof_Covering", "Fascia_S_1"), "roof")
@@ -41,6 +41,17 @@ class ClassifyTests(unittest.TestCase):
 
     def test_overrides_per_experiment(self):
         self.assertEqual(L.classify("08_x", "Facade/East/East_Battens", "Rail_E_1"), "cladding ext")
+        self.assertEqual(L.classify("08_x", "Facade/South/South_Windows", "CanopyStrut"), "fixtures")
+        self.assertEqual(L.classify("04_x", "Facade/Beading", "Skirt_S_0"), "cladding int")
+        self.assertEqual(L.classify("04_x", "Facade/Beading", "Skirt_P1_A_2"), "interior")
+        self.assertEqual(L.classify("09_x", "Core/Core_Walls", "Core_W_S3"), "interior")
+        self.assertEqual(L.classify("09_x", "Core/Core_Slabs", "Core_Slab_Corr_2"), "floors")
+        self.assertEqual(L.classify("09_x", "Podium/Podium_Walls", "Podium_Core_S_S1"), "foundations")
+        self.assertEqual(L.classify("09_x", "Openings/Glazing", "Roof_Glass_S_1"), "fixtures")
+        self.assertEqual(L.classify("09_x", "Roof/Roof_Panels", "Roof_S_1"), "roof")
+        self.assertEqual(L.classify("09_x", "Floors/Ribs", "Rib_L2_3"), "floors")
+        self.assertEqual(L.classify("09_x", "Structure/Knee_Walls", "Knee_S_L5"), "interior")
+        self.assertEqual(L.classify("09_x", "Podium/Podium_Stairs", "Flight_A_1"), "fixtures")
         self.assertEqual(L.classify("09_x", "", "Ext_Long_+Y_L1"), "frame")
         self.assertEqual(L.classify("02_x", "", "diag_3"), "frame")
 

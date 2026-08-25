@@ -68,6 +68,38 @@ export function makeViews(renderer, canvas) {
     applyFixedZoom();
   }, { capture: true, passive: false });
 
+  // Two-finger pinch over a fixed quadrant zooms the fixed views (touch
+  // counterpart of the wheel above). OrbitControls still sees the pointers
+  // but its own dolly/pan is switched off for the gesture.
+  const fixedTouches = new Map(); // pointerId -> {x, y}
+  let pinchDist = 0;
+  function pinchEnd(ev) {
+    if (!fixedTouches.delete(ev.pointerId)) return;
+    pinchDist = 0;
+    if (fixedTouches.size === 0) { controls.enableZoom = true; controls.enablePan = true; }
+  }
+  canvas.addEventListener("pointerdown", (ev) => {
+    if (!quad || ev.pointerType !== "touch") return;
+    if (quadrantAt(ev.clientX, ev.clientY).camera === camera) return;
+    fixedTouches.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    pinchDist = 0;
+    if (fixedTouches.size >= 2) { controls.enableZoom = false; controls.enablePan = false; }
+  }, { capture: true });
+  canvas.addEventListener("pointermove", (ev) => {
+    if (!fixedTouches.has(ev.pointerId)) return;
+    fixedTouches.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (fixedTouches.size !== 2) return;
+    const [a, b] = [...fixedTouches.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinchDist > 0 && d > 0) {
+      fixedZoom = Math.min(50, Math.max(0.1, fixedZoom * d / pinchDist));
+      applyFixedZoom();
+    }
+    pinchDist = d;
+  }, { capture: true });
+  canvas.addEventListener("pointerup", pinchEnd, { capture: true });
+  canvas.addEventListener("pointercancel", pinchEnd, { capture: true });
+
   function endFlight() {
     if (!fly) return;
     camera.quaternion.copy(fly.q1);

@@ -74,6 +74,7 @@ OVERRIDES = {
     ],
     "03": [
         (r"shear_panels\|", INTERIOR),    # ply on the bath/storage walls
+        (r"^\|shell_wall_short", CLAD_EXT),
         (r"^\|skylight.*plate", FRAME),
         (r"^\|int_", INTERIOR),           # ChatGPT run: interior walls as boxes
         (r"^\|shell_long", CLAD_EXT),
@@ -81,6 +82,9 @@ OVERRIDES = {
     ],
     "04": [
         (r"verandah\|ver_column", FRAME),
+        (r"verandah\|ver_toprail", FRAME),
+        (r"beading\|skirt_(?!p)", CLAD_INT),  # skirting of the exterior walls (Skirt_P* stays interior)
+        (r"^\|door_?lintel", FIXT),
         (r"^\|(bottom|top)_[nsew]", FRAME),   # ChatGPT run: wall plates
         (r"^\|roof(_slope_[ns])?(_|\d|$)", ROOF),
     ],
@@ -88,10 +92,14 @@ OVERRIDES = {
         (r"^\|(bottom|top)_[nsew]", FRAME),
         (r"^\|roof(_slope_[ns])?(_|\d|$)", ROOF),
     ],
+    "06": [
+        (r"\|tray_.*_rib", FRAME),         # ribs of the roof trays
+    ],
     "07": [
         (r"^\|(bottom|top)_[nsew]", FRAME),
+        (r"^\|roof_rul", FRAME),          # before the generic roof_* rule below
         (r"^\|roof(_slope_[ns])?(_|\d|$)", ROOF),
-        (r"^\|roof_rul", ROOF),
+        (r"^\|tess_stud", FRAME),
         (r"^\|(shard|south_horizontal_cut|tess_)", CLAD_EXT),
         (r"^\|mezzanine_hanger", FRAME),
     ],
@@ -101,12 +109,23 @@ OVERRIDES = {
         (r"core\|core_", CLAD_INT),         # infill-panel core, between the plies
         (r"^\|wall_", CLAD_EXT),            # ChatGPT run: Wall_* are the infill panels
         (r"^\|postext", FRAME),
+        (r"^\|frame_", FIXT),              # ChatGPT run: window/door frames
+        (r"^\|skylightroof", ROOF),
+        (r"\|canopystrut", FIXT),
     ],
     "09": [
+        (r"\|(landing_|flight_)", FIXT),  # stairs everywhere, podium included
+        (r"podium", FOUND),                # the rest of the podium, before the name rules below
         (r"^\|ext_", FRAME),               # ChatGPT run: CLT exterior walls
-        (r"walls_interior\|", FRAME),
-        (r"floors/ribs\|", FRAME),
-        (r"roof/roof_panels\|", FRAME),    # CLT roof panels; covering is separate
+        (r"\|roof_(?!glass)", ROOF),       # plates, CLT roof panels, covering (skylight glass stays fixtures)
+        (r"\|(int_|elev_|partition_|corridor_|ledger_|knee_|parting_)", INTERIOR),
+        (r"\|core_(?!slab)", INTERIOR),    # core walls (core slabs stay floors)
+        (r"\|[snew]_", CLAD_EXT),          # ChatGPT run: S_/N_/E_/W_ piers and wall bands
+        (r"\|(wall_|gable_)", CLAD_INT),
+        (r"\|rib_", FLOORS),
+    ],
+    "12": [
+        (r"^\|dormer_window", FRAME),
     ],
 }
 
@@ -160,7 +179,8 @@ def bake_dict(model, exp_id):
 
 
 def model_files(only):
-    files = sorted(glob.glob(os.path.join(MODELS_DIR, "*", "*.json")))
+    """Model JSONs (<agent>_vNN.json) - not the rationale/callouts files beside them."""
+    files = sorted(glob.glob(os.path.join(MODELS_DIR, "*", "*_v[0-9][0-9].json")))
     return [f for f in files if not only or only in f]
 
 

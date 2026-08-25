@@ -21,16 +21,21 @@ export function makeDocPanel(host, title = "DESIGN RATIONALE") {
 
   const cache = new Map(); // path -> markdown source
   let current = null;
-  const toggleListeners = [];
+  const expandListeners = [];
   const sectionListeners = [];
   let hoveredSection = null;
 
   const isOpen = () => !root.hidden && !root.classList.contains("closed");
-  const emitToggle = () => { for (const fn of toggleListeners) fn(isOpen()); };
+  // Fired when the collapsed panel is expanded (header click or a callout)
+  const expand = () => {
+    if (!root.classList.contains("closed")) return;
+    root.classList.remove("closed");
+    for (const fn of expandListeners) fn();
+  };
 
   root.querySelector("h2").addEventListener("click", () => {
-    root.classList.toggle("closed");
-    emitToggle();
+    if (root.classList.contains("closed")) expand();
+    else root.classList.add("closed");
   });
 
   // Heading hover -> section listeners (null when leaving headings)
@@ -50,23 +55,23 @@ export function makeDocPanel(host, title = "DESIGN RATIONALE") {
   return {
     el: root,
     get isOpen() { return isOpen(); },
-    onToggle(fn) { toggleListeners.push(fn); },
+    onExpand(fn) { expandListeners.push(fn); },
     onSectionHover(fn) { sectionListeners.push(fn); },
 
     // path=null hides the panel. callouts = the run's authored callouts
     // (their quotes get marked). Loads lazily and caches per document.
     async show(path, callouts = null) {
       current = path;
-      if (!path) { root.hidden = true; emitToggle(); return; }
+      if (!path) { root.hidden = true; return; }
       let source = cache.get(path);
       if (source === undefined) {
         try {
-          const res = await fetch(path);
+          const res = await fetch(path, { cache: "no-cache" });
           if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
           source = await res.text();
         } catch (err) {
           console.warn(`rationale: ${path}: ${err.message}`);
-          if (current === path) { root.hidden = true; emitToggle(); }
+          if (current === path) root.hidden = true;
           return;
         }
         cache.set(path, source);
@@ -75,17 +80,13 @@ export function makeDocPanel(host, title = "DESIGN RATIONALE") {
       md.innerHTML = renderMarkdown(markQuotes(source, callouts?.callouts));
       md.scrollTop = 0;
       root.hidden = false;
-      emitToggle();
     },
 
     // Open the panel and scroll to a section heading (or to the callout's
     // marked quote inside it), flashing the target.
     scrollToSection(section, calloutId = null) {
       if (root.hidden) return;
-      if (root.classList.contains("closed")) {
-        root.classList.remove("closed");
-        emitToggle();
-      }
+      expand();
       const heading = md.querySelector(`[data-section="${CSS.escape(section)}"]`);
       const mark = calloutId ? md.querySelector(`mark[data-callout="${CSS.escape(calloutId)}"]`) : null;
       const target = mark ?? heading;

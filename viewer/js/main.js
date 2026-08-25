@@ -13,6 +13,10 @@ import { makeViewCube } from "./viewcube.js";
 import { makeDocPanel } from "./rationale.js";
 import { makeCallouts } from "./callouts.js";
 
+// Always revalidate data files (304 when unchanged): local http.server and
+// GitHub Pages both let the browser serve stale JSON otherwise.
+export const FETCH_OPTS = { cache: "no-cache" };
+
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
 
@@ -94,7 +98,7 @@ let loadSeq = 0; // the iteration slider can fire faster than fetches land
 async function loadModel(file, { keepView = false } = {}) {
   const seq = ++loadSeq;
   try {
-    const res = await fetch(file);
+    const res = await fetch(file, FETCH_OPTS);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const json = await res.json();
     if (seq !== loadSeq) return; // a newer load superseded this one
@@ -223,8 +227,8 @@ const iterSlider = secModel.addSlider("Iteration", 1, 1, 1, (i) => {
   loadPicked();
 }, { step: 1, readout: (i) => currentVersions()[i - 1]?.v ?? "" });
 const modelInfo = secModel.addInfo();
-// Rationale callouts follow the DESIGN RATIONALE panel (open = shown) but
-// can be switched independently.
+// Rationale callouts: shown only while this is on. Expanding the DESIGN
+// RATIONALE panel switches it off (the panel covers the model on phones).
 const calloutToggle = secModel.addToggle("callouts", false, (on) => callouts.setVisible(on));
 
 function refreshPickers() {
@@ -252,7 +256,7 @@ async function loadRunDocs(run) {
   let data = null;
   if (run?.callouts) {
     try {
-      const res = await fetch(`models/${run.callouts}`);
+      const res = await fetch(`models/${run.callouts}`, FETCH_OPTS);
       if (res.ok) data = await res.json();
     } catch (err) {
       console.warn(`callouts: ${run.callouts}: ${err.message}`);
@@ -278,9 +282,9 @@ const docPanel = makeDocPanel(document.body);
 const callouts = makeCallouts(document.body, {
   views, canvas, getSceneApi: () => sceneApi, getStyles: () => styles, docPanel,
 });
-docPanel.onToggle((open) => {
-  calloutToggle.set(open);
-  callouts.setVisible(open);
+docPanel.onExpand(() => {
+  calloutToggle.set(false);
+  callouts.setVisible(false);
 });
 docPanel.onSectionHover((section) => callouts.highlightSection(section));
 document.addEventListener("craftbot:model", (ev) => callouts.setModel(ev.detail.model));
@@ -328,6 +332,7 @@ renderer.setAnimationLoop(() => {
 });
 resize();
 
+const SHOWCASE = ["02", "03", "04", "06", "07", "08", "09", "11"];
 const bootParams = new URLSearchParams(location.search);
 const requested = bootParams.get("model");
 if (STYLES.includes(bootParams.get("style"))) {
@@ -379,6 +384,13 @@ if (!Number.isNaN(selectParam)) {
     sceneApi.setSelected(selectParam, styles.selectColor);
   });
 }
+// Testing: ?callouts=1 switches the rationale callouts on after load
+if (bootParams.get("callouts") === "1") {
+  document.addEventListener("craftbot:model", () => {
+    calloutToggle.set(true);
+    callouts.setVisible(true);
+  }, { once: true });
+}
 // Testing: ?hover=elementId shows the hover tag at the canvas centre
 const hoverParam = parseInt(bootParams.get("hover"), 10);
 if (!Number.isNaN(hoverParam)) {
@@ -389,7 +401,7 @@ const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
   document.addEventListener("craftbot:model", () => anims.freeze(freezeAt));
 }
-fetch("models/index.json")
+fetch("models/index.json", FETCH_OPTS)
   .then((r) => r.json())
   .then((idx) => {
     index = idx;
@@ -402,8 +414,11 @@ fetch("models/index.json")
         }
       }
     }
-    const e = found?.e ?? idx.experiments[0];
-    const r = found?.r ?? last(e.runs);
+    // No ?model: open a random Fable showcase at its final iteration
+    const showcase = idx.experiments.filter((exp) =>
+      SHOWCASE.includes(exp.id.slice(0, 2)) && exp.runs.some((run) => run.agent === "Fable"));
+    const e = found?.e ?? showcase[Math.floor(Math.random() * showcase.length)] ?? idx.experiments[0];
+    const r = found?.r ?? e.runs.find((run) => run.agent === "Fable") ?? last(e.runs);
     const x = found?.x ?? last(r.versions);
     pick.exp = e.id; pick.agent = r.agent; pick.v = x.v;
     refreshPickers();

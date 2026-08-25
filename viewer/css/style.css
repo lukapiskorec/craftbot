@@ -15,6 +15,7 @@
   --bg: #ffffff;
   --ink: #000000;
   --accent: #000000;
+  --shadow: 3px; /* hard-offset bitmap shadow (see below); 2px on phones */
   /* Type follows the viewport: ~13px on a 1280px laptop, 18px from ~2000px up */
   font-size: clamp(12px, 0.7vw + 4px, 18px);
 }
@@ -28,7 +29,7 @@ body {
 
 /* Hard-offset drop shadow in the page colour: keeps type legible where it
    crosses the model, and reads as a retro bitmap shadow elsewhere. */
-#gui, #stats, #footer, #inspector .text, .dim-label { text-shadow: 3px 3px 0 var(--bg); }
+#gui, #stats, #footer, #inspector .text, .dim-label { text-shadow: var(--shadow) var(--shadow) 0 var(--bg); }
 button, select { text-shadow: none; }
 
 #banner {
@@ -100,7 +101,7 @@ button.active { background: var(--accent); color: var(--bg); border-color: var(-
 input[type=checkbox] {
   appearance: none; width: 0.7rem; height: 0.7rem; flex: 0 0 0.7rem;
   border: 1px solid var(--ink); background: var(--bg); cursor: pointer;
-  box-shadow: 3px 3px 0 var(--bg); /* same bitmap shadow as the type */
+  box-shadow: var(--shadow) var(--shadow) 0 var(--bg); /* same bitmap shadow as the type */
 }
 input[type=checkbox]:checked { background: var(--accent); border-color: var(--accent); }
 
@@ -136,9 +137,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
 #viewcube canvas { display: block; touch-action: none; }
-#viewcube .quad-btn {
-  padding: 4px 0; font-size: 0.8rem; letter-spacing: 1px; border-width: 2px;
-}
+#viewcube .quad-btn { padding: 4px 0; font-size: 0.8rem; letter-spacing: 1px; }
 
 /* ---- element inspector: opaque text block over a transparent viewport
    that the main renderer draws into (same style pipeline as the model).
@@ -166,7 +165,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   position: fixed; z-index: 11; pointer-events: none; user-select: none;
   background: var(--bg); color: var(--ink); border: 1px solid var(--ink);
   padding: 0.2rem 0.5rem; font-size: 0.85rem; line-height: 1.3; white-space: nowrap;
-  box-shadow: 3px 3px 0 var(--bg);
+  box-shadow: var(--shadow) var(--shadow) 0 var(--bg);
 }
 #hover-tag[hidden] { display: none; }
 #hover-tag b { color: var(--accent); font-weight: normal; }
@@ -186,6 +185,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 }
 #doc > h2::before { content: "v "; color: var(--accent); }
 #doc > h2:hover { color: var(--accent); }
+#doc.closed { width: auto; } /* collapsed: just the title */
 #doc.closed > h2 { border-bottom: 0; }
 #doc.closed > h2::before { content: "> "; }
 #doc.closed > .md { display: none; }
@@ -237,7 +237,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   position: fixed; z-index: 10; transform: translate(-50%, -50%);
   max-width: 14rem; padding: 0.2rem 0.5rem; font-size: 0.8rem; line-height: 1.3;
   background: var(--bg); color: var(--ink); border: 1px solid var(--ink);
-  cursor: pointer; user-select: none; box-shadow: 3px 3px 0 var(--bg);
+  cursor: pointer; user-select: none; box-shadow: var(--shadow) var(--shadow) 0 var(--bg);
 }
 .callout[hidden] { display: none; }
 .callout:hover, .callout.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
@@ -262,7 +262,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 /* ---- phones: collapsed exclusive GUI (see makePanel), smaller view cube
    (viewcube.js), takeoff bottom-left, rationale collapsed and full width ---- */
 @media (max-width: 760px) {
-  :root { font-size: 13px; }
+  :root { font-size: 13px; --shadow: 2px; }
   #gui { width: 16rem; max-height: calc(100vh - 2.5rem); }
   #stats { top: auto; bottom: 2.4rem; left: 0.6rem; }
   #inspector { left: auto; right: 0.6rem; width: min(18rem, 55vw); bottom: 2.4rem; }
