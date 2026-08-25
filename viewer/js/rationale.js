@@ -3,12 +3,14 @@
 // Pure DOM - no three.js imports.
 
 import { renderMarkdown } from "./markdown.js";
+import { isMobile } from "./gui.js";
 
 export function makeDocPanel(host, title = "DESIGN RATIONALE") {
   const root = document.createElement("div");
   root.id = "doc";
   root.hidden = true;
   root.innerHTML = `<h2>${title}</h2><div class="md"></div>`;
+  if (isMobile()) root.classList.add("closed");
   root.querySelector("h2").addEventListener("click", () => root.classList.toggle("closed"));
   const md = root.querySelector(".md");
   host.appendChild(root);

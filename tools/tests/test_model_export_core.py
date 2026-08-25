@@ -118,5 +118,27 @@ class TestIndexRationale(unittest.TestCase):
         self.assertNotIn("rationale", runs["ChatGPT 5.1"])
 
 
+class TestWinding(unittest.TestCase):
+    FLAT = [c for v in CUBE_VERTS for c in v]
+
+    def test_signed_volume_sign(self):
+        self.assertAlmostEqual(core.signed_volume(self.FLAT, CUBE_FACES), 8.0)
+        reversed_faces = [tuple(reversed(f)) for f in CUBE_FACES]
+        self.assertAlmostEqual(core.signed_volume(self.FLAT, reversed_faces), -8.0)
+
+    def test_orient_outward_flips_only_inverted(self):
+        self.assertEqual(core.orient_outward(self.FLAT, CUBE_FACES),
+                         [list(f) for f in CUBE_FACES])
+        reversed_faces = [tuple(reversed(f)) for f in CUBE_FACES]
+        fixed = core.orient_outward(self.FLAT, reversed_faces)
+        self.assertGreater(core.signed_volume(self.FLAT, fixed), 0)
+
+    def test_build_model_dict_orients_meshes(self):
+        rec = {"name": "P", "collection": "", "kind": "mesh", "verts": self.FLAT,
+               "faces": [tuple(reversed(f)) for f in CUBE_FACES]}
+        model = core.build_model_dict("s", [rec])
+        self.assertGreater(core.signed_volume(self.FLAT, model["meshes"][0]["faces"]), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -6,8 +6,9 @@
 // corners - and the snapped vector IS the view direction to fly to.
 
 import * as THREE from "three";
+import { isMobile } from "./gui.js";
 
-const SIZE = 118; // css px
+const SIZE = isMobile() ? 88 : 118; // css px
 const CUBE = 1.7; // cube edge in world units of the widget scene
 const SNAP = 0.62; // |coord| above this counts as "on that side"
 
@@ -72,6 +73,7 @@ export function makeViewCube(views, onQuadToggle) {
   const quadBtn = document.createElement("button");
   quadBtn.className = "quad-btn";
   quadBtn.textContent = "4-view";
+  quadBtn.style.width = `${SIZE}px`;
   quadBtn.addEventListener("click", () => {
     const on = !views.quad;
     views.setQuad(on);

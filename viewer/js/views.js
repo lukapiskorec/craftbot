@@ -36,6 +36,37 @@ export function makeViews(renderer, canvas) {
   // up vector never flips mid-way. Orbit controls are paused until it lands.
   let fly = null; // {q0, q1, up, dist, t0, dur}
   const FLY_SECONDS = 0.5;
+  // One zoom shared by the three fixed 4-view cameras so they stay on grid
+  let fixedZoom = 1;
+
+  function applyFixedZoom() {
+    for (const cam of Object.values(fixedCams)) {
+      cam.zoom = fixedZoom;
+      cam.updateProjectionMatrix();
+    }
+  }
+
+  // Which camera owns a client-space point, with its viewport in CSS px.
+  // 4-view layout: top | axo over front | side.
+  function quadrantAt(clientX, clientY) {
+    const r = canvas.getBoundingClientRect();
+    if (!quad) return { camera, x0: r.left, y0: r.top, w: r.width, h: r.height };
+    const w = r.width / 2, h = r.height / 2;
+    const right = clientX >= r.left + w, bottom = clientY >= r.top + h;
+    const cam = bottom ? (right ? fixedCams.side : fixedCams.front)
+      : (right ? camera : fixedCams.top);
+    return { camera: cam, x0: r.left + (right ? w : 0), y0: r.top + (bottom ? h : 0), w, h };
+  }
+
+  // Wheel over a fixed quadrant zooms the fixed views; registered in the
+  // capture phase so OrbitControls (which would zoom axo) never sees it.
+  canvas.addEventListener("wheel", (ev) => {
+    if (!quad || quadrantAt(ev.clientX, ev.clientY).camera === camera) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    fixedZoom = Math.min(50, Math.max(0.1, fixedZoom * Math.pow(0.95, ev.deltaY * 0.01)));
+    applyFixedZoom();
+  }, { capture: true, passive: false });
 
   function endFlight() {
     if (!fly) return;
@@ -92,6 +123,8 @@ export function makeViews(renderer, canvas) {
         controls.update();
       } else {
         api.setPreset("axo");
+        fixedZoom = 1;
+        applyFixedZoom();
       }
       for (const name of Object.keys(fixedCams)) place(fixedCams[name], name);
       updateFrustums();
@@ -122,6 +155,17 @@ export function makeViews(renderer, canvas) {
         t0: performance.now(), dur: FLY_SECONDS * 1000,
       };
       controls.enabled = false;
+    },
+
+    // Camera + normalised device coords for picking at a client point;
+    // honours the 4-view quadrants.
+    pickCamera(clientX, clientY) {
+      const q = quadrantAt(clientX, clientY);
+      return {
+        camera: q.camera,
+        x: ((clientX - q.x0) / q.w) * 2 - 1,
+        y: -((clientY - q.y0) / q.h) * 2 + 1,
+      };
     },
 
     // Camera direction from the model centre, for the view cube to mirror.

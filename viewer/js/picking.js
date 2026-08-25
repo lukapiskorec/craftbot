@@ -6,7 +6,8 @@
 import * as THREE from "three";
 import { LAYERS, TIMBER_DENSITY } from "./model-data.js";
 
-export function makePicking(canvas, getCamera, getSceneApi, getStyles, onSelect) {
+// getPickCamera(clientX, clientY) -> {camera, x, y} (NDC in that camera's viewport)
+export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSelect) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let hovered = null;
@@ -15,10 +16,9 @@ export function makePicking(canvas, getCamera, getSceneApi, getStyles, onSelect)
   function pick(ev) {
     const api = getSceneApi();
     if (!api) return null;
-    const rect = canvas.getBoundingClientRect();
-    pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(pointer, getCamera());
+    const { camera, x, y } = getPickCamera(ev.clientX, ev.clientY);
+    pointer.set(x, y);
+    raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(api.pickables(), false);
     return hits.length ? api.elementOf(hits[0]) : null;
   }

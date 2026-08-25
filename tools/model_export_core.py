@@ -35,6 +35,31 @@ def is_unit_cube(verts, faces, eps=1e-6):
     return True
 
 
+def signed_volume(verts, faces):
+    """Signed volume of a closed polygon mesh (fan-triangulated faces);
+    negative means the faces wind inward. verts: flat [x, y, z, ...]."""
+    total = 0.0
+    for face in faces:
+        for i in range(1, len(face) - 1):
+            a, b, c = face[0], face[i], face[i + 1]
+            ax, ay, az = verts[3 * a], verts[3 * a + 1], verts[3 * a + 2]
+            bx, by, bz = verts[3 * b], verts[3 * b + 1], verts[3 * b + 2]
+            cx, cy, cz = verts[3 * c], verts[3 * c + 1], verts[3 * c + 2]
+            total += (ax * (by * cz - bz * cy)
+                      + ay * (bz * cx - bx * cz)
+                      + az * (bx * cy - by * cx)) / 6.0
+    return total
+
+
+def orient_outward(verts, faces):
+    """Return faces wound so normals point outward. Some generators build
+    prisms inside-out (consistent but reversed winding); those render as
+    hollow shells in the viewer and shade dark in Blender."""
+    if signed_volume(verts, faces) < 0:
+        return [list(reversed(f)) for f in faces]
+    return [list(f) for f in faces]
+
+
 def rnd(x, nd=5):
     """Round to nd decimals; collapse to int when integral (smaller JSON)."""
     r = round(x, nd)
@@ -67,7 +92,7 @@ def build_model_dict(source, records):
                 "name": rec["name"],
                 "collection": cid,
                 "verts": [rnd(x) for x in rec["verts"]],
-                "faces": [list(f) for f in rec["faces"]],
+                "faces": orient_outward(rec["verts"], rec["faces"]),
             })
     return {
         "format": "craftbot-model",

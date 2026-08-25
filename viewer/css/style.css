@@ -1,7 +1,7 @@
 /* CraftBot viewer. The active render style writes three colours onto <html>:
    --bg (page and every panel), --ink (type, borders) and --accent. Nothing
    in the GUI is translucent or grey: a surface is either the page colour or
-   fully transparent, and type is ink, accent, or (on active buttons) bg. */
+   fully transparent, and type is ink, accent, or (on inverted chips) bg. */
 
 @font-face {
   font-family: "MEK-Mono";
@@ -14,8 +14,9 @@
 :root {
   --bg: #ffffff;
   --ink: #000000;
-  --accent: #e5195b;
-  font-size: 20px;
+  --accent: #000000;
+  /* Type follows the viewport: ~13px on a 1280px laptop, 18px from ~2000px up */
+  font-size: clamp(12px, 0.7vw + 4px, 18px);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; overflow: hidden; background: var(--bg); }
@@ -69,6 +70,11 @@ button, select { text-shadow: none; }
 .gui-row select, .gui-row input[type=range] { flex: 1; min-width: 0; }
 .gui-row .readout { flex: 0 0 auto; color: var(--accent); }
 
+/* < value > steppers, several per row (entry animation, then order) */
+.stepper { display: inline-flex; align-items: center; gap: 0.2rem; margin-right: 0.4rem; }
+.stepper button { padding: 0 0.2rem; }
+.stepper .value { text-align: center; color: var(--accent); }
+
 /* Layer / cut rows: the whole row is the hit area */
 .gui-toggle { cursor: pointer; padding: 1px 3px; margin: 2px -3px; }
 .gui-toggle:hover { color: var(--accent); }
@@ -102,17 +108,14 @@ input[type=range]::-webkit-slider-thumb {
   appearance: none; width: 0.5rem; height: 0.8rem; background: var(--accent);
 }
 
-/* ---- material takeoff column, right of the panel. The table lets pointer
-   events through (orbiting over it works); the rationale panel below it,
-   when it lives here (doc=left), does not. ---- */
+/* ---- material takeoff, right of the panel; lets pointer events through
+   so orbiting over it still works ---- */
 #stats {
   position: fixed; top: 0.5rem; left: 18rem; z-index: 10;
-  display: flex; flex-direction: column; gap: 0.6rem;
-  max-height: calc(100vh - 3.5rem);
   user-select: none; pointer-events: none;
 }
 
-table.stats { border-collapse: collapse; flex: 0 0 auto; }
+table.stats { border-collapse: collapse; }
 table.stats td, table.stats th {
   text-align: right; padding: 1px 0.35rem 1px 0; font-weight: normal;
   white-space: nowrap;
@@ -131,14 +134,14 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 }
 #viewcube canvas { display: block; touch-action: none; }
 #viewcube .quad-btn {
-  width: 118px; padding: 4px 0; font-size: 0.8rem; letter-spacing: 1px;
-  border-width: 2px;
+  padding: 4px 0; font-size: 0.8rem; letter-spacing: 1px; border-width: 2px;
 }
 
 /* ---- element inspector: opaque text block over a transparent viewport
-   that the main renderer draws into (same style pipeline as the model) ---- */
+   that the main renderer draws into (same style pipeline as the model).
+   Sits next to the GUI; the rationale column owns the right edge. ---- */
 #inspector {
-  position: fixed; right: 14px; bottom: 14px; z-index: 10;
+  position: fixed; left: 18rem; bottom: 14px; z-index: 10;
   width: 20rem; border: 1px solid var(--ink);
 }
 #inspector .text { background: var(--bg); padding: 0.4rem 0.6rem 0.5rem; }
@@ -149,18 +152,17 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   display: block; width: 100%; aspect-ratio: 276 / 200;
   border-top: 1px solid var(--ink);
 }
-/* With the rationale column on the right, the inspector moves next to the GUI */
-body.doc-right #inspector { right: auto; left: 18rem; }
 
 .dim-label {
   position: fixed; z-index: 11; pointer-events: none;
   color: var(--accent); font-size: 0.8rem; transform: translate(-50%, -50%);
 }
 
-/* ---- design rationale panel (Fable runs only) ---- */
+/* ---- design rationale panel (Fable runs only): column under the view cube ---- */
 #doc {
-  z-index: 10; display: flex; flex-direction: column;
-  width: 24rem; min-height: 0; pointer-events: auto;
+  position: fixed; top: 180px; right: 12px; z-index: 10;
+  display: flex; flex-direction: column;
+  width: 24rem; max-height: calc(100vh - 180px - 3rem); min-height: 0;
   border: 1px solid var(--ink); background: var(--bg);
 }
 #doc[hidden] { display: none; }
@@ -179,21 +181,25 @@ body.doc-right #inspector { right: auto; left: 18rem; }
   padding: 0.4rem 0.6rem 0.8rem; font-size: 0.8rem; line-height: 1.35;
   overflow-wrap: anywhere;
 }
+/* One face throughout; emphasis is colour or an inverted chip, which stays
+   readable when accent == ink (mono, wireframe). */
 .md h1, .md h2, .md h3, .md h4 {
-  font-weight: normal; color: var(--accent); margin: 1em 0 0.3em; font-size: 1em;
+  font-weight: normal; color: var(--accent); margin: 1.1em 0 0.35em;
 }
-.md h1 { font-size: 1.15em; margin-top: 0.3em; }
-.md h2::before { content: "## "; }
-.md h3::before { content: "### "; }
+.md h1 { font-size: 1.45em; margin-top: 0.3em; }
+.md h2 { font-size: 1.25em; }
+.md h3 { font-size: 1.1em; }
+.md h4 { font-size: 1em; }
 .md p { margin: 0.4em 0; }
 .md ul, .md ol { margin: 0.4em 0 0.4em 1.4em; }
 .md li { margin: 0.15em 0; }
-.md code { color: var(--accent); }
+.md code, .md pre { font: inherit; }
+.md code { background: var(--ink); color: var(--bg); padding: 0 0.25em; }
 .md pre {
   border: 1px solid var(--ink); padding: 0.4em 0.6em; margin: 0.5em 0;
   overflow-x: auto; white-space: pre;
 }
-.md pre code { color: var(--ink); }
+.md pre code { background: none; color: var(--ink); padding: 0; }
 .md table { border-collapse: collapse; margin: 0.5em 0; }
 .md th, .md td {
   border: 1px solid var(--ink); padding: 1px 0.4em; text-align: left;
@@ -203,17 +209,13 @@ body.doc-right #inspector { right: auto; left: 18rem; }
 .md a { color: var(--accent); }
 .md hr { border: 0; border-top: 1px solid var(--ink); margin: 0.8em 0; }
 .md blockquote { border-left: 2px solid var(--accent); padding-left: 0.6em; margin: 0.4em 0; }
-.md strong { color: var(--accent); font-weight: normal; }
-
-body.doc-right #doc {
-  position: fixed; top: 180px; right: 12px;
-  max-height: calc(100vh - 180px - 3rem);
-}
+.md strong { background: var(--ink); color: var(--bg); font-weight: normal; padding: 0 0.2em; }
+.md em { color: var(--accent); font-style: normal; }
 
 /* ---- footer ---- */
 #footer {
-  position: fixed; left: 12px; bottom: 10px; z-index: 10;
-  font-size: 0.8rem; user-select: none;
+  position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%);
+  z-index: 10; font-size: 0.8rem; user-select: none; white-space: nowrap;
 }
 #footer a { color: var(--accent); text-decoration: none; }
 #footer a:hover { text-decoration: underline; }
@@ -227,7 +229,16 @@ body.doc-right #doc {
 #quad-lines::before { left: 0; right: 0; top: 50%; height: 1px; }
 #quad-lines::after { top: 0; bottom: 0; left: 50%; width: 1px; }
 
+/* ---- phones: collapsed exclusive GUI (see makePanel), smaller view cube
+   (viewcube.js), takeoff bottom-left, rationale collapsed and full width ---- */
 @media (max-width: 760px) {
-  :root { font-size: 15px; }
-  #doc { width: 18rem; }
+  :root { font-size: 13px; }
+  #gui { width: 16rem; max-height: calc(100vh - 2.5rem); }
+  #stats { top: auto; bottom: 2.4rem; left: 0.6rem; }
+  #inspector { left: auto; right: 0.6rem; width: min(18rem, 55vw); bottom: 2.4rem; }
+  #doc {
+    top: 160px; right: 8px;
+    width: min(24rem, calc(100vw - 16px)); max-height: calc(100vh - 160px - 3rem);
+  }
+  #footer { bottom: 6px; font-size: 0.75rem; }
 }

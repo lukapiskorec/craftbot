@@ -171,3 +171,46 @@ test("parseModel: mesh dims are oriented, box frames match matrix columns", () =
   assert.ok(Math.abs(Math.abs(m.frames[2]) - 1) < 1e-6);
   assert.equal(m.frames.length, 9 * m.count);
 });
+
+test("orientedBox: centre equals the vertex centroid for any box orientation", () => {
+  // Rotations chosen so the winning frame comes out in varying axis orders
+  const L = 2.0, W = 0.3, T = 0.05;
+  let seed = 7;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  for (let trial = 0; trial < 12; trial++) {
+    const ax = rand() * Math.PI * 2, ay = rand() * Math.PI * 2, az = rand() * Math.PI * 2;
+    const off = [rand() * 10 - 5, rand() * 10 - 5, rand() * 10 - 5];
+    const verts = [];
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
+      let [x, y, z] = [sx * L / 2, sy * W / 2, sz * T / 2];
+      [y, z] = [y * Math.cos(ax) - z * Math.sin(ax), y * Math.sin(ax) + z * Math.cos(ax)];
+      [x, z] = [x * Math.cos(ay) + z * Math.sin(ay), -x * Math.sin(ay) + z * Math.cos(ay)];
+      [x, y] = [x * Math.cos(az) - y * Math.sin(az), x * Math.sin(az) + y * Math.cos(az)];
+      verts.push(x + off[0], y + off[1], z + off[2]);
+    }
+    const quads = [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]];
+    const index = [];
+    for (const q of quads) index.push(q[0], q[1], q[2], q[0], q[2], q[3]);
+    const ob = orientedBox(Float32Array.from(verts), Uint32Array.from(index));
+    for (let k = 0; k < 3; k++) {
+      assert.ok(Math.abs(ob.center[k] - off[k]) < 1e-3, `trial ${trial} centre[${k}] ${ob.center[k]} vs ${off[k]}`);
+    }
+    assert.ok(Math.abs(ob.dims[0] - L) < 1e-3 && Math.abs(ob.dims[2] - T) < 1e-3);
+  }
+});
+
+test("parseModel: inside-out meshes are re-wound to face outward", () => {
+  const reversed = M.meshes[0].faces.map((f) => [...f].reverse());
+  const m = parseModel({ ...M, meshes: [{ ...M.meshes[0], faces: reversed }] });
+  const mm = m.meshes[0];
+  const v = mm.verts, ix = mm.index;
+  let vol = 0;
+  for (let i = 0; i < ix.length; i += 3) {
+    const a = ix[i] * 3, b = ix[i + 1] * 3, c = ix[i + 2] * 3;
+    vol += (v[a] * (v[b + 1] * v[c + 2] - v[b + 2] * v[c + 1])
+      + v[a + 1] * (v[b + 2] * v[c] - v[b] * v[c + 2])
+      + v[a + 2] * (v[b] * v[c + 1] - v[b + 1] * v[c])) / 6;
+  }
+  assert.ok(vol > 0.99, `signed volume ${vol}`);
+  assert.ok(Math.abs(m.volumes[2] - 1) < 1e-4);
+});

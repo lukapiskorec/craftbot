@@ -1,6 +1,7 @@
-// Render styles: material sets, a UI theme, and optional full-screen post
-// passes. Post passes are hand-rolled (render target + fullscreen triangle),
-// no addons - that keeps them compatible with the quad-view viewport path.
+// Render styles: material sets, a UI theme, and an optional chain of
+// full-screen post passes. Passes are hand-rolled (render target + fullscreen
+// triangle), no addons - that keeps them compatible with the quad-view
+// viewport path. Colour is encoded to sRGB exactly once, by the last pass.
 //
 // A style has one or more variants ("modes"): clicking the active style button
 // advances to its next variant (and re-seeds the palette for RANDOM).
@@ -80,7 +81,10 @@ uniform mat4 uProjInv;
 uniform vec2 uTexel;
 uniform float uRadius;
 uniform float uStrength;
+uniform float uEncode;
 varying vec2 vUv;
+
+vec3 enc(vec3 c) { return uEncode > 0.5 ? toSRGB(c) : c; }
 
 vec3 viewPos(vec2 uv, float d) {
   vec4 clip = vec4(uv * 2.0 - 1.0, d * 2.0 - 1.0, 1.0);
@@ -111,7 +115,7 @@ float occlude(vec3 p, mat3 tbn, vec3 k, float radius) {
 void main() {
   vec3 color = texture2D(tDiffuse, vUv).rgb;
   float depth = texture2D(tDepth, vUv).x;
-  if (depth >= 1.0) { gl_FragColor = vec4(toSRGB(color), 1.0); return; }
+  if (depth >= 1.0) { gl_FragColor = vec4(enc(color), 1.0); return; }
 
   vec3 p = viewPos(vUv, depth);
   // Pick the nearer neighbour on each axis so silhouettes keep sane normals
@@ -133,18 +137,25 @@ void main() {
   float occ = 0.0;
 ${aoKernel(AO_SAMPLES).map((k) => `  occ += occlude(p, tbn, ${k}, uRadius);`).join("\n")}
   float shade = clamp(1.0 - (occ / float(${AO_SAMPLES})) * uStrength, 0.0, 1.0);
-  gl_FragColor = vec4(toSRGB(color * shade), 1.0);
+  gl_FragColor = vec4(enc(color * shade), 1.0);
 }`;
 
+// Ordered dither in uScale-pixel blocks: one Bayer cell per block, sampling
+// the block centre so the pattern reads as chunky pixels.
 const DITHER_FRAG = `
 ${SRGB_FN}
 uniform sampler2D tDiffuse;
+uniform vec2 uTexel;
+uniform float uScale;
+uniform float uEncode;
 varying vec2 vUv;
 void main() {
-  vec3 c = toSRGB(texture2D(tDiffuse, vUv).rgb);
+  vec2 block = floor(vUv / uTexel / uScale);
+  vec3 c = texture2D(tDiffuse, (block + 0.5) * uScale * uTexel).rgb;
+  if (uEncode > 0.5) c = toSRGB(c);
   float lum = dot(c, vec3(0.299, 0.587, 0.114));
-  int x = int(mod(gl_FragCoord.x, 4.0));
-  int y = int(mod(gl_FragCoord.y, 4.0));
+  int x = int(mod(block.x, 4.0));
+  int y = int(mod(block.y, 4.0));
   int i = y * 4 + x;
   float b[16];
   b[0]=0.0;  b[1]=8.0;  b[2]=2.0;  b[3]=10.0;
@@ -167,7 +178,7 @@ function makeFullscreenQuad(fragmentShader, extraUniforms = {}) {
   geom.setAttribute("uv", new THREE.BufferAttribute(
     new Float32Array([0, 0, 2, 0, 0, 2]), 2));
   const mat = new THREE.ShaderMaterial({
-    uniforms: { tDiffuse: { value: null }, ...extraUniforms },
+    uniforms: { tDiffuse: { value: null }, uEncode: { value: 1 }, ...extraUniforms },
     vertexShader: QUAD_VERT,
     fragmentShader,
     depthTest: false, depthWrite: false,
@@ -203,19 +214,19 @@ const hidden = () => new THREE.MeshBasicMaterial({
 
 const DEFS = {
   plaster: [{
-    bg: 0xffffff, colors: 0xe8e4dc, edges: true, ao: true,
+    bg: 0xffffff, colors: 0xffffff, edges: true, passes: ["ao"],
     theme: theme(LIGHT, "#ffffff", MAGENTA),
     fill: plasterFill,
     line: () => new THREE.LineBasicMaterial({ color: 0x1a1a1a }),
   }],
   solid: [{
-    bg: 0xffffff, colors: "layer", edges: true, ao: true,
+    bg: 0xffffff, colors: "layer", edges: true, passes: ["ao"],
     theme: theme(LIGHT, "#ffffff", MAGENTA),
     fill: lambert,
     line: () => new THREE.LineBasicMaterial({ color: 0x1a1a1a }),
   }],
   random: [{
-    bg: 0xffffff, colors: "random", edges: true, ao: true,
+    bg: 0xffffff, colors: "random", edges: true, passes: ["ao"],
     theme: theme(LIGHT, "#ffffff", MAGENTA),
     fill: lambert,
     line: () => new THREE.LineBasicMaterial({ color: 0x111111 }),
@@ -224,16 +235,16 @@ const DEFS = {
   // a heavier version of its own edges.
   mono: [
     {
-      bg: 0x000000, colors: 0xffffff, edges: true,
-      theme: theme(DARK, "#000000", "#ffffff", { hover: "#8a8a8a", select: "#000000" }),
-      fill: flat,
-      line: () => new THREE.LineBasicMaterial({ color: 0x000000 }),
-    },
-    {
       bg: 0xffffff, colors: 0x121212, edges: true,
       theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#8a8a8a", select: "#ffffff" }),
       fill: flat,
       line: () => new THREE.LineBasicMaterial({ color: 0xffffff }),
+    },
+    {
+      bg: 0x000000, colors: 0xffffff, edges: true,
+      theme: theme(DARK, "#000000", "#ffffff", { hover: "#8a8a8a", select: "#000000" }),
+      fill: flat,
+      line: () => new THREE.LineBasicMaterial({ color: 0x000000 }),
     },
   ],
   wireframe: [
@@ -256,17 +267,30 @@ const DEFS = {
     fill: flat,
     line: () => new THREE.LineBasicMaterial({ color: 0xdce8ff }),
   }],
-  dither: [{
-    bg: 0xffffff, colors: 0xe8e4dc, edges: false, pass: "dither",
-    theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#909090" }),
-    fill: plasterFill,
-    line: () => new THREE.LineBasicMaterial({ color: 0x555555 }),
-  }],
+  // Plaster (white + AO) pushed through a 2px ordered dither. The second
+  // mode only swaps the page to black: the model dithers exactly the same.
+  dither: [
+    {
+      bg: 0xffffff, colors: 0xffffff, edges: false, passes: ["ao", "dither"],
+      theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#909090" }),
+      fill: plasterFill,
+      line: () => new THREE.LineBasicMaterial({ color: 0x555555 }),
+    },
+    {
+      bg: 0x000000, colors: 0xffffff, edges: false, passes: ["ao", "dither"],
+      theme: theme(DARK, "#000000", "#ffffff", { hover: "#909090" }),
+      fill: plasterFill,
+      line: () => new THREE.LineBasicMaterial({ color: 0x555555 }),
+    },
+  ],
 };
 
 export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
   const passes = {
-    dither: makeFullscreenQuad(DITHER_FRAG),
+    dither: makeFullscreenQuad(DITHER_FRAG, {
+      uTexel: { value: new THREE.Vector2() },
+      uScale: { value: 2 },
+    }),
     ao: makeFullscreenQuad(AO_FRAG, {
       tDepth: { value: null },
       uProj: { value: new THREE.Matrix4() },
@@ -295,8 +319,9 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
 
   function def() { return DEFS[active][mode]; }
 
-  function ensureRT(w, h, needDepth) {
-    const key = `${w}x${h}x${needDepth}`;
+  // tag separates the scene target from pass intermediates of the same size
+  function ensureRT(w, h, needDepth, tag) {
+    const key = `${w}x${h}x${needDepth}x${tag}`;
     const hit = targets.get(key);
     if (hit) {
       targets.delete(key); // re-insert to keep Map order = least-recently-used first
@@ -316,7 +341,7 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
     // visibly thinner than in the styles that draw straight to the screen.
     const target = new THREE.WebGLRenderTarget(tw, th, {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
-      depthBuffer: true, samples: SAMPLES,
+      depthBuffer: true, samples: tag === "scene" ? SAMPLES : 0,
     });
     if (needDepth) {
       target.depthTexture = new THREE.DepthTexture(tw, th, THREE.UnsignedIntType);
@@ -407,31 +432,48 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
       renderer.setScissor(vp.x / pr, vp.y / pr, vp.w / pr, vp.h / pr);
       renderer.setScissorTest(viewport !== null);
     };
-    if (!d.pass && !d.ao) {
+    const chain = d.passes ?? [];
+    if (!chain.length) {
       setVp();
       renderer.render(scene, camera);
       renderer.setScissorTest(false);
       return;
     }
-    const target = ensureRT(vp.w, vp.h, !!d.ao);
-    renderer.setRenderTarget(target);
     // setViewport multiplies by pixelRatio internally, so divide it back out;
     // passing raw device pixels here scales the image and shifts it off-centre.
-    renderer.setViewport(0, 0, target.width / pr, target.height / pr);
-    renderer.setScissorTest(false);
+    const fullTarget = (t) => {
+      renderer.setRenderTarget(t);
+      renderer.setViewport(0, 0, t.width / pr, t.height / pr);
+      renderer.setScissorTest(false);
+    };
+    const first = ensureRT(vp.w, vp.h, chain.includes("ao"), "scene");
+    fullTarget(first);
     renderer.render(scene, camera);
-    renderer.setRenderTarget(null);
 
-    const pass = d.ao ? passes.ao : passes[d.pass];
-    pass.mat.uniforms.tDiffuse.value = target.texture;
-    if (d.ao) {
-      pass.mat.uniforms.tDepth.value = target.depthTexture;
-      pass.mat.uniforms.uProj.value.copy(camera.projectionMatrix);
-      pass.mat.uniforms.uProjInv.value.copy(camera.projectionMatrixInverse);
-      pass.mat.uniforms.uTexel.value.set(1 / target.width, 1 / target.height);
-    }
-    setVp();
-    renderer.render(pass.quadScene, pass.quadCam);
+    let src = first;
+    chain.forEach((name, i) => {
+      const last = i === chain.length - 1;
+      const pass = passes[name];
+      const u = pass.mat.uniforms;
+      u.tDiffuse.value = src.texture;
+      u.uEncode.value = last ? 1 : 0;
+      if (name === "ao") {
+        u.tDepth.value = first.depthTexture;
+        u.uProj.value.copy(camera.projectionMatrix);
+        u.uProjInv.value.copy(camera.projectionMatrixInverse);
+      }
+      u.uTexel.value.set(1 / src.width, 1 / src.height);
+      let dst = null;
+      if (last) {
+        renderer.setRenderTarget(null);
+        setVp();
+      } else {
+        dst = ensureRT(vp.w, vp.h, false, `pass${i}`);
+        fullTarget(dst);
+      }
+      renderer.render(pass.quadScene, pass.quadCam);
+      if (dst) src = dst;
+    });
     renderer.setScissorTest(false);
   }
   return api;

@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { parseModel, computeStats, LAYERS } from "./model-data.js";
 import { buildModelGroup } from "./scene.js";
 import { makeViews, VIEWS } from "./views.js";
-import { makePanel, makeTable, fmtBytes } from "./gui.js";
+import { makePanel, makeTable, fmtBytes, isMobile } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
 import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
 import { makeSections } from "./sections.js";
@@ -37,7 +37,7 @@ const sections = makeSections();
 
 let sceneApi = null;
 let currentModel = null;
-let currentStyle = "solid";
+let currentStyle = "mono";
 let inspector = null;
 let selected = null;
 const layerVisible = LAYERS.map(() => true);
@@ -56,7 +56,7 @@ const styles = makeStyles(renderer, scene, {
   },
 });
 
-const picking = makePicking(canvas, () => views.camera, () => sceneApi,
+const picking = makePicking(canvas, (x, y) => views.pickCamera(x, y), () => sceneApi,
   () => styles, (eid) => {
     if (!inspector) return;
     selected = eid;
@@ -129,7 +129,7 @@ async function loadModel(file, { keepView = false } = {}) {
 // GUI
 // ------------------------------------------------------------------
 
-const panel = makePanel(document.getElementById("gui"));
+const panel = makePanel(document.getElementById("gui"), undefined, { exclusive: isMobile() });
 const secModel = panel.section("MODEL");
 const secStyle = panel.section("STYLE");
 const secLayers = panel.section("LAYERS", true, "layers");
@@ -144,10 +144,9 @@ const styleButtons = secStyle.addButtons(STYLES, (name) => {
 }, { radio: true, active: currentStyle });
 
 const secAnim = panel.section("ANIMATION", false);
-const selAnim = secAnim.addSelect("Entry", ANIMS.map((a) => ({ value: a, label: a })),
-  (v) => anims.setAnim(v));
-const selOrder = secAnim.addSelect("Order", ORDERS.map((o) => ({ value: o, label: o })),
-  (v) => anims.setOrder(v));
+const animRow = secAnim.addRow();
+const selAnim = secAnim.addStepper("Entry", ANIMS, (v) => anims.setAnim(v), animRow);
+const selOrder = secAnim.addStepper("Order", ORDERS, (v) => anims.setOrder(v), animRow);
 secAnim.addButtons(["replay"], () => {
   if (currentModel) anims.play(currentModel, sceneApi);
 });
@@ -234,13 +233,7 @@ LAYERS.forEach((name, li) =>
 
 // Always-visible material takeoff, top of the screen next to the panel
 const statsTable = makeTable(document.getElementById("stats"),
-  ["layer", "n", "len m", "m³", "kg"]);
-// Design rationale placement: ?doc=left stacks it under the takeoff table,
-// default "right" hangs it under the view cube (inspector moves left).
-const docLayout = new URLSearchParams(location.search).get("doc") === "left" ? "left" : "right";
-document.body.classList.add(`doc-${docLayout}`);
-const docPanel = makeDocPanel(
-  docLayout === "left" ? document.getElementById("stats") : document.body);
+  ["layer", "n", "len m", "m³", "kg"]);const docPanel = makeDocPanel(document.body);
 
 function refreshStats() {
   if (!currentModel) return;
@@ -290,6 +283,8 @@ if (STYLES.includes(bootParams.get("style"))) {
   currentStyle = bootParams.get("style");
   styleButtons.setActive(currentStyle);
 }
+// Testing: ?open=ANIMATION,SECTION expands GUI sections
+for (const name of (bootParams.get("open") || "").split(",").filter(Boolean)) panel.open(name);
 // Testing: ?mode=1 picks the second variant of a two-mode style
 const modeParam = parseInt(bootParams.get("mode"), 10);
 if (ANIMS.includes(bootParams.get("anim"))) {

@@ -1,19 +1,30 @@
 // Retro terminal GUI panel. Pure DOM - no three.js imports.
 // makePanel(root) returns a section factory; callers compose controls.
 
-export function makePanel(root, title = "CRAFTBOT VIEWER") {
+// Narrow screens get the compact layout (see the media query in style.css)
+export const isMobile = () => window.matchMedia("(max-width: 760px)").matches;
+
+// exclusive: sections start collapsed and only one can be open (mobile)
+export function makePanel(root, title = "CRAFTBOT VIEWER", { exclusive = false } = {}) {
   root.innerHTML = "";
   const header = document.createElement("header");
   header.innerHTML = `${title} &gt; <span class="cursor">█</span>`;
   root.appendChild(header);
+  const sections = [];
 
   // className hooks section-specific layout (e.g. the two-column layer grid)
   function section(name, open = true, className = "") {
+    if (exclusive) open = false;
     const sec = document.createElement("div");
     sec.className = `gui-section ${className}${open ? " open" : ""}`;
+    sections.push(sec);
     const h2 = document.createElement("h2");
     h2.textContent = name;
-    h2.addEventListener("click", () => sec.classList.toggle("open"));
+    h2.addEventListener("click", () => {
+      const opening = !sec.classList.contains("open");
+      if (exclusive && opening) for (const s of sections) s.classList.remove("open");
+      sec.classList.toggle("open", opening);
+    });
     const body = document.createElement("div");
     body.className = "body";
     sec.append(h2, body);
@@ -34,6 +45,41 @@ export function makePanel(root, title = "CRAFTBOT VIEWER") {
     return {
       el: sec,
       body,
+
+      // Empty row to host several inline controls (see addStepper)
+      addRow() { return row(null); },
+
+      // < value > cycling through options; host = row to share with others.
+      // The label is a tooltip only - two labelled steppers do not fit one
+      // panel line in a monospace face.
+      addStepper(label, options, onChange, host = null) {
+        const r = host ?? row(null);
+        const wrap = document.createElement("span");
+        wrap.className = "stepper";
+        wrap.title = label;
+        const prev = document.createElement("button");
+        prev.textContent = "<";
+        const val = document.createElement("span");
+        val.className = "value";
+        const next = document.createElement("button");
+        next.textContent = ">";
+        wrap.append(prev, val, next);
+        r.appendChild(wrap);
+        let i = 0;
+        const show = () => { val.textContent = options[i]; };
+        const step = (d) => {
+          i = (i + d + options.length) % options.length;
+          show();
+          onChange(options[i]);
+        };
+        prev.addEventListener("click", () => step(-1));
+        next.addEventListener("click", () => step(1));
+        show();
+        return {
+          set(v) { const k = options.indexOf(v); if (k >= 0) { i = k; show(); } },
+          get value() { return options[i]; },
+        };
+      },
 
       addSelect(label, options, onChange) {
         const r = row(label);
@@ -132,7 +178,14 @@ export function makePanel(root, title = "CRAFTBOT VIEWER") {
     };
   }
 
-  return { section };
+  // Open a section by its title (testing: ?open=ANIMATION,SECTION)
+  function open(name) {
+    for (const sec of sections) {
+      if (sec.querySelector("h2").textContent === name) sec.classList.add("open");
+    }
+  }
+
+  return { section, open };
 }
 
 // Standalone stats table - used both inside a section and in the always-visible

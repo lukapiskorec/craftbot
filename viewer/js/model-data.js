@@ -113,12 +113,14 @@ export function orientedBox(verts, index) {
     (best.ext[j][1] - best.ext[j][0]) - (best.ext[i][1] - best.ext[i][0]));
   const axes = order.map((i) => best.axes[i]);
   const ext = order.map((i) => best.ext[i]);
-  axes[2] = crossV(axes[0], axes[1]); // keep the frame right-handed
+  // Centre from the axes the extents were measured on - before re-handing
+  // the frame below, which may negate axis 2.
   const center = [0, 0, 0];
   for (let k = 0; k < 3; k++) {
     const mid = (ext[k][0] + ext[k][1]) / 2;
     center[0] += mid * axes[k][0]; center[1] += mid * axes[k][1]; center[2] += mid * axes[k][2];
   }
+  axes[2] = crossV(axes[0], axes[1]); // keep the frame right-handed
   return {
     dims: ext.map((e) => e[1] - e[0]),
     axes: Float32Array.from(axes.flat()),
@@ -224,6 +226,14 @@ export function parseModel(json) {
       vol += (ax * (by * cz - bz * cy)
         + ay * (bz * cx - bx * cz)
         + az * (bx * cy - by * cx)) / 6;
+    }
+    // Some generators emit inside-out prisms (consistent but reversed
+    // winding). Negative signed volume = inverted: flip every triangle so the
+    // faces are front-facing again.
+    if (vol < 0) {
+      for (let i = 0; i < index.length; i += 3) {
+        const t = index[i + 1]; index[i + 1] = index[i + 2]; index[i + 2] = t;
+      }
     }
     volumes[e] = Math.abs(vol);
     meshes.push({ elementId: e, name: src.name, verts, index });
