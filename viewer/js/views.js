@@ -32,6 +32,19 @@ export function makeViews(renderer, canvas) {
   let center = new THREE.Vector3();
   let quad = false;
   const quadLines = document.getElementById("quad-lines");
+  // In-flight camera move (view cube click): slerp between orientations so the
+  // up vector never flips mid-way. Orbit controls are paused until it lands.
+  let fly = null; // {q0, q1, up, dist, t0, dur}
+  const FLY_SECONDS = 0.5;
+
+  function endFlight() {
+    if (!fly) return;
+    camera.quaternion.copy(fly.q1);
+    camera.up.copy(fly.up);
+    fly = null;
+    controls.enabled = true;
+    controls.update();
+  }
 
   function frustum(cam, w, h) {
     const aspect = w / h;
@@ -64,17 +77,28 @@ export function makeViews(renderer, canvas) {
     camera, controls,
     get quad() { return quad; },
 
-    fit(bounds) {
+    // keepView: re-centre on the new bounds but keep direction and zoom
+    // (switching iterations of the same model must not jump the camera).
+    fit(bounds, { keepView = false } = {}) {
+      endFlight();
       const sphere = bounds.getBoundingSphere(new THREE.Sphere());
       radius = Math.max(sphere.radius, 0.001);
+      const dir = api.getDirection(new THREE.Vector3());
       center = sphere.center.clone();
       controls.target.copy(center);
-      api.setPreset("axo");
+      if (keepView) {
+        camera.position.copy(center).addScaledVector(dir, radius * 4);
+        camera.lookAt(center);
+        controls.update();
+      } else {
+        api.setPreset("axo");
+      }
       for (const name of Object.keys(fixedCams)) place(fixedCams[name], name);
       updateFrustums();
     },
 
     setPreset(name) {
+      endFlight();
       place(camera, name);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
@@ -82,16 +106,22 @@ export function makeViews(renderer, canvas) {
       controls.update();
     },
 
-    // Look at the model from an arbitrary unit direction (view cube widget).
-    setDirection(dir) {
+    // Fly to look at the model from an arbitrary unit direction (view cube).
+    flyTo(dir) {
       const d = dir.clone().normalize();
       // Straight down/up has no meaningful +Z up vector - fall back to +Y
-      camera.up.set(0, 0, 1);
-      if (Math.abs(d.z) > 0.999) camera.up.set(0, 1, 0);
-      camera.position.copy(center).addScaledVector(d, radius * 4);
-      camera.lookAt(center);
+      const up = new THREE.Vector3(0, 0, 1);
+      if (Math.abs(d.z) > 0.999) up.set(0, 1, 0);
       controls.target.copy(center);
-      controls.update();
+      const dist = camera.position.distanceTo(center) || radius * 4;
+      const endPos = center.clone().addScaledVector(d, dist);
+      const q1 = new THREE.Quaternion().setFromRotationMatrix(
+        new THREE.Matrix4().lookAt(endPos, center, up));
+      fly = {
+        q0: camera.quaternion.clone(), q1, up, dist,
+        t0: performance.now(), dur: FLY_SECONDS * 1000,
+      };
+      controls.enabled = false;
     },
 
     // Camera direction from the model centre, for the view cube to mirror.
@@ -139,7 +169,15 @@ export function makeViews(renderer, canvas) {
 
     onResize() { updateFrustums(); },
 
-    tick() { controls.update(); },
+    tick() {
+      if (!fly) { controls.update(); return; }
+      const t = Math.min((performance.now() - fly.t0) / fly.dur, 1);
+      const e = t * t * (3 - 2 * t);
+      camera.quaternion.slerpQuaternions(fly.q0, fly.q1, e);
+      camera.position.copy(center).add(
+        new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion).multiplyScalar(fly.dist));
+      if (t >= 1) endFlight();
+    },
   };
   return api;
 }

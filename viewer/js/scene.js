@@ -254,6 +254,11 @@ export function buildModelGroup(model) {
       }
     },
 
+    // Colour the active style assigned to an element (before any hover tint)
+    baseColor(eid) {
+      return new THREE.Color(baseColors[eid * 3], baseColors[eid * 3 + 1], baseColors[eid * 3 + 2]);
+    },
+
     highlight(eid, color) { // color=null restores base
       const c = new THREE.Color();
       if (color === null) {

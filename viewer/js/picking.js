@@ -1,6 +1,7 @@
 // Hover highlight + element selection. Selection opens an inspector panel:
-// an inset viewport with the isolated element auto-rotating, dimension lines
-// with DOM labels, and the element's numbers.
+// the isolated element auto-rotating in a viewport of the main canvas (so it
+// is drawn by the active style, AO/dither included), dimension lines with
+// DOM labels, and the element's numbers.
 
 import * as THREE from "three";
 import { LAYERS, TIMBER_DENSITY } from "./model-data.js";
@@ -73,31 +74,49 @@ export function makePicking(canvas, getCamera, getSceneApi, getStyles, onSelect)
 // Element inspector
 // ------------------------------------------------------------------
 
-export function makeInspector(model, theme) {
+// The style materials carry the entry-animation vertex patch, which reads
+// these attributes; a spawn time in the far past keeps the element static.
+function addAnimAttributes(geom) {
+  const n = geom.getAttribute("position").count;
+  geom.setAttribute("aSpawn", new THREE.BufferAttribute(new Float32Array(n).fill(-1e9), 1));
+  geom.setAttribute("aCenter", new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  return geom;
+}
+
+const fmt = (m) => `${m.toFixed(3)} m`;
+
+// deps: getSceneApi() -> model scene api (materials, base colours),
+//       styles (render pipeline), renderer + mainCanvas (viewport placement)
+export function makeInspector(model, theme, { getSceneApi, styles, renderer, mainCanvas }) {
   let root = document.getElementById("inspector");
   if (root) root.remove();
   root = document.createElement("div");
   root.id = "inspector";
   root.hidden = true;
-  root.innerHTML = `<h3></h3><div class="dims"></div><canvas width="276" height="200"></canvas>`;
+  root.innerHTML = `<div class="text"><h3></h3><div class="dims"></div></div>
+<div class="viewport"></div>`;
   document.body.appendChild(root);
+  const viewport = root.querySelector(".viewport");
 
-  const canvas = root.querySelector("canvas");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(theme.bg);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x556066, 1.2));
-  const dl = new THREE.DirectionalLight(0xffffff, 1.4);
-  dl.position.set(2, -3, 4);
+  // Same rig as the main scene so shading matches
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x666a70, 1.1);
+  hemi.position.set(0, 0, 1);
+  scene.add(hemi);
+  const dl = new THREE.DirectionalLight(0xffffff, 1.6);
+  dl.position.set(3, -2, 6);
   scene.add(dl);
   const camera = new THREE.PerspectiveCamera(35, 276 / 200, 0.01, 100);
   camera.up.set(0, 0, 1);
 
   let group = null;
+  let edges = null;
   let labels = [];
   let dimAnchors = []; // {mid: Vector3, text: string}
   let active = false;
+  let currentEid = null;
+  let radius = 1;
 
   function clearLabels() {
     for (const l of labels) l.remove();
@@ -110,35 +129,43 @@ export function makeInspector(model, theme) {
       group.traverse((o) => o.geometry && o.geometry.dispose());
       scene.remove(group);
       group = null;
+      edges = null;
     }
     clearLabels();
   }
 
+  // Geometry in the element's own frame: longest axis along X, centred.
   function buildGeometry(eid) {
-    const isBox = model.kinds[eid] === 0;
-    if (isBox) {
-      const d = [model.dims[eid * 3], model.dims[eid * 3 + 1], model.dims[eid * 3 + 2]];
-      return { geom: new THREE.BoxGeometry(d[0], d[1], d[2]), dims: d };
+    const d = [model.dims[eid * 3], model.dims[eid * 3 + 1], model.dims[eid * 3 + 2]];
+    let geom;
+    if (model.kinds[eid] === 0) {
+      geom = new THREE.BoxGeometry(d[0], d[1], d[2]);
+    } else {
+      const mm = model.meshes.find((m) => m.elementId === eid);
+      const f = model.frames.subarray(eid * 9, eid * 9 + 9);
+      const c = model.centers.subarray(eid * 3, eid * 3 + 3);
+      const verts = new Float32Array(mm.verts.length);
+      for (let i = 0; i < mm.verts.length; i += 3) {
+        const x = mm.verts[i] - c[0], y = mm.verts[i + 1] - c[1], z = mm.verts[i + 2] - c[2];
+        for (let k = 0; k < 3; k++) {
+          verts[i + k] = x * f[k * 3] + y * f[k * 3 + 1] + z * f[k * 3 + 2];
+        }
+      }
+      geom = new THREE.BufferGeometry();
+      geom.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+      geom.setIndex(new THREE.BufferAttribute(mm.index, 1));
+      geom.computeVertexNormals();
     }
-    const mm = model.meshes.find((m) => m.elementId === eid);
-    const geom = new THREE.BufferGeometry();
-    const verts = new Float32Array(mm.verts.length);
-    for (let i = 0; i < mm.verts.length; i += 3) {
-      verts[i] = mm.verts[i] - model.centers[eid * 3];
-      verts[i + 1] = mm.verts[i + 1] - model.centers[eid * 3 + 1];
-      verts[i + 2] = mm.verts[i + 2] - model.centers[eid * 3 + 2];
-    }
-    geom.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-    geom.setIndex(new THREE.BufferAttribute(mm.index, 1));
-    geom.computeVertexNormals();
-    return {
-      geom,
-      dims: [model.dims[eid * 3], model.dims[eid * 3 + 1], model.dims[eid * 3 + 2]],
-    };
+    const n = geom.getAttribute("position").count;
+    const color = getSceneApi().baseColor(eid);
+    const col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { col[i * 3] = color.r; col[i * 3 + 1] = color.g; col[i * 3 + 2] = color.b; }
+    geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    return { geom: addAnimAttributes(geom), dims: d };
   }
 
   function addDimLines(dims) {
-    // Dimension lines just outside the AABB, one per axis, with tick marks.
+    // Dimension lines just outside the box, one per axis, with tick marks.
     const [dx, dy, dz] = dims;
     const h = [dx / 2, dy / 2, dz / 2];
     const off = Math.max(dx, dy, dz) * 0.18;
@@ -146,7 +173,7 @@ export function makeInspector(model, theme) {
     const axes = [
       { text: dx, a: [-h[0], h[1] + off, -h[2]], b: [h[0], h[1] + off, -h[2]], tick: [0, off * 0.2, 0] },
       { text: dy, a: [h[0] + off, -h[1], -h[2]], b: [h[0] + off, h[1], -h[2]], tick: [off * 0.2, 0, 0] },
-      { text: dz, a: [h[0] + off, h[1], -h[2]], b: [h[0] + off, h[1], h[2]], tick: [off * 0.2, 0, 0] },
+      { text: dz, a: [-h[0] - off, -h[1], -h[2]], b: [-h[0] - off, -h[1], h[2]], tick: [off * 0.2, 0, 0] },
     ];
     for (const ax of axes) {
       pts.push(...ax.a, ...ax.b);
@@ -156,12 +183,13 @@ export function makeInspector(model, theme) {
       }
       const mid = new THREE.Vector3(
         (ax.a[0] + ax.b[0]) / 2, (ax.a[1] + ax.b[1]) / 2, (ax.a[2] + ax.b[2]) / 2);
-      dimAnchors.push({ mid, text: `${ax.text.toFixed(2)} m` });
+      dimAnchors.push({ mid, text: fmt(ax.text) });
     }
     const geom = new THREE.BufferGeometry();
     geom.setAttribute("position", new THREE.BufferAttribute(Float32Array.from(pts), 3));
     const lines = new THREE.LineSegments(geom,
       new THREE.LineBasicMaterial({ color: theme.accent }));
+    lines.name = "dims";
     group.add(lines);
     for (const anchor of dimAnchors) {
       const el = document.createElement("div");
@@ -174,20 +202,22 @@ export function makeInspector(model, theme) {
 
   const api = {
     show(eid) {
+      const rotation = group ? group.rotation.z : 0;
       dispose();
+      currentEid = eid;
       const { geom, dims } = buildGeometry(eid);
+      const mats = getSceneApi().materials;
       group = new THREE.Group();
-      const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
-        color: 0xd8d5cd, roughness: 0.9,
-      }));
-      group.add(mesh);
-      group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 10),
-        new THREE.LineBasicMaterial({ color: theme.ink })));
+      group.rotation.z = rotation;
+      group.add(new THREE.Mesh(geom, model.isGlass[eid] ? mats.glass : mats.fill));
+      edges = new THREE.LineSegments(addAnimAttributes(new THREE.EdgesGeometry(geom, 10)), mats.line);
+      edges.visible = styles.edgesVisible;
+      group.add(edges);
       addDimLines(dims);
       scene.add(group);
 
-      const radius = Math.max(dims[0], dims[1], dims[2]) * 0.9 + 0.01;
-      camera.position.set(radius * 2.2, -radius * 2.2, radius * 1.6);
+      radius = Math.max(dims[0], dims[1], dims[2]) * 0.55 + 0.01;
+      camera.position.set(radius * 2.0, -radius * 2.0, radius * 1.4);
       camera.lookAt(0, 0, 0);
 
       const [dx, dy, dz] = dims;
@@ -195,7 +225,7 @@ export function makeInspector(model, theme) {
       root.querySelector("h3").textContent = model.names[eid];
       root.querySelector(".dims").innerHTML =
         `layer <b>${LAYERS[model.layer[eid]]}</b><br>` +
-        `size <b>${dx.toFixed(2)} × ${dy.toFixed(2)} × ${dz.toFixed(2)} m</b><br>` +
+        `size <b>${dx.toFixed(3)} × ${dy.toFixed(3)} × ${dz.toFixed(3)} m</b><br>` +
         `volume <b>${vol.toFixed(3)} m³</b> · weight <b>${(vol * TIMBER_DENSITY).toFixed(1)} kg</b>`;
       root.hidden = false;
       active = true;
@@ -204,15 +234,32 @@ export function makeInspector(model, theme) {
     hide() {
       root.hidden = true;
       active = false;
+      currentEid = null;
       dispose();
+    },
+
+    // Re-pick materials and colour after a style change
+    refresh() {
+      if (active && currentEid !== null) api.show(currentEid);
     },
 
     render(t) {
       if (!active || !group) return;
       group.rotation.z = t * 0.5;
-      renderer.render(scene, camera);
+      const rect = viewport.getBoundingClientRect();
+      const main = mainCanvas.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return;
+      const pr = renderer.getPixelRatio();
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
+      // GL viewport origin is bottom-left
+      styles.render(camera, {
+        x: Math.round((rect.left - main.left) * pr),
+        y: Math.round((main.bottom - rect.bottom) * pr),
+        w: Math.round(rect.width * pr),
+        h: Math.round(rect.height * pr),
+      }, { scene, radius });
       // Project dimension labels to screen space
-      const rect = canvas.getBoundingClientRect();
       const v = new THREE.Vector3();
       for (let i = 0; i < dimAnchors.length; i++) {
         v.copy(dimAnchors[i].mid).applyAxisAngle(new THREE.Vector3(0, 0, 1), group.rotation.z);
@@ -227,14 +274,12 @@ export function makeInspector(model, theme) {
     setTheme(t) {
       theme = t;
       scene.background = new THREE.Color(t.bg);
-      group?.traverse((o) => {
-        if (o.isLineSegments) o.material.color.set(t.accent);
-      });
+      const dims = group?.getObjectByName("dims");
+      if (dims) dims.material.color.set(t.accent);
     },
 
     destroy() {
       api.hide();
-      renderer.dispose();
       root.remove();
     },
   };

@@ -4,12 +4,13 @@
 export function makePanel(root, title = "CRAFTBOT VIEWER") {
   root.innerHTML = "";
   const header = document.createElement("header");
-  header.innerHTML = `${title}<span class="cursor">█</span>`;
+  header.innerHTML = `${title} &gt; <span class="cursor">█</span>`;
   root.appendChild(header);
 
-  function section(name, open = true) {
+  // className hooks section-specific layout (e.g. the two-column layer grid)
+  function section(name, open = true, className = "") {
     const sec = document.createElement("div");
-    sec.className = `gui-section${open ? " open" : ""}`;
+    sec.className = `gui-section ${className}${open ? " open" : ""}`;
     const h2 = document.createElement("h2");
     h2.textContent = name;
     h2.addEventListener("click", () => sec.classList.toggle("open"));
@@ -73,15 +74,28 @@ export function makePanel(root, title = "CRAFTBOT VIEWER") {
         return { set(v) { box.checked = v; }, get value() { return box.checked; } };
       },
 
-      addSlider(label, min, max, value, onChange) {
+      // readout(value) -> text shown after the slider (omit for none)
+      addSlider(label, min, max, value, onChange, { step = "any", readout = null } = {}) {
         const r = row(label);
         const input = document.createElement("input");
         input.type = "range";
         input.min = min; input.max = max; input.value = value;
-        input.step = "any";
-        input.addEventListener("input", () => onChange(parseFloat(input.value)));
+        input.step = step;
         r.appendChild(input);
-        return { set(v) { input.value = v; }, el: input };
+        let out = null;
+        if (readout) {
+          out = document.createElement("span");
+          out.className = "readout";
+          r.appendChild(out);
+        }
+        const show = () => { if (out) out.textContent = readout(parseFloat(input.value)); };
+        show();
+        input.addEventListener("input", () => { show(); onChange(parseFloat(input.value)); });
+        return {
+          set(v) { input.value = v; show(); },
+          setRange(lo, hi) { input.min = lo; input.max = hi; show(); },
+          el: input,
+        };
       },
 
       addButtons(labels, onClick, { radio = false, active = null } = {}) {

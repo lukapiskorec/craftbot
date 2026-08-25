@@ -9,7 +9,7 @@ import * as THREE from "three";
 import { LAYER_COLORS } from "./model-data.js";
 
 export const STYLES = [
-  "plaster", "solid", "random", "mono", "wireframe", "blueprint", "dither", "pixel",
+  "plaster", "solid", "random", "mono", "wireframe", "blueprint", "dither",
 ];
 
 // Deterministic per-element colors for the "random" style
@@ -25,20 +25,17 @@ function mulberry32(seed) {
 }
 
 // ------------------------------------------------------------------
-// UI themes - written to CSS custom properties on <html>
+// UI themes - written to CSS custom properties on <html>. Three colours only,
+// all fully opaque: page/panel background, type, and one accent.
+// hover/select tint the model, not the GUI.
 // ------------------------------------------------------------------
 
-const LIGHT = {
-  ink: "#141414", dim: "#5f5f5c", border: "rgba(0,0,0,0.32)",
-  panel: "rgba(255,255,255,0.62)", halo: "rgba(255,255,255,0.9)",
-};
-const DARK = {
-  ink: "#f0f0ee", dim: "#a0a09c", border: "rgba(255,255,255,0.34)",
-  panel: "rgba(0,0,0,0.5)", halo: "rgba(0,0,0,0.9)",
-};
+const LIGHT = { ink: "#000000" };
+const DARK = { ink: "#ffffff" };
+const MAGENTA = "#e5195b";
 
-function theme(base, bg, accent, hover = accent) {
-  return { ...base, bg, accent, hover, select: accent };
+function theme(base, bg, accent, { hover = accent, select = accent } = {}) {
+  return { ...base, bg, accent, hover, select };
 }
 
 // ------------------------------------------------------------------
@@ -159,16 +156,6 @@ void main() {
   gl_FragColor = vec4(vec3(v), 1.0);
 }`;
 
-const PIXEL_FRAG = `
-${SRGB_FN}
-uniform sampler2D tDiffuse;
-varying vec2 vUv;
-void main() {
-  vec3 c = toSRGB(texture2D(tDiffuse, vUv).rgb);
-  c = floor(c * 5.0 + 0.5) / 5.0;
-  gl_FragColor = vec4(c, 1.0);
-}`;
-
 const QUAD_VERT = `
 varying vec2 vUv;
 void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
@@ -196,61 +183,70 @@ function makeFullscreenQuad(fragmentShader, extraUniforms = {}) {
 // Style variants
 // ------------------------------------------------------------------
 
-// Flat, unlit fill. Every fill material stays white and takes its colour from
-// the vertex/instance attribute - that way the hover tint can lighten as well
+// Every fill material stays white and takes its colour from the
+// vertex/instance attribute - that way the hover tint can lighten as well
 // as darken, which a tinted material multiplied by vertex colour cannot.
-const flat = () => new THREE.MeshBasicMaterial({
+// Polygon offset pushes faces behind their own edges so the 1px edge lines
+// do not z-fight into a dashed look.
+const FILL = {
   color: 0xffffff, vertexColors: true,
   polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+};
+const flat = () => new THREE.MeshBasicMaterial(FILL);
+const lambert = () => new THREE.MeshLambertMaterial(FILL);
+const plasterFill = () => new THREE.MeshStandardMaterial({ ...FILL, roughness: 0.95 });
+// Wireframe: faces are drawn into neither colour nor depth, so only the edge
+// lines show - but the meshes still exist for picking.
+const hidden = () => new THREE.MeshBasicMaterial({
+  ...FILL, colorWrite: false, depthWrite: false,
 });
 
 const DEFS = {
   plaster: [{
-    bg: 0xc9c9c6, colors: 0xe8e4dc, edges: true, ao: true,
-    theme: theme(LIGHT, "#c9c9c6", "#b4633a"),
-    fill: () => new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness: 0.95, vertexColors: true,
-    }),
+    bg: 0xffffff, colors: 0xe8e4dc, edges: true, ao: true,
+    theme: theme(LIGHT, "#ffffff", MAGENTA),
+    fill: plasterFill,
     line: () => new THREE.LineBasicMaterial({ color: 0x1a1a1a }),
   }],
   solid: [{
-    bg: 0xd3d5d3, colors: "layer", edges: true, ao: true,
-    theme: theme(LIGHT, "#d3d5d3", "#2f6fb0"),
-    fill: () => new THREE.MeshLambertMaterial({ vertexColors: true }),
+    bg: 0xffffff, colors: "layer", edges: true, ao: true,
+    theme: theme(LIGHT, "#ffffff", MAGENTA),
+    fill: lambert,
     line: () => new THREE.LineBasicMaterial({ color: 0x1a1a1a }),
   }],
   random: [{
     bg: 0xffffff, colors: "random", edges: true, ao: true,
-    theme: theme(LIGHT, "#ffffff", "#e5195b"),
-    fill: () => new THREE.MeshLambertMaterial({ vertexColors: true }),
+    theme: theme(LIGHT, "#ffffff", MAGENTA),
+    fill: lambert,
     line: () => new THREE.LineBasicMaterial({ color: 0x111111 }),
   }],
+  // Selection outline matches the edge colour, so a picked element reads as
+  // a heavier version of its own edges.
   mono: [
     {
       bg: 0x000000, colors: 0xffffff, edges: true,
-      theme: theme(DARK, "#000000", "#ffffff", "#8a8a8a"),
+      theme: theme(DARK, "#000000", "#ffffff", { hover: "#8a8a8a", select: "#000000" }),
       fill: flat,
       line: () => new THREE.LineBasicMaterial({ color: 0x000000 }),
     },
     {
       bg: 0xffffff, colors: 0x121212, edges: true,
-      theme: theme(LIGHT, "#ffffff", "#000000", "#8a8a8a"),
+      theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#8a8a8a", select: "#ffffff" }),
       fill: flat,
       line: () => new THREE.LineBasicMaterial({ color: 0xffffff }),
     },
   ],
   wireframe: [
     {
-      // Fill painted in the background color = hidden-line removal
       bg: 0xffffff, colors: 0xffffff, edges: true,
-      theme: theme(LIGHT, "#ffffff", "#000000", "#9a9a9a"),
-      fill: flat,
+      theme: theme(LIGHT, "#ffffff", "#000000"),
+      fill: hidden,
       line: () => new THREE.LineBasicMaterial({ color: 0x000000 }),
     },
     {
       bg: 0x000000, colors: 0x000000, edges: true,
-      theme: theme(DARK, "#000000", "#ffffff", "#6a6a6a"),
-      fill: flat,
+      theme: theme(DARK, "#000000", "#ffffff"),
+      fill: hidden,
       line: () => new THREE.LineBasicMaterial({ color: 0xffffff }),
     },
   ],
@@ -261,25 +257,16 @@ const DEFS = {
     line: () => new THREE.LineBasicMaterial({ color: 0xdce8ff }),
   }],
   dither: [{
-    bg: 0xffffff, colors: 0xe8e4dc, edges: false, pass: "dither", passScale: 1,
-    theme: theme(LIGHT, "#ffffff", "#000000", "#909090"),
-    fill: () => new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness: 0.95, vertexColors: true,
-    }),
+    bg: 0xffffff, colors: 0xe8e4dc, edges: false, pass: "dither",
+    theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#909090" }),
+    fill: plasterFill,
     line: () => new THREE.LineBasicMaterial({ color: 0x555555 }),
-  }],
-  pixel: [{
-    bg: 0xd3d5d3, colors: "layer", edges: false, pass: "pixel", passScale: 0.25,
-    theme: theme(LIGHT, "#d3d5d3", "#2f6fb0"),
-    fill: () => new THREE.MeshLambertMaterial({ vertexColors: true }),
-    line: () => new THREE.LineBasicMaterial({ color: 0x1a1a1a }),
   }],
 };
 
 export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
   const passes = {
     dither: makeFullscreenQuad(DITHER_FRAG),
-    pixel: makeFullscreenQuad(PIXEL_FRAG),
     ao: makeFullscreenQuad(AO_FRAG, {
       tDepth: { value: null },
       uProj: { value: new THREE.Matrix4() },
@@ -297,13 +284,19 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
   // target four times a frame.
   const targets = new Map();
   const MAX_TARGETS = 6;
+  // Multisampled targets hang Chrome on the SwiftShader software renderer
+  // (headless --disable-gpu smoke tests); everything else gets 4x MSAA.
+  const gl = renderer.getContext();
+  const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+  const gpuName = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : "";
+  const SAMPLES = /swiftshader/i.test(gpuName) ? 0 : 4;
   let lastSceneApi = null;
   let lastModel = null;
 
   function def() { return DEFS[active][mode]; }
 
-  function ensureRT(w, h, scale, nearest, needDepth) {
-    const key = `${w}x${h}x${scale}x${nearest}x${needDepth}`;
+  function ensureRT(w, h, needDepth) {
+    const key = `${w}x${h}x${needDepth}`;
     const hit = targets.get(key);
     if (hit) {
       targets.delete(key); // re-insert to keep Map order = least-recently-used first
@@ -317,12 +310,13 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
       oldest.dispose();
       targets.delete(oldestKey);
     }
-    const tw = Math.max(1, Math.round(w * scale));
-    const th = Math.max(1, Math.round(h * scale));
+    const tw = Math.max(1, w);
+    const th = Math.max(1, h);
+    // Multisampled like the canvas, or the 1px edge lines come out jagged and
+    // visibly thinner than in the styles that draw straight to the screen.
     const target = new THREE.WebGLRenderTarget(tw, th, {
-      minFilter: nearest ? THREE.NearestFilter : THREE.LinearFilter,
-      magFilter: nearest ? THREE.NearestFilter : THREE.LinearFilter,
-      depthBuffer: true,
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+      depthBuffer: true, samples: SAMPLES,
     });
     if (needDepth) {
       target.depthTexture = new THREE.DepthTexture(tw, th, THREE.UnsignedIntType);
@@ -335,17 +329,14 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
     const root = document.documentElement.style;
     root.setProperty("--bg", t.bg);
     root.setProperty("--ink", t.ink);
-    root.setProperty("--dim", t.dim);
     root.setProperty("--accent", t.accent);
-    root.setProperty("--border", t.border);
-    root.setProperty("--panel", t.panel);
-    root.setProperty("--halo", t.halo);
     if (onTheme) onTheme(t);
   }
 
   const api = {
     get theme() { return def().theme; },
     get hoverColor() { return new THREE.Color(def().theme.hover); },
+    get edgesVisible() { return def().edges; },
     get selectColor() { return new THREE.Color(def().theme.select); },
 
     // Radius of the model's bounding sphere - scales the AO kernel to the model
@@ -395,44 +386,53 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
 
     // Render honoring the active post pass. viewport: {x,y,w,h} in device px
     // (used by the quad view); defaults to the full drawing buffer.
-    render(camera, viewport = null) {
-      const d = def();
-      const size = renderer.getDrawingBufferSize(new THREE.Vector2());
-      const vp = viewport ?? { x: 0, y: 0, w: size.x, h: size.y };
-      const pr = renderer.getPixelRatio();
-      const setVp = () => {
-        renderer.setViewport(vp.x / pr, vp.y / pr, vp.w / pr, vp.h / pr);
-        renderer.setScissor(vp.x / pr, vp.y / pr, vp.w / pr, vp.h / pr);
-        renderer.setScissorTest(viewport !== null);
-      };
-      if (!d.pass && !d.ao) {
-        setVp();
-        renderer.render(scene, camera);
-        renderer.setScissorTest(false);
-        return;
-      }
-      const target = ensureRT(vp.w, vp.h, d.pass ? d.passScale : 1,
-        d.pass === "pixel", !!d.ao);
-      renderer.setRenderTarget(target);
-      // setViewport multiplies by pixelRatio internally, so divide it back out;
-      // passing raw device pixels here scales the image and shifts it off-centre.
-      renderer.setViewport(0, 0, target.width / pr, target.height / pr);
-      renderer.setScissorTest(false);
-      renderer.render(scene, camera);
-      renderer.setRenderTarget(null);
-
-      const pass = d.ao ? passes.ao : passes[d.pass];
-      pass.mat.uniforms.tDiffuse.value = target.texture;
-      if (d.ao) {
-        pass.mat.uniforms.tDepth.value = target.depthTexture;
-        pass.mat.uniforms.uProj.value.copy(camera.projectionMatrix);
-        pass.mat.uniforms.uProjInv.value.copy(camera.projectionMatrixInverse);
-        pass.mat.uniforms.uTexel.value.set(1 / target.width, 1 / target.height);
-      }
-      setVp();
-      renderer.render(pass.quadScene, pass.quadCam);
-      renderer.setScissorTest(false);
+    // opts.scene draws another scene through the same pipeline (the element
+    // inspector); opts.radius is that scene's bounding radius for the AO kernel.
+    render(camera, viewport = null, { scene: target = scene, radius = null } = {}) {
+      const aoRadius = passes.ao.mat.uniforms.uRadius;
+      const savedRadius = aoRadius.value;
+      if (radius !== null) aoRadius.value = Math.max(radius * 0.022, 0.05);
+      renderScene(target, camera, viewport);
+      aoRadius.value = savedRadius;
     },
   };
+
+  function renderScene(scene, camera, viewport) {
+    const d = def();
+    const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+    const vp = viewport ?? { x: 0, y: 0, w: size.x, h: size.y };
+    const pr = renderer.getPixelRatio();
+    const setVp = () => {
+      renderer.setViewport(vp.x / pr, vp.y / pr, vp.w / pr, vp.h / pr);
+      renderer.setScissor(vp.x / pr, vp.y / pr, vp.w / pr, vp.h / pr);
+      renderer.setScissorTest(viewport !== null);
+    };
+    if (!d.pass && !d.ao) {
+      setVp();
+      renderer.render(scene, camera);
+      renderer.setScissorTest(false);
+      return;
+    }
+    const target = ensureRT(vp.w, vp.h, !!d.ao);
+    renderer.setRenderTarget(target);
+    // setViewport multiplies by pixelRatio internally, so divide it back out;
+    // passing raw device pixels here scales the image and shifts it off-centre.
+    renderer.setViewport(0, 0, target.width / pr, target.height / pr);
+    renderer.setScissorTest(false);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+
+    const pass = d.ao ? passes.ao : passes[d.pass];
+    pass.mat.uniforms.tDiffuse.value = target.texture;
+    if (d.ao) {
+      pass.mat.uniforms.tDepth.value = target.depthTexture;
+      pass.mat.uniforms.uProj.value.copy(camera.projectionMatrix);
+      pass.mat.uniforms.uProjInv.value.copy(camera.projectionMatrixInverse);
+      pass.mat.uniforms.uTexel.value.set(1 / target.width, 1 / target.height);
+    }
+    setVp();
+    renderer.render(pass.quadScene, pass.quadCam);
+    renderer.setScissorTest(false);
+  }
   return api;
 }

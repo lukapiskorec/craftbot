@@ -57,13 +57,86 @@ function triangulate(face, out) {
   }
 }
 
+
+// Minimum-volume oriented bounding box of a triangulated mesh (world verts,
+// triangle index). Candidate frames: every triangle normal paired with each
+// of that triangle's edges - exact for boxes and prisms, a close fit for
+// anything else. Returns dims sorted longest first, the matching unit axes
+// (row-major 3x3, right-handed) and the box centre.
+export function orientedBox(verts, index) {
+  const nv = verts.length / 3;
+  const seen = new Set();
+  let best = null;
+  const extent = (ax, ay, az) => {
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < nv; i++) {
+      const d = verts[i * 3] * ax + verts[i * 3 + 1] * ay + verts[i * 3 + 2] * az;
+      if (d < lo) lo = d;
+      if (d > hi) hi = d;
+    }
+    return [lo, hi];
+  };
+  const tryFrame = (u, v, n) => {
+    // Canonical key: sign-normalise so (u, n) and (-u, -n) dedupe
+    const key = [n, u].map((a) => {
+      const s = Math.sign(Math.abs(a[0]) > 1e-6 ? a[0] : Math.abs(a[1]) > 1e-6 ? a[1] : a[2]) || 1;
+      return a.map((c) => (s * c).toFixed(3)).join(",");
+    }).join("|");
+    if (seen.has(key)) return;
+    seen.add(key);
+    const eu = extent(...u), ev = extent(...v), en = extent(...n);
+    const vol = (eu[1] - eu[0]) * (ev[1] - ev[0]) * (en[1] - en[0]);
+    if (!best || vol < best.vol - 1e-12) best = { vol, axes: [u, v, n], ext: [eu, ev, en] };
+  };
+  const norm = (a) => {
+    const l = Math.hypot(a[0], a[1], a[2]);
+    return l > 1e-9 ? [a[0] / l, a[1] / l, a[2] / l] : null;
+  };
+  const crossV = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const P = (i) => [verts[i * 3], verts[i * 3 + 1], verts[i * 3 + 2]];
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  for (let t = 0; t < index.length; t += 3) {
+    const a = P(index[t]), b = P(index[t + 1]), c = P(index[t + 2]);
+    const edges = [sub(b, a), sub(c, b), sub(a, c)];
+    const n = norm(crossV(edges[0], sub(c, a)));
+    if (!n) continue;
+    for (const e of edges) {
+      const u = norm(e);
+      if (!u) continue;
+      tryFrame(u, crossV(n, u), n);
+    }
+  }
+  if (!best) { // degenerate mesh: world-aligned box
+    tryFrame([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+  }
+  const order = [0, 1, 2].sort((i, j) =>
+    (best.ext[j][1] - best.ext[j][0]) - (best.ext[i][1] - best.ext[i][0]));
+  const axes = order.map((i) => best.axes[i]);
+  const ext = order.map((i) => best.ext[i]);
+  axes[2] = crossV(axes[0], axes[1]); // keep the frame right-handed
+  const center = [0, 0, 0];
+  for (let k = 0; k < 3; k++) {
+    const mid = (ext[k][0] + ext[k][1]) / 2;
+    center[0] += mid * axes[k][0]; center[1] += mid * axes[k][1]; center[2] += mid * axes[k][2];
+  }
+  return {
+    dims: ext.map((e) => e[1] - e[0]),
+    axes: Float32Array.from(axes.flat()),
+    center,
+  };
+}
+
 /**
  * Parse a craftbot-model JSON into typed arrays.
  * Element order: all boxes (creation order), then all meshes (creation order);
  * this is the construction sequence used by entry animations.
  *
- * Returns {count, names, collections, layer, kinds, isGlass, dims, centers,
- *          volumes, boxes: {elementIds, matrices},
+ * dims are each element's own (oriented) size, longest first; frames holds the
+ * matching unit axes (row-major 3x3 per element) so the element can be shown
+ * axis-aligned. centers is the oriented-box centre.
+ *
+ * Returns {count, names, collections, layer, kinds, isGlass, dims, frames,
+ *          centers, volumes, boxes: {elementIds, matrices},
  *          meshes: [{elementId, name, verts, index}]}
  */
 export function parseModel(json) {
@@ -80,6 +153,7 @@ export function parseModel(json) {
   const kinds = new Uint8Array(count); // 0 = box, 1 = mesh
   const isGlass = new Uint8Array(count); // 1 = drawn semi-transparent
   const dims = new Float32Array(3 * count);
+  const frames = new Float32Array(9 * count);
   const centers = new Float32Array(3 * count);
   const volumes = new Float32Array(count);
 
@@ -105,13 +179,23 @@ export function parseModel(json) {
     M[k + 4] = m[o + 1]; M[k + 5] = m[o + 5]; M[k + 6] = m[o + 9]; M[k + 7] = 0;
     M[k + 8] = m[o + 2]; M[k + 9] = m[o + 6]; M[k + 10] = m[o + 10]; M[k + 11] = 0;
     M[k + 12] = m[o + 3]; M[k + 13] = m[o + 7]; M[k + 14] = m[o + 11]; M[k + 15] = 1;
-    // Sizes: 2 x column norms of the 3x3 part (unit cube is 2x2x2)
-    const dx = 2 * Math.hypot(m[o + 0], m[o + 4], m[o + 8]);
-    const dy = 2 * Math.hypot(m[o + 1], m[o + 5], m[o + 9]);
-    const dz = 2 * Math.hypot(m[o + 2], m[o + 6], m[o + 10]);
-    dims[b * 3] = dx; dims[b * 3 + 1] = dy; dims[b * 3 + 2] = dz;
+    // Sizes: 2 x column norms of the 3x3 part (unit cube is 2x2x2); the
+    // normalised columns are the box's own axes.
+    const cols = [0, 1, 2].map((c) => [m[o + c], m[o + 4 + c], m[o + 8 + c]]);
+    const lens = cols.map((v) => 2 * Math.hypot(v[0], v[1], v[2]));
+    const order = [0, 1, 2].sort((i, j) => lens[j] - lens[i]);
+    for (let k = 0; k < 3; k++) {
+      const c = order[k];
+      dims[b * 3 + k] = lens[c];
+      for (let i = 0; i < 3; i++) frames[b * 9 + k * 3 + i] = cols[c][i] / (lens[c] / 2 || 1);
+    }
+    // Re-derive the third axis so the frame stays right-handed after sorting
+    const f = frames, q = b * 9;
+    f[q + 6] = f[q + 1] * f[q + 5] - f[q + 2] * f[q + 4];
+    f[q + 7] = f[q + 2] * f[q + 3] - f[q + 0] * f[q + 5];
+    f[q + 8] = f[q + 0] * f[q + 4] - f[q + 1] * f[q + 3];
     centers[b * 3] = m[o + 3]; centers[b * 3 + 1] = m[o + 7]; centers[b * 3 + 2] = m[o + 11];
-    volumes[b] = dx * dy * dz;
+    volumes[b] = lens[0] * lens[1] * lens[2];
   }
 
   const meshes = [];
@@ -126,18 +210,10 @@ export function parseModel(json) {
     const idx = [];
     for (const face of src.faces) triangulate(face, idx);
     const index = Uint32Array.from(idx);
-    // World AABB
-    let minx = Infinity, miny = Infinity, minz = Infinity;
-    let maxx = -Infinity, maxy = -Infinity, maxz = -Infinity;
-    for (let i = 0; i < verts.length; i += 3) {
-      minx = Math.min(minx, verts[i]); maxx = Math.max(maxx, verts[i]);
-      miny = Math.min(miny, verts[i + 1]); maxy = Math.max(maxy, verts[i + 1]);
-      minz = Math.min(minz, verts[i + 2]); maxz = Math.max(maxz, verts[i + 2]);
-    }
-    dims[e * 3] = maxx - minx; dims[e * 3 + 1] = maxy - miny; dims[e * 3 + 2] = maxz - minz;
-    centers[e * 3] = (minx + maxx) / 2;
-    centers[e * 3 + 1] = (miny + maxy) / 2;
-    centers[e * 3 + 2] = (minz + maxz) / 2;
+    const ob = orientedBox(verts, index);
+    dims.set(ob.dims, e * 3);
+    frames.set(ob.axes, e * 9);
+    centers.set(ob.center, e * 3);
     // Volume: sum of signed tetra volumes over triangles (divergence theorem)
     let vol = 0;
     for (let i = 0; i < index.length; i += 3) {
@@ -154,14 +230,14 @@ export function parseModel(json) {
   }
 
   return {
-    count, names, collections: colls, layer, kinds, isGlass, dims, centers, volumes,
+    count, names, collections: colls, layer, kinds, isGlass, dims, frames, centers, volumes,
     boxes: { elementIds, matrices }, meshes,
   };
 }
 
 /**
  * Per-layer material stats for the currently visible layers.
- * visible: bool[6] indexed like LAYERS. Length = longest element dimension.
+ * visible: bool[6] indexed like LAYERS. Length = element's oriented length.
  * Returns [{layer, count, lengthM, volumeM3, weightKg}] for all 6 layers.
  */
 export function computeStats(model, visible) {
@@ -171,7 +247,7 @@ export function computeStats(model, visible) {
     if (!visible[li]) continue;
     const r = rows[li];
     r.count += 1;
-    r.lengthM += Math.max(model.dims[e * 3], model.dims[e * 3 + 1], model.dims[e * 3 + 2]);
+    r.lengthM += model.dims[e * 3];
     r.volumeM3 += model.volumes[e];
   }
   for (const r of rows) r.weightKg = r.volumeM3 * TIMBER_DENSITY;

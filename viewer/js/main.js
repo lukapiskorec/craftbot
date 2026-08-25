@@ -10,6 +10,7 @@ import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
 import { makeSections } from "./sections.js";
 import { makePicking, makeInspector } from "./picking.js";
 import { makeViewCube } from "./viewcube.js";
+import { makeDocPanel } from "./rationale.js";
 
 const canvas = document.getElementById("view");
 const banner = document.getElementById("banner");
@@ -21,7 +22,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.localClippingEnabled = true;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xd3d5d3);
+scene.background = new THREE.Color(0xffffff);
 
 const hemi = new THREE.HemisphereLight(0xffffff, 0x666a70, 1.1);
 hemi.position.set(0, 0, 1);
@@ -47,6 +48,7 @@ const styles = makeStyles(renderer, scene, {
     sections.refresh();
     if (selected !== null && sceneApi) sceneApi.setSelected(selected, styles.selectColor);
     picking.refreshHover();
+    if (inspector) inspector.refresh();
   },
   onTheme: (theme) => {
     viewCube.setTheme(theme);
@@ -83,11 +85,16 @@ function showError(msg) {
 window.addEventListener("error", (e) => showError(`Error: ${e.message}`));
 window.addEventListener("unhandledrejection", (e) => showError(`Error: ${e.reason}`));
 
-async function loadModel(file) {
+let loadSeq = 0; // the iteration slider can fire faster than fetches land
+
+// keepView: keep the camera where it is (another iteration of the same model)
+async function loadModel(file, { keepView = false } = {}) {
+  const seq = ++loadSeq;
   try {
     const res = await fetch(file);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const json = await res.json();
+    if (seq !== loadSeq) return; // a newer load superseded this one
     const model = parseModel(json);
     if (sceneApi) sceneApi.dispose();
     currentModel = model;
@@ -103,8 +110,9 @@ async function loadModel(file) {
     anims.play(model, sceneApi);
     picking.resetAfterModelChange();
     if (inspector) inspector.destroy();
-    inspector = makeInspector(model, styles.theme);
-    views.fit(sceneApi.bounds);
+    inspector = makeInspector(model, styles.theme,
+      { getSceneApi: () => sceneApi, styles, renderer, mainCanvas: canvas });
+    views.fit(sceneApi.bounds, { keepView });
     banner.hidden = true;
     const url = new URL(location);
     url.searchParams.set("model", file);
@@ -124,7 +132,8 @@ async function loadModel(file) {
 const panel = makePanel(document.getElementById("gui"));
 const secModel = panel.section("MODEL");
 const secStyle = panel.section("STYLE");
-const secLayers = panel.section("LAYERS");
+const secLayers = panel.section("LAYERS", true, "layers");
+
 
 // Clicking the active style again advances its mode (mono/wireframe) or
 // re-seeds the palette (random).
@@ -162,12 +171,16 @@ secSection.addButtons(["flip x", "flip y", "flip z", "reset"], (label) => {
 
 let index = null;
 const pick = { exp: null, agent: null, v: null };
+let loadedExp = null; // experiment of the model currently in the scene
 
 function currentRuns() {
-  return index.experiments.find((e) => e.id === pick.exp)?.runs ?? [];
+  return index?.experiments.find((e) => e.id === pick.exp)?.runs ?? [];
 }
 function currentVersions() {
   return currentRuns().find((r) => r.agent === pick.agent)?.versions ?? [];
+}
+function currentRun() {
+  return currentRuns().find((r) => r.agent === pick.agent) ?? null;
 }
 function currentEntry() {
   return currentVersions().find((x) => x.v === pick.v) ?? null;
@@ -185,10 +198,11 @@ const selAgent = secModel.addSelect("Agent", [], (v) => {
   refreshPickers();
   loadPicked();
 });
-const selVersion = secModel.addSelect("Version", [], (v) => {
-  pick.v = v;
+// Iterations as a slider: 1..n over the versions of the picked run
+const iterSlider = secModel.addSlider("Iteration", 1, 1, 1, (i) => {
+  pick.v = currentVersions()[i - 1]?.v ?? pick.v;
   loadPicked();
-});
+}, { step: 1, readout: (i) => currentVersions()[i - 1]?.v ?? "" });
 const modelInfo = secModel.addInfo();
 
 function refreshPickers() {
@@ -196,14 +210,18 @@ function refreshPickers() {
   selAgent.setOptions(currentRuns().map((r) => ({ value: r.agent, label: r.agent })), pick.agent);
   const versions = currentVersions();
   if (!versions.some((x) => x.v === pick.v)) pick.v = last(versions)?.v ?? null;
-  selVersion.setOptions(versions.map((x) => ({ value: x.v, label: x.v })), pick.v);
+  iterSlider.setRange(1, Math.max(versions.length, 1));
+  iterSlider.set(versions.findIndex((x) => x.v === pick.v) + 1);
 }
 
 function loadPicked() {
   const entry = currentEntry();
   if (!entry) return;
   modelInfo.set(`<b>${entry.elements}</b> elements &middot; <b>${fmtBytes(entry.bytes)}</b>`);
-  loadModel(`models/${entry.file}`);
+  const rationale = currentRun()?.rationale;
+  docPanel.show(rationale ? `models/${rationale}` : null);
+  loadModel(`models/${entry.file}`, { keepView: loadedExp === pick.exp });
+  loadedExp = pick.exp;
 }
 
 // LAYERS section - visibility only; the takeoff numbers live in #stats
@@ -217,6 +235,12 @@ LAYERS.forEach((name, li) =>
 // Always-visible material takeoff, top of the screen next to the panel
 const statsTable = makeTable(document.getElementById("stats"),
   ["layer", "n", "len m", "m³", "kg"]);
+// Design rationale placement: ?doc=left stacks it under the takeoff table,
+// default "right" hangs it under the view cube (inspector moves left).
+const docLayout = new URLSearchParams(location.search).get("doc") === "left" ? "left" : "right";
+document.body.classList.add(`doc-${docLayout}`);
+const docPanel = makeDocPanel(
+  docLayout === "left" ? document.getElementById("stats") : document.body);
 
 function refreshStats() {
   if (!currentModel) return;

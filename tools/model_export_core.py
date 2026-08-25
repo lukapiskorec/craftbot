@@ -98,9 +98,10 @@ def _experiment_title(exp_id):
 def build_index(entries):
     """
     Build index.json dict from flat export entries:
-      {"experiment", "agent", "v", "file", "elements", "bytes"}
+      {"experiment", "agent", "v", "file", "elements", "bytes", "rationale"?}
     Experiments sorted by id, agents sorted by name ("ChatGPT 5.1" first),
-    versions sorted by version string.
+    versions sorted by version string. A run carries "rationale" (relative
+    path of the design rationale markdown) when any of its entries has one.
     """
     by_exp = {}
     for e in entries:
@@ -111,12 +112,17 @@ def build_index(entries):
         runs = []
         for agent in sorted(by_exp[exp_id]):
             versions = sorted(by_exp[exp_id][agent], key=lambda e: e["v"])
-            runs.append({
+            run = {
                 "agent": agent,
                 "versions": [{"v": e["v"], "file": e["file"],
                               "elements": e["elements"], "bytes": e["bytes"]}
                              for e in versions],
-            })
+            }
+            rationale = next((e["rationale"] for e in versions
+                              if e.get("rationale")), None)
+            if rationale:
+                run["rationale"] = rationale
+            runs.append(run)
         experiments.append({
             "id": exp_id,
             "title": _experiment_title(exp_id),

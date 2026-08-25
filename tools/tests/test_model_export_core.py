@@ -105,5 +105,18 @@ class TestIndex(unittest.TestCase):
         self.assertEqual([r["agent"] for r in runs], ["ChatGPT 5.1", "Fable"])
 
 
+class TestIndexRationale(unittest.TestCase):
+    def test_run_carries_rationale_when_any_entry_has_one(self):
+        base = {"experiment": "01_X", "file": "f", "elements": 1, "bytes": 1}
+        idx = core.build_index([
+            dict(base, agent="Fable", v="v01", rationale=None),
+            dict(base, agent="Fable", v="v02", rationale="01_X/fable_rationale.md"),
+            dict(base, agent="ChatGPT 5.1", v="v01", rationale=None),
+        ])
+        runs = {r["agent"]: r for r in idx["experiments"][0]["runs"]}
+        self.assertEqual(runs["Fable"]["rationale"], "01_X/fable_rationale.md")
+        self.assertNotIn("rationale", runs["ChatGPT 5.1"])
+
+
 if __name__ == "__main__":
     unittest.main()

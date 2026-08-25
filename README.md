@@ -57,7 +57,7 @@ Example (Windows):
 
 A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to GitHub Pages. Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
 
-Features: model/agent/iteration picker, eight render styles (plaster, solid, random, mono, wireframe, blueprint, 1-bit dither, pixel) — mono and wireframe each have a light and a dark mode, and re-clicking random re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style. Also: GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), layer toggles with an always-visible material takeoff (length, volume, weight), section planes on three axes, a Blender-style navigation cube with a 4-view mode, and hover/click element inspection with dimensions.
+Features: model/agent picker with an iteration slider (the camera stays put when switching iterations), seven render styles (plaster, solid, random, mono, wireframe, blueprint, 1-bit dither) — mono and wireframe each have a light and a dark mode, and re-clicking random re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style. Also: GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), layer toggles with an always-visible material takeoff (length, volume, weight), section planes on three axes, a Blender-style navigation cube with a 4-view mode, and hover/click element inspection showing the element's true (oriented) length × width × thickness, drawn in the active style. Fable runs also show their design rationale document in a panel (`?doc=left` moves it under the takeoff table; default is the column under the view cube).
 
 Run locally:
 
@@ -68,9 +68,12 @@ python -m http.server -d viewer 8123
 Re-export models after adding or changing experiment scripts (uses headless Blender):
 
 ```
-python tools/export_all_models.py            # everything
-python tools/export_all_models.py --only 08  # one experiment / pattern
+python tools/export_all_models.py               # everything
+python tools/export_all_models.py --only 08     # one experiment / pattern
+python tools/export_all_models.py --index-only  # no Blender: index + rationale docs only
 ```
+
+The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it.
 
 Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`. One-time repo setting: *Settings → Pages → Source: GitHub Actions*.
 

@@ -22,15 +22,13 @@ const FACES = [
   { label: "BOTTOM", normal: [0, 0, -1], up: [0, 1, 0] },
 ];
 
-// Opaque face tile: the panel colour composited over the theme background,
-// so the cube reads as solid whatever the style is.
+// Opaque face tile in the page colour, so the cube reads as solid whatever
+// the style is.
 function labelTexture(text, theme) {
   const c = document.createElement("canvas");
   c.width = c.height = 128;
   const g = c.getContext("2d");
   g.fillStyle = theme.bg;
-  g.fillRect(0, 0, 128, 128);
-  g.fillStyle = theme.panel;
   g.fillRect(0, 0, 128, 128);
   g.fillStyle = theme.ink;
   g.textAlign = "center";
@@ -73,7 +71,7 @@ export function makeViewCube(views, onQuadToggle) {
   root.appendChild(canvas);
   const quadBtn = document.createElement("button");
   quadBtn.className = "quad-btn";
-  quadBtn.textContent = "quad";
+  quadBtn.textContent = "4-view";
   quadBtn.addEventListener("click", () => {
     const on = !views.quad;
     views.setQuad(on);
@@ -181,7 +179,7 @@ export function makeViewCube(views, onQuadToggle) {
     if (dir) {
       views.setQuad(false);
       quadBtn.classList.remove("active");
-      views.setDirection(dir);
+      views.flyTo(dir);
     }
   });
 
