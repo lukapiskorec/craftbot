@@ -55,7 +55,13 @@ Example (Windows):
 
 ## Web viewer
 
-A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to GitHub Pages. Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
+![CraftBot viewer screenshots](visuals/craftbot_viewer_triptych_260830.png)
+
+*CraftBot viewer interface - exp 06 Prove Cabanon (left, MONO 1 mode), exp 04 Construction Manual (middle, BLUEPRINT mode) and exp 07 Gehry Deconstruction (right, MONO 2 mode) with callouts linking to a design rationale document*
+
+A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to [GitHub Pages (live link)](https://lukapiskorec.github.io/craftbot)
+
+Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
 
 Features: model/agent picker with an iteration slider (the camera stays put when switching iterations and only the elements that changed animate in), seven render styles (plaster, solid, random, mono, wireframe, blueprint, 1-bit dither) — mono, wireframe and dither each have a light and a dark mode, and re-clicking random re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style. Also: GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), eight layer toggles (frame, exterior/interior cladding, interior boards, roof, floors, foundations, fixtures) with an always-visible material takeoff (length, volume, weight), section planes on three axes, a Blender-style navigation cube with a 4-view mode (the three fixed views share one wheel zoom), and hover/click element inspection (a name/layer tag at the cursor; clicks also pick through section cuts) showing the element's true (oriented) length × width × thickness, drawn in the active style. Fable runs also show their design rationale document in a panel under the view cube, with callouts on the model (tags with leader lines, authored per run in `experiment_NN_fable_callouts.json`) that link groups of elements to passages of the document — click a tag to jump to the passage, hover a heading to see its callouts. On phones the GUI starts collapsed with one section open at a time.
 
