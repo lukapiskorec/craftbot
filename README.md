@@ -17,6 +17,7 @@ A draft paper describing the project is in [`papers/`](papers/):
 ```
 papers/         Draft paper PDF
 experiments/    13 experiments, one folder each
+skills/         Distilled modelling knowledge from the experiments, one skill per folder
 tools/          Helper scripts for running experiments
 outputs/        Default folder for headless renders (gitignored)
 ```
@@ -34,6 +35,25 @@ All experiments were run with ChatGPT 5.1 (November 2025 – January 2026), grou
 **Visual references** — 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
 
 **Hybrid references (images + text)** — 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11–13 Hip Roof / Dormer Window / Roof Sheathing
+
+## Skills
+
+[`skills/`](skills/) holds knowledge distilled from the experiments: principles, methods and techniques extracted from the Fable design rationale documents and the reference documents, formatted as agent skills (a folder per skill with a `SKILL.md`; the frontmatter description says when to load it). They are written to be usable outside this repo. For use with Claude Code, place them into your `.claude\skills\` folder, or add one line to `CLAUDE.md` telling the agent to check [`skills/`](skills/) and load the relevant `SKILL.md` files before starting an experiment - latter method works with any agent.
+
+| Skill | Load when |
+|---|---|
+| [working-from-reference-documents](skills/working-from-reference-documents/SKILL.md) | the experiment is grounded in a construction manual or guide |
+| [reading-visual-references](skills/reading-visual-references/SKILL.md) | dimensions or topology must be read off photos, drawings or plans |
+| [procedural-geometry](skills/procedural-geometry/SKILL.md) | writing Blender Python that generates construction geometry |
+| [non-orthogonal-geometry](skills/non-orthogonal-geometry/SKILL.md) | sloped, tilted, twisted or warped surfaces are involved |
+| [verifying-models](skills/verifying-models/SKILL.md) | setting up or running the render-inspect-revise loop |
+| [timber-framing](skills/timber-framing/SKILL.md) | modelling framed timber structures or reviewing them as structures |
+| [roof-framing-and-sheathing](skills/roof-framing-and-sheathing/SKILL.md) | modelling pitched roofs, sheathing or coverings |
+| [modular-grids-and-panelization](skills/modular-grids-and-panelization/SKILL.md) | prefabrication, panels, sheet materials, CLT, multi-storey systems |
+| [extending-previous-models](skills/extending-previous-models/SKILL.md) | continuing or layering onto a previous experiment's model |
+| [writing-design-rationale](skills/writing-design-rationale/SKILL.md) | closing out a run, before archiving the transcript |
+
+The standalone interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py) (the SAT test from the Fable render harnesses, runnable on any saved `.blend`).
 
 ## Headless execution
 
