@@ -219,6 +219,8 @@ __marimo__/
 
 # CraftBot headless render outputs
 outputs/
+*.blend
+*.blend1
 
 # Claude
 CLAUDE.md

@@ -15,8 +15,9 @@ argv = sys.argv[sys.argv.index("--") + 1:]
 experiment_path, lib_dir, out_path = argv[0], argv[1], argv[2]
 
 tools_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, tools_dir)
-sys.path.insert(0, lib_dir)
+sys.path.insert(0, tools_dir)                                        # craftbot_lib V2 and the kits
+sys.path.insert(0, os.path.dirname(os.path.abspath(experiment_path)))  # a base script next to the experiment
+sys.path.insert(0, lib_dir)                                          # input/craftbot_lib.py V1.1 wins for old runs
 import model_export_core as core
 
 os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)

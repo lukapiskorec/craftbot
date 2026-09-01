@@ -49,9 +49,9 @@ def find_scripts():
         if not os.path.isdir(exp_dir):
             continue
         exp_id = os.path.basename(exp_dir)
-        lib_dir = os.path.join(exp_dir, "input")
-        if not os.path.isfile(os.path.join(lib_dir, "craftbot_lib.py")):
-            continue
+        lib_dir = os.path.join(exp_dir, "input")   # old runs keep craftbot_lib V1.1 here;
+        if not os.path.isdir(lib_dir):              # newer runs import tools/ instead
+            lib_dir = exp_dir
         for agent in AGENT_DIRS:
             agent_dir = os.path.join(exp_dir, agent)
             if not os.path.isdir(agent_dir):
