@@ -19,7 +19,11 @@ papers/         Draft paper PDF
 experiments/    13 experiments, one folder each
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
 tools/          Shared modelling kits and harness scripts (see tools/README.md)
+viewer/         Web viewer: static site plus the exported models in viewer/models/
+visuals/        Figures used in this README
 outputs/        Default folder for headless renders (gitignored)
+.claude/        Claude Code command /run-experiment, which starts an experiment run
+.github/        GitHub Pages workflow that publishes viewer/ on every push to main
 ```
 
 Each experiment folder follows the same layout:
