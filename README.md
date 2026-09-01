@@ -18,7 +18,7 @@ A draft paper describing the project is in [`papers/`](papers/):
 papers/         Draft paper PDF
 experiments/    13 experiments, one folder each
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
-tools/          Helper scripts for running experiments
+tools/          Shared modelling kits and harness scripts (see tools/README.md)
 outputs/        Default folder for headless renders (gitignored)
 ```
 
@@ -52,8 +52,26 @@ All experiments were run with ChatGPT 5.1 (November 2025 – January 2026), grou
 | [modular-grids-and-panelization](skills/modular-grids-and-panelization/SKILL.md) | prefabrication, panels, sheet materials, CLT, multi-storey systems |
 | [extending-previous-models](skills/extending-previous-models/SKILL.md) | continuing or layering onto a previous experiment's model |
 | [writing-design-rationale](skills/writing-design-rationale/SKILL.md) | closing out a run, before archiving the transcript |
+| [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish (repo-specific: folders, `tools/`, viewer export) |
 
 The standalone interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py) (the SAT test from the Fable render harnesses, runnable on any saved `.blend`).
+
+## Tools
+
+[`tools/`](tools/) holds the code side of the same distillation: the geometry helpers the Fable runs converged on, extracted into importable modules so a new experiment starts from them instead of re-deriving them. [`tools/README.md`](tools/README.md) lists every module and function. In short:
+
+| Module | What it gives an experiment script |
+|---|---|
+| [`craftbot_lib.py`](tools/craftbot_lib.py) (V 2.0) | `place_element` as before, plus nested collections, `box` from corner coordinates, convex prisms |
+| [`geometry2d.py`](tools/geometry2d.py) | polygon clipping, member spacing, sheet tiling with holes, walls minus openings (pure Python, unit-tested) |
+| [`planes.py`](tools/planes.py) | half-spaces, plane intersections, `Roof` planes, members built long and clipped (rafters, hips, braces, plates) |
+| [`ruled.py`](tools/ruled.py) | bilinear surfaces for warped and leaning walls and roofs |
+| [`framing.py`](tools/framing.py) | stud walls with openings, cladding, decks, boards, solid walls with openings, roof layers, stairs |
+| [`sheathing.py`](tools/sheathing.py) | mitred board sheathing on planar facets, hip dropping, protrusion check |
+| [`render_views.py`](tools/render_views.py) | headless renders with outlines, colours, hidden layers, close-ups and section cuts, plus the overlap check |
+| [`experiment_template.py`](tools/experiment_template.py) | starting point for a new experiment script |
+
+Point your agent at both folders in its project instructions, one line each, as described under Skills above.
 
 ## Headless execution
 
