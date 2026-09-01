@@ -11,7 +11,13 @@ Usage (headless, on a saved model):
     blender --background model.blend --python tools/check_overlaps.py -- [tolerance_mm]
 
 Default tolerance is 1 mm. Can also be appended after any script that
-builds the scene in the same Blender session.
+builds the scene in the same Blender session, or imported:
+
+    from check_overlaps import find_overlaps, report
+    hits = find_overlaps(tol=0.001)      # [(depth_m, name_a, name_b), ...]
+
+The check cannot see MISSING geometry (a member clipped away by a wrong
+sign reports no overlap). Always also look at the renders.
 """
 import itertools
 import sys
@@ -57,15 +63,12 @@ def penetration(a, b):
     return depth
 
 
-def main():
-    tol_mm = 1.0
-    if "--" in sys.argv:
-        extra = sys.argv[sys.argv.index("--") + 1:]
-        if extra:
-            tol_mm = float(extra[0])
-    tol = tol_mm / 1000.0
-
-    meshes = [o for o in bpy.data.objects if o.type == "MESH" and len(o.data.vertices) >= 4]
+def find_overlaps(meshes=None, tol=0.001):
+    """Penetrating pairs among `meshes` (default: every mesh object in
+    the file) deeper than `tol` metres, as (depth, name_a, name_b)
+    sorted deepest first."""
+    if meshes is None:
+        meshes = [o for o in bpy.data.objects if o.type == "MESH" and len(o.data.vertices) >= 4]
     hulls = [(o.name, hull(o)) for o in meshes]
     hits = []
     for (name_a, a), (name_b, b) in itertools.combinations(hulls, 2):
@@ -75,9 +78,25 @@ def main():
         if p > tol:
             hits.append((p, name_a, name_b))
     hits.sort(reverse=True)
-    print(f"OVERLAP CHECK: {len(hulls)} members, {len(hits)} penetrating pairs (> {tol_mm:.0f} mm)")
-    for p, name_a, name_b in hits:
+    return hits
+
+
+def report(hits, n_members, tol=0.001, limit=None):
+    print(f"OVERLAP CHECK: {n_members} members, {len(hits)} penetrating pairs (> {tol * 1000:.0f} mm)")
+    for p, name_a, name_b in (hits if limit is None else hits[:limit]):
         print(f"  {p * 1000:6.1f} mm  {name_a}  x  {name_b}")
 
 
-main()
+def main():
+    tol_mm = 1.0
+    if "--" in sys.argv:
+        extra = sys.argv[sys.argv.index("--") + 1:]
+        if extra:
+            tol_mm = float(extra[0])
+    tol = tol_mm / 1000.0
+    meshes = [o for o in bpy.data.objects if o.type == "MESH" and len(o.data.vertices) >= 4]
+    report(find_overlaps(meshes, tol), len(meshes), tol)
+
+
+if __name__ == "__main__":
+    main()
