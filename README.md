@@ -4,9 +4,9 @@
 
 *Blender model generated with the Python code output of Experiment 08 (left), and its physical model visualization (right). The input for generation was a 27-page PDF "The Segal Method", a special issue of The Architect's Journal from 1986.*
 
-CraftBot is an architect AI agent. It interprets design briefs, grounds its thinking in domain knowledge through ingesting documents, images and other references, and outputs Python code that procedurally defines a building design. Instead of producing meshes or images, CraftBot writes scripts that construct architectural geometry in Blender. From there, it can produce a range of industry standard representations - floorplans, sections, elevations, BIM models, bills of quantities etc. It can work in a fully automated iterative loop of code generation, execution, visual feedback, and revision. More broadly, CraftBot is a research project exploring whether large language models can participate meaningfully in architectural design when constrained to operate through executable CAD code.
+CraftBot is an architect AI agent. It reads a design brief, grounds itself in domain knowledge by ingesting documents, images and other references, and outputs Python code that defines a building procedurally. Instead of producing meshes or images, CraftBot writes scripts that construct architectural geometry in Blender. From there it can produce the industry's standard representations: floorplans, sections, elevations, BIM models, bills of quantities. It can run in a fully automated loop of code generation, execution, visual feedback and revision. CraftBot is a research project asking whether large language models can take part in architectural design when they are constrained to work through executable CAD code.
 
-This repo hosts code files, iteration steps, references and outputs from previous experiments, enabling anyone to build upon CraftBot with minimal friction by pointing their own agent to it. Python and Blender were specifically chosen to facilitate ease of access; both are open-source, well-maintained, have a large community of users, and are free for commercial use. 
+This repo holds the code, iteration steps, references and outputs of the experiments so far, so anyone can build on CraftBot by pointing their own agent at it. Python and Blender were chosen for ease of access: both are open source, maintained, widely used, and free for commercial use.
 
 A draft paper describing the project is in [`papers/`](papers/):
 
@@ -24,21 +24,22 @@ outputs/        Default folder for headless renders (gitignored)
 
 Each experiment folder follows the same layout:
 
-- `input/` — everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference PDFs/images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template
-- `ChatGPT 5.1/` — outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models
-- `references/` (some experiments) — additional reference and annotation images used during the iteration loop
+- `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference PDFs and images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template.
+- `ChatGPT 5.1/` holds the outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models.
+- `Fable/` (ten experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation.
+- `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
 
 ## Experiments
 
-All experiments were run with ChatGPT 5.1 (November 2025 – January 2026), grouped by the type of reference material used:
+The experiments started in November 2025 with ChatGPT 5.1 (runs through January 2026); other agents followed, with Fable runs added in August 2026, and the series is ongoing as of September 2026. Grouped by the type of reference material used:
 
-**Visual references** — 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
+**Visual references.** 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
 
-**Hybrid references (images + text)** — 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11–13 Hip Roof / Dormer Window / Roof Sheathing
+**Hybrid references (images and text).** 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11 to 13 Hip Roof, Dormer Window and Roof Sheathing
 
 ## Skills
 
-[`skills/`](skills/) holds knowledge distilled from the experiments: principles, methods and techniques extracted from the Fable design rationale documents and the reference documents, formatted as agent skills (a folder per skill with a `SKILL.md`; the frontmatter description says when to load it). They are written to be usable outside this repo. For use with Claude Code, place them into your `.claude\skills\` folder, or add one line to `CLAUDE.md` telling the agent to check [`skills/`](skills/) and load the relevant `SKILL.md` files before starting an experiment - latter method works with any agent.
+[`skills/`](skills/) holds knowledge distilled from the experiments: principles, methods and techniques extracted from the Fable design rationale documents and the reference documents, formatted as agent skills. Each skill is a folder with a `SKILL.md` whose frontmatter description says when to load it. They are written to be usable outside this repo. For Claude Code, place them in your `.claude\skills\` folder, or add one line to `CLAUDE.md` telling the agent to check [`skills/`](skills/) and load the relevant `SKILL.md` files before starting an experiment. The second method works with any agent.
 
 | Skill | Load when |
 |---|---|
@@ -54,11 +55,11 @@ All experiments were run with ChatGPT 5.1 (November 2025 – January 2026), grou
 | [writing-design-rationale](skills/writing-design-rationale/SKILL.md) | closing out a run, before archiving the transcript |
 | [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish (repo-specific: folders, `tools/`, viewer export) |
 
-The standalone interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py) (the SAT test from the Fable render harnesses, runnable on any saved `.blend`).
+The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the Fable render harnesses. It runs on any saved `.blend`.
 
 ## Tools
 
-[`tools/`](tools/) holds the code side of the same distillation: the geometry helpers the Fable runs converged on, extracted into importable modules so a new experiment starts from them instead of re-deriving them. [`tools/README.md`](tools/README.md) lists every module and function. In short:
+[`tools/`](tools/) is the code side of the same distillation: the geometry helpers the Fable runs converged on, extracted into importable modules so a new experiment starts from them instead of deriving them again. [`tools/README.md`](tools/README.md) lists every module and function. In short:
 
 | Module | What it gives an experiment script |
 |---|---|
@@ -75,15 +76,15 @@ Point your agent at both folders in its project instructions, one line each, as 
 
 ## Headless execution
 
-Experiment scripts can be executed without opening the Blender GUI using [`tools/run_experiment_headless.py`](tools/run_experiment_headless.py). The wrapper runs an experiment script in background Blender, frames the generated geometry with an orthographic (parallel) camera so the whole model is always visible, renders four orbit views with the Workbench engine (visually similar to solid-mode viewport screenshots), and saves the resulting `.blend` file:
+[`tools/run_experiment_headless.py`](tools/run_experiment_headless.py) executes an experiment script without opening the Blender GUI. It runs the script in background Blender, frames the generated geometry with an orthographic camera so the whole model is always visible, renders four orbit views with the Workbench engine (close to solid-mode viewport screenshots), and saves the resulting `.blend` file:
 
 ```
 blender --background --python tools/run_experiment_headless.py -- <experiment.py> <lib_dir> [out_dir]
 ```
 
-- `<experiment.py>` — path to the experiment script to execute
-- `<lib_dir>` — folder containing `craftbot_lib.py` (the experiment's `input/` folder)
-- `[out_dir]` — optional output folder for `view_1..4.png` and `model.blend`; defaults to `outputs/<experiment_name>/` (gitignored)
+- `<experiment.py>` is the path to the experiment script to execute.
+- `<lib_dir>` is the folder containing `craftbot_lib.py` (the experiment's `input/` folder).
+- `[out_dir]` is an optional output folder for `view_1..4.png` and `model.blend`; it defaults to `outputs/<experiment_name>/` (gitignored).
 
 Example (Windows):
 
@@ -95,13 +96,22 @@ Example (Windows):
 
 ![CraftBot viewer screenshots](visuals/craftbot_viewer_triptych_260830.png)
 
-*CraftBot viewer interface - exp 06 Prove Cabanon (left, MONO 1 mode), exp 04 Construction Manual (middle, BLUEPRINT mode) and exp 07 Gehry Deconstruction (right, MONO 2 mode) with callouts linking to a design rationale document*
+*CraftBot viewer interface: exp 06 Prouvé Cabanon (left, MONO 1 mode), exp 04 Construction Manual (middle, BLUEPRINT mode) and exp 07 Gehry Deconstruction (right, MONO 2 mode) with callouts linking to a design rationale document*
 
-A lightweight WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to [GitHub Pages (live link)](https://lukapiskorec.github.io/craftbot)
+A WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to [GitHub Pages (live link)](https://lukapiskorec.github.io/craftbot).
 
-Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format (`viewer/models/`, typically 10–20× smaller than the corresponding `.blend`). The viewer is a static site — vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
+Since `.blend` files are not stored in the repo, each experiment script is executed once in headless Blender and exported to a compact JSON model format in `viewer/models/`, typically 10 to 20 times smaller than the corresponding `.blend`. The viewer is a static site: vanilla ES modules with [three.js](https://threejs.org) from a pinned CDN, no build step.
 
-Features: model/agent picker with an iteration slider (the camera stays put when switching iterations and only the elements that changed animate in), seven render styles (plaster, solid, random, mono, wireframe, blueprint, 1-bit dither) — mono, wireframe and dither each have a light and a dark mode, and re-clicking random re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style. Also: GPU-driven entry animations (elements drop/rise/assemble in construction order or layer by layer), eight layer toggles (frame, exterior/interior cladding, interior boards, roof, floors, foundations, fixtures) with an always-visible material takeoff (length, volume, weight), section planes on three axes, a Blender-style navigation cube with a 4-view mode (the three fixed views share one wheel zoom), and hover/click element inspection (a name/layer tag at the cursor; clicks also pick through section cuts) showing the element's true (oriented) length × width × thickness, drawn in the active style. Fable runs also show their design rationale document in a panel under the view cube, with callouts on the model (tags with leader lines, authored per run in `experiment_NN_fable_callouts.json`) that link groups of elements to passages of the document — click a tag to jump to the passage, hover a heading to see its callouts. On phones the GUI starts collapsed with one section open at a time.
+Features:
+
+- A model and agent picker with an iteration slider. The camera stays put when switching iterations and only the elements that changed animate in.
+- Seven render styles: plaster, solid, random, mono, wireframe, blueprint and 1-bit dither. Mono, wireframe and dither each have a light and a dark mode; clicking random again re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style.
+- GPU-driven entry animations: elements drop, rise or assemble in construction order or layer by layer.
+- Eight layer toggles (frame, exterior and interior cladding, interior boards, roof, floors, foundations, fixtures) with an always-visible material takeoff (length, volume, weight).
+- Section planes on three axes, and a Blender-style navigation cube with a 4-view mode in which the three fixed views share one wheel zoom.
+- Hover and click element inspection: a name and layer tag at the cursor, picking that works through section cuts, and the element's true oriented length, width and thickness drawn in the active style.
+- For Fable runs, the design rationale document in a panel under the view cube, with callouts on the model (tags with leader lines, authored per run in `experiment_NN_fable_callouts.json`) that link groups of elements to passages of the document. Click a tag to jump to the passage; hover a heading to see its callouts.
+- On phones the GUI starts collapsed with one section open at a time.
 
 Run locally:
 
@@ -121,9 +131,9 @@ python tools/callouts.py --check                # validate the rationale callout
 python tools/callouts.py --names 04             # element name patterns, for authoring callouts
 ```
 
-The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it. Meshes are re-wound to face outward at export (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
+The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
 
-Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`. One-time repo setting: *Settings → Pages → Source: GitHub Actions*.
+Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`. One-time repo setting: *Settings, Pages, Source: GitHub Actions*.
 
 ## Notes
 
@@ -132,6 +142,6 @@ Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`
 
 ## About
 
-The project author is Luka Piškorec, previously a lecturer at Aalto University and researcher at ETH Zürich. He is a co-founder of TEN Studio (Zürich and Belgrade) and {protocell:labs} (Helsinki), practices that work at an intersection of architecture, design, digital art and research.
+The project author is Luka Piškorec, previously a lecturer at Aalto University and researcher at ETH Zürich. He is a co-founder of TEN Studio (Zürich and Belgrade) and {protocell:labs} (Helsinki), practices that work at the intersection of architecture, design, digital art and research.
 
-The project is part of [art-ai-fact](https://www.aalto.fi/en/research-art/art-ai-fact) initiative funded by Aalto University in 2025-2026.
+The project is part of the [art-ai-fact](https://www.aalto.fi/en/research-art/art-ai-fact) initiative funded by Aalto University in 2025-2026.
