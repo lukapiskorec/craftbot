@@ -1,0 +1,14 @@
+Original PDF used during this experiment
+
+"THE SEGAL METHOD - color.pdf"
+(The Segal Method, The Architects' Journal special issue, 5 November 1986, by Jon Broome, 16 PDF pages of spreads)
+
+This PDF was kept in this input/ folder while the experiment ran (both the ChatGPT 5.1 and the Fable runs read it; the Fable phase-2 comparison used the finished-house photographs on its first page). It was removed from the repository on 2026-09-02 for copyright reasons.
+
+From now on the manuals/ folder at the repository root is the sole source for original PDFs:
+
+    manuals/THE SEGAL METHOD - color.pdf   (gitignored, kept locally)
+
+If the file is missing there, manuals/INDEX.md lists where it can be downloaded.
+
+The extracted summary segal_method_extracted.md in this folder is the copy that was used during the run and stays here unchanged for provenance. The maintained copy, with the download link in its header, is manuals/segal_method_extracted.md. Future experiments do not copy manuals into their input/ folder; they read manuals/ directly.

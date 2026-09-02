@@ -50,9 +50,13 @@ Keep three running lists, and repeat them in the rationale's scope section:
 2. Considered and not changed, with reasons. This stops the next iteration from re-litigating settled questions.
 3. Not verified: what the source specifies that the model never checked.
 
+## Where the references live
+
+The summaries and the PDFs behind them are in `manuals/` at the repo root, catalogued in `manuals/INDEX.md` (title, summary filename, download link, description, table of contents). The PDFs are gitignored; each summary's header says where to download its PDF and under what filename to save it. Reading, selection and download are described in the running-craftbot-experiment skill.
+
 ## Summarizing a new reference
 
-When producing a new summarized md document from a PDF, use this structure: a scope note naming what is and is not included (so nobody hallucinates absent span tables), a flat quick-reference table of parameter/value pairs, the prose with figure labels transcribed, a figure index, and a closing step-by-step summary for procedural modelling. A summary that ends in an ordered build sequence and begins with a parameter table can be used without rereading the prose.
+When producing a new summarized md document from a PDF, put it in `manuals/`, give it the header block the existing summaries use (original PDF filename and download link, source, scope, most useful for), and add an entry to `manuals/INDEX.md`. Use this structure: a scope note naming what is and is not included (so nobody hallucinates absent span tables), a flat quick-reference table of parameter/value pairs, the prose with figure labels transcribed, a figure index, and a closing step-by-step summary for procedural modelling. A summary that ends in an ordered build sequence and begins with a parameter table can be used without rereading the prose.
 
 ## Provenance
 

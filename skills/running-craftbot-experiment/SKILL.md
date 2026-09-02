@@ -14,21 +14,23 @@ One run turns a brief plus reference materials into versioned Blender Python scr
 | Item | Where | Notes |
 |---|---|---|
 | Experiment folder | `experiments/NN_Name_Blender_Python/` | NN = two digits; a bare number in the invocation resolves by globbing `experiments/NN_*` |
-| Materials | `input/` | manuals (PDF and extracted `.md`), photos, drawings, an inherited script when the brief extends an earlier model |
+| Materials | `input/` | photos, drawings, an inherited script when the brief extends an earlier model |
+| Manuals | `manuals/` (repo root, shared by all experiments) | 17 timber construction manuals as extracted `.md` summaries plus the original PDFs (gitignored, downloadable); `manuals/INDEX.md` is the catalogue. Runs before 2026-09-02 kept their manual in `input/`; a `original_pdf_provenance.txt` there says which one. |
 | Extra references | `references/` (optional) | annotated screenshots, comparison images |
-| The brief | the invocation message | what to build, constraints, iteration limit |
+| The brief | the invocation message | what to build, constraints, iteration limit; may name a manual or a chapter, which is then mandatory |
 
 The user places no code and no prompt files; the agent writes the prompt file itself (step 0). If the brief is missing, derive it from the folder name and the materials, state it in the first message, and proceed; the user can interrupt. When the brief and a material disagree (a photo of a different roof type than the brief names), the brief wins; record the conflict as a deliberate deviation and use the material only for what still applies (joints, member proportions, bracing idiom).
 
 ## Rules for the whole run
 
-- **Independence.** Never open another agent's scripts for the same experiment (`ChatGPT 5.1/` or any other run folder). Common ground is `tools/`, `skills/`, `input/` and `references/` only.
+- **Independence.** Never open another agent's scripts for the same experiment (`ChatGPT 5.1/` or any other run folder). Common ground is `tools/`, `skills/`, `manuals/`, `input/` and `references/` only.
 - **Narrate visibly.** Transcripts drop the model's private reasoning. Write decisions, rejected alternatives and key numbers into messages as you go; they become the rationale.
 - **Settle questions from the materials.** Consult the manuals and images before asking; state an assumption and continue rather than blocking.
+- **Manuals stay in `manuals/`.** Read them there; never copy a PDF or an extracted `.md` into `input/`. A PDF downloaded during a run lands in `manuals/` under the filename the index gives and is gitignored. Adding a new manual (summary plus index entry) is a separate task, not part of a run.
 - **Run every command from the repo root.** Blender resolves relative paths against its own cwd, so the output prefix is always absolute.
 - **Blender executable.** `CRAFTBOT_BLENDER` if set, else the first existing path in `KNOWN_BLENDERS` of `tools/export_all_models.py` (4.3 first); write that path into the render command. Run it from the Bash tool; if you wrap it in a Python subprocess instead, capture with `encoding="utf-8", errors="replace"` or cp1252 decoding crashes.
 - **Windows shell.** Write Python files and patch scripts with the Write tool and run them from a file: Bash heredocs containing an apostrophe break on this machine.
-- **Shared code.** The one sanctioned edit to `tools/` during a run is an `OVERRIDES` entry for this experiment in `tools/layers.py` (step 5). Promote a helper into `tools/` only after the run, as a separate proposal.
+- **Shared code.** The one sanctioned edit to `tools/` during a run is an `OVERRIDES` entry for this experiment in `tools/layers.py` (step 6). Promote a helper into `tools/` only after the run, as a separate proposal.
 - **No commits.** The user commits; list the files for them instead.
 - **Load the other skills by their descriptions** before the step that needs them: working-from-reference-documents, reading-visual-references, procedural-geometry, non-orthogonal-geometry, timber-framing, roof-framing-and-sheathing, modular-grids-and-panelization, extending-previous-models, verifying-models, writing-design-rationale.
 
@@ -40,11 +42,22 @@ The user places no code and no prompt files; the agent writes the prompt file it
 2. Create `Fable/`. If it already exists with versions, this is a continuation: read the highest `experiment_NN_fable_vXX.py`, the rationale if present, and resume the numbering.
 3. Read `tools/README.md`; the kits there are the starting point for all geometry.
 
-### 1. Read the inputs
+### 1. Select the manuals
 
-Read every file in `input/` and `references/`: PDFs page by page with the Read tool (the appendix sheets carry plans and panel dimensions that the extracted `.md` loses), the extracted `.md`, every image. Post the source-to-rule-to-number table (figure or clause, the rule it gives, the number used) and the list of deliberate deviations before writing geometry. This table is rationale section 2. Defaults where the source is silent: 1220 x 2440 sheets, metric member sizes from the timber-framing skill, labelled as your derivation.
+Read `manuals/INDEX.md` in full. It has one entry per manual: title, extracted `.md` filename, download link, a short description and a table of contents. Narrow down in this order, and stop at the level that settles the question:
 
-### 2. Set up the run files
+1. Descriptions: pick every manual whose description touches the brief (building type, structural system, region, level of detail). A brief that names a manual or chapter makes that one mandatory.
+2. Table of contents: within the picked manuals, pick the chapters; most manuals contribute one or two chapters, and an 800-page handbook is never read whole.
+3. Extracted `.md`: read the chosen manuals' summaries in full (they are 200 to 900 lines); they carry the numbers, rules, build sequences and a figure index with PDF page numbers.
+4. Original PDF: open the pages of the chosen chapters with the Read tool (`pages` ranges of at most 20), plus every page the figure index points to. Drawn details, appendix sheets and span tables live only there.
+
+For the PDF, check `manuals/<filename>.pdf` first; if it is missing, download it from the link in the index entry into `manuals/` under that exact filename (`curl -L -o`). If the link is a landing page or a borrow-only item and no download is possible, work from the extracted `.md` and record in the rationale that the PDF was not consulted. Post the selection in the first message: manual, chapters, why, and whether the PDF was available.
+
+### 2. Read the inputs
+
+Read every file in `input/` and `references/` (every image, any drawing or script), then the selected manual chapters as above: the extracted `.md` first, then the PDF pages (the appendix sheets carry plans and panel dimensions that the extracted `.md` loses). Post the source-to-rule-to-number table (manual, figure or clause, the rule it gives, the number used) and the list of deliberate deviations before writing geometry. This table is rationale section 2. Defaults where the source is silent: 1220 x 2440 sheets, metric member sizes from the timber-framing skill, labelled as your derivation.
+
+### 3. Set up the run files
 
 | File | Purpose |
 |---|---|
@@ -61,18 +74,18 @@ Render each version with:
 
 This writes `experiment_NN_fable_vXX_blender_view_01.png` and following, saves a `.blend` (gitignored) and prints `OVERLAP CHECK: <n> members, <k> penetrating pairs (> 1 mm)`.
 
-### 3. Iterate (phase 1: build to the brief)
+### 4. Iterate (phase 1: build to the brief)
 
 Loop: write the script, render, open every view PNG with the Read tool, read the overlap line, fix, repeat. Each rendered version is a new file; never overwrite a version that has renders. Add a view for every new feature in the version that adds it. Per version, post one message: what changed, what the renders showed, member count and penetrating pairs. Stop when the brief is met, the renders show no missing or misplaced geometry, and the check reports 0 pairs at 1 mm. Default limit 10 versions per phase unless the brief says otherwise; if the limit is reached, say what remains open.
 
-### 4. Iterate (phase 2: comparison and structural review)
+### 5. Iterate (phase 2: comparison and structural review)
 
 Runs automatically once phase 1 converges; post a phase-boundary message first. Two reviews, then more versions under the same loop and limit:
 
 - **Against the reference** (rationale section 2b). Compare the last model with the photos, drawings or figures in `input/` and `references/`: plan layout, connection details, element dimensions and positions. Table: in the reference, in the model, change or kept with reason. When the reference shows a different building, state the mismatch in one line and limit the table to what transfers; when nothing transfers, skip it.
 - **Independent of the reference** (rationale section 5b). Review the model as a structure: load path to ground for every element, bearing, bracing, continuity, member sizes. List improvements with the reason for each.
 
-### 5. Close out, in this order
+### 6. Close out, in this order
 
 1. Write `Fable/experiment_NN_fable_design_rationale.md` following writing-design-rationale; section 0 of `experiments/13_Hip_Roof_Sheathing_Blender_Python/Fable/experiment_13_fable_design_rationale.md` is the template, with 2b and 5b added for the phase-2 tables. One document only.
 2. Export every version to the viewer: `python tools/export_all_models.py --only NN_` (Blender runs each `Fable/experiment_NN_fable_vXX.py`; the rationale is copied and `index.json` rebuilt).
@@ -106,6 +119,7 @@ experiments/<exp>/Fable/experiment_NN_fable_callouts.json
 experiments/<exp>/Fable/experiment_NN_fable_conversation.jsonl
 viewer/models/<exp>/fable_vXX.json, fable_rationale.md, fable_callouts.json, index.json updated
 tools/layers.py                                                      only if an OVERRIDES entry was needed
+manuals/<name>.pdf                                                   only if downloaded during the run; gitignored, nothing to commit
 ```
 
 ## Common mistakes
@@ -113,6 +127,9 @@ tools/layers.py                                                      only if an 
 | Mistake | Consequence | Rule |
 |---|---|---|
 | Reading only the extracted `.md` of a manual | plans and panel schedules in the appendix sheets missed | read the PDF pages too |
+| Picking a manual from memory instead of `manuals/INDEX.md` | the chapter that answers the brief sits in a manual you did not think of | index descriptions, then contents, then `.md`, then PDF |
+| Reading a whole handbook PDF | hundreds of pages of fire and acoustics for two chapters of framing | select chapters from the index contents and the `.md` figure index |
+| Copying a manual into `input/` | a second copy drifts from `manuals/`, and the PDF gets committed | read from `manuals/`; download missing PDFs there |
 | Inverted half-space normal in a clip | member silently missing, overlap check clean | frame-only views for every version |
 | Two pieces with the same object name | one overwrites the other without error | name with all loop indices |
 | Rendering a fix over an existing version file | the iterations table no longer matches the renders | new version per render batch |
@@ -123,4 +140,4 @@ tools/layers.py                                                      only if an 
 
 ## Provenance
 
-Assembled from the Fable prompt files of experiments 01-13 (`input/experiment_NN_prompts_fable.txt`), their design rationale documents, and the project notes that accumulated across those runs.
+Assembled from the Fable prompt files of experiments 01-13 (`input/experiment_NN_prompts_fable.txt`), their design rationale documents, and the project notes that accumulated across those runs. The manuals step was added on 2026-09-02 when the reference PDFs moved out of the experiment folders into `manuals/`.

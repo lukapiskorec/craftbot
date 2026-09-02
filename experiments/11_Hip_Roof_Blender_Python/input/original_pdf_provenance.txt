@@ -1,0 +1,14 @@
+Original PDF used during this experiment
+
+"Canadian Wood-Frame House Construction - Chapters 11-12.pdf"
+(an excerpt of Canadian Wood-Frame House Construction, Canada Mortgage and Housing Corporation: chapter 11 "Ceiling and Roof Framing", pp. 118-135, and chapter 12 "Roof Sheathing and Coverings", pp. 136-147, figures 77-106)
+
+This excerpt was kept in this input/ folder while the experiment ran (both the ChatGPT 5.1 and the Fable runs read it; the Fable phase-2 comparison used its figures). It was removed from the repository on 2026-09-02 for copyright reasons.
+
+From now on the manuals/ folder at the repository root is the sole source for original PDFs. The excerpt is not kept separately; the complete book is:
+
+    manuals/Canadian Wood-Frame House Construction.pdf   (gitignored, kept locally; chapters 11 and 12 are the pages named above)
+
+If the file is missing there, manuals/INDEX.md lists where it can be downloaded.
+
+The extracted summary canadian_wood_frame_roof_extracted.md in this folder covers chapters 11 and 12 only, is the copy that was used during the run, and stays here unchanged for provenance. The maintained whole-book summary, with the download link in its header, is manuals/canadian_wood_frame_house_construction_extracted.md. Future experiments do not copy manuals into their input/ folder; they read manuals/ directly.

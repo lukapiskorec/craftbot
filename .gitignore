@@ -232,3 +232,7 @@ experiments/*/Fable/**/*.png
 
 # Claude working documents (specs, plans) - kept local only
 docs/
+
+# Timber construction manuals: copyrighted PDFs stay local, only the extracted .md summaries and INDEX.md are committed.
+# See manuals/INDEX.md for where each PDF can be downloaded.
+manuals/*.pdf

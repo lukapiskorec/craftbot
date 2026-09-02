@@ -1,0 +1,14 @@
+Original PDF used during this experiment
+
+"Arkemi - How to CLT Handbook.pdf"
+(How to CLT: architectural guidelines for early stages, Arkemi, Stockholm, 2nd edition 2024, 38 PDF pages of landscape spreads)
+
+This PDF was kept in this input/ folder while the experiment ran (both the ChatGPT 5.1 and the Fable runs read it). It was removed from the repository on 2026-09-02 for copyright reasons.
+
+From now on the manuals/ folder at the repository root is the sole source for original PDFs:
+
+    manuals/Arkemi - How to CLT Handbook.pdf   (gitignored, kept locally)
+
+If the file is missing there, manuals/INDEX.md lists where it can be downloaded.
+
+The extracted summary how_to_clt_extracted.md in this folder is the copy that was used during the run and stays here unchanged for provenance. The maintained copy, with the download link in its header, is manuals/how_to_clt_extracted.md. Future experiments do not copy manuals into their input/ folder; they read manuals/ directly.

@@ -17,6 +17,7 @@ A draft paper describing the project is in [`papers/`](papers/):
 ```
 papers/         Draft paper PDF
 experiments/    13 experiments, one folder each
+manuals/        Timber construction manuals as extracted .md summaries, with INDEX.md (the PDFs themselves are gitignored)
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
 tools/          Shared modelling kits and harness scripts (see tools/README.md)
 viewer/         Web viewer: static site plus the exported models in viewer/models/
@@ -28,7 +29,7 @@ outputs/        Default folder for headless renders (gitignored)
 
 Each experiment folder follows the same layout:
 
-- `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference PDFs and images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template.
+- `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template. Experiments 04, 08, 09, 11 and 13 also used a construction manual PDF; it was removed from the repository for copyright reasons, an `original_pdf_provenance.txt` in the folder names it, and the extracted summary used during the run stays next to it.
 - `ChatGPT 5.1/` holds the outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models.
 - `Fable/` (ten experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation.
 - `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
