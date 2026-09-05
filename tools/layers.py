@@ -127,6 +127,17 @@ OVERRIDES = {
     "12": [
         (r"^\|dormer_window", FRAME),
     ],
+    "14": [
+        (r"headhouse_floor\|", FLOORS),    # head house floor boards
+        (r"shed_ceiling\|", FRAME),        # ceiling joists, headers, trimmers, mid beam (not roof)
+        (r"shed_outriggers\|", FRAME),     # outrigger beams and their ledger
+        (r"tower_girts\|", FRAME),         # preserved perimeter girts
+        (r"trestle\|", FRAME),             # trestle posts, girts, crosses, ties
+        (r"guards\|", FIXT),               # guard posts and rails, before the generic post rule
+        (r"cladding_interior\|", CLAD_INT),
+        (r"doors\|", FIXT),
+        (r"ladder\|", FIXT),
+    ],
 }
 
 _compiled = {}
@@ -159,7 +170,7 @@ def classify_index(exp_id, collection, name):
 
 def experiment_of(path):
     """Experiment id from a model JSON path or an export source path."""
-    m = re.search(r"(\d\d_[A-Za-z0-9_\-]+?_Blender_Python)", path.replace("\\", "/"))
+    m = re.search(r"(\d\d_[A-Za-z0-9_\-]+?)(?=/|$)", path.replace("\\", "/"))   # folder with or without _Blender_Python
     return m.group(1) if m else ""
 
 

@@ -1,0 +1,22 @@
+/run-experiment 14 refurbishment of an industrial structure into a modern multi-storey home, original timber structure of both the ground floor house and the addition on top is preserved, repaired and a distinct feature of the new design
+
+--- follow-up instruction (phase 3), 2026-09-05 ---
+Let us introduce the following improvements to the design:
+- remove the knee elements on the outside of the tower - they don't exist in the original photo reference and seem not to be needed, also they look clumsy the way they are placed now
+- change the construction of the tower facade - exterior cladding should be placed between posts and the infill elements
+- add the interior cladding throughout - on the ground floor shed, the tower, and the little house on the roof - its construction should mirror the exterior cladding
+- both exterior and interior cladding should have no gaps between members - this is true for the ground floor building, but not for the tower or the house on the roof
+- windows on the tower are too uniform and too repetitive - add variation in size and position (for example a full height window) and overall reduce the number of openings on the side that now has 12 windows (leave only 6 max on that side)
+- windows on the top floor of the tower are ok, leave them as they are and only change the windows on the first and the second floor of the tower
+- staircases should be supported by a thin prism beam that holds the steps from both sides - landing on the ground floor should additionally be supported with posts
+- floors in the tower have gaps (isolate and check) - make sure to close them
+- add ladders that lead to the small house from the roof
+- outriggers are a nice touch but like this they don't work - make them thinner and align them so they connect to shed wall studs - add knee elements to support them (but cut the geometry precisely so we have modeled joints) and add a small roof on top to match the photo
+- remove thin shed gable elements (ShedGable_W_01 etc.), they seem to be a leftover and don't connect with anything in a meaningful way
+- add elements (maybe simple panel boards) that close the gap between the ground floor shed roof and the tower floor
+- add window and door fixtures to the entire building - we only have window fixtures on the tower for now
+
+Iterate on these changes the same way you did for the first two phases. Additionally:
+- make sure to update all the relevant documents - design rationale, conversation transcript, prompt text document, callouts, model for the viewer etc.
+
+I really like "Brief as understood" you outlined above. Make sure to add that into design rationale document somewhere towards the top, and update the relevant skill in skills\ folder so that this section is added to every design rationale document in the future.

@@ -55,7 +55,7 @@ For the PDF, check `manuals/<filename>.pdf` first; if it is missing, download it
 
 ### 2. Read the inputs
 
-Read every file in `input/` and `references/` (every image, any drawing or script), then the selected manual chapters as above: the extracted `.md` first, then the PDF pages (the appendix sheets carry plans and panel dimensions that the extracted `.md` loses). Post the source-to-rule-to-number table (manual, figure or clause, the rule it gives, the number used) and the list of deliberate deviations before writing geometry. This table is rationale section 2. Defaults where the source is silent: 1220 x 2440 sheets, metric member sizes from the timber-framing skill, labelled as your derivation.
+Read every file in `input/` and `references/` (every image, any drawing or script), then the selected manual chapters as above: the extracted `.md` first, then the PDF pages (the appendix sheets carry plans and panel dimensions that the extracted `.md` loses). Post the brief as understood (one paragraph: what is built, preserved, dropped and why; it becomes rationale section 1 verbatim), then the source-to-rule-to-number table (manual, figure or clause, the rule it gives, the number used) and the list of deliberate deviations before writing geometry. This table is rationale section 3. Defaults where the source is silent: 1220 x 2440 sheets, metric member sizes from the timber-framing skill, labelled as your derivation.
 
 ### 3. Set up the run files
 
@@ -76,18 +76,18 @@ This writes `experiment_NN_fable_vXX_blender_view_01.png` and following, saves a
 
 ### 4. Iterate (phase 1: build to the brief)
 
-Loop: write the script, render, open every view PNG with the Read tool, read the overlap line, fix, repeat. Each rendered version is a new file; never overwrite a version that has renders. Add a view for every new feature in the version that adds it. Per version, post one message: what changed, what the renders showed, member count and penetrating pairs. Stop when the brief is met, the renders show no missing or misplaced geometry, and the check reports 0 pairs at 1 mm. Default limit 10 versions per phase unless the brief says otherwise; if the limit is reached, say what remains open.
+Loop: write the script, render, open every view PNG with the Read tool, read the overlap line, fix, repeat. Each rendered version is a new file; never overwrite a version that has renders. When the user sends a list of changes after a phase, that is a new phase: append the message verbatim to the prompt file, treat every item as a requirement (push back in one line where a request is a mistake, then do it as asked), and record the round as rationale section 3c. Add a view for every new feature in the version that adds it. Per version, post one message: what changed, what the renders showed, member count and penetrating pairs. Stop when the brief is met, the renders show no missing or misplaced geometry, and the check reports 0 pairs at 1 mm. Default limit 10 versions per phase unless the brief says otherwise; if the limit is reached, say what remains open.
 
 ### 5. Iterate (phase 2: comparison and structural review)
 
 Runs automatically once phase 1 converges; post a phase-boundary message first. Two reviews, then more versions under the same loop and limit:
 
-- **Against the reference** (rationale section 2b). Compare the last model with the photos, drawings or figures in `input/` and `references/`: plan layout, connection details, element dimensions and positions. Table: in the reference, in the model, change or kept with reason. When the reference shows a different building, state the mismatch in one line and limit the table to what transfers; when nothing transfers, skip it.
-- **Independent of the reference** (rationale section 5b). Review the model as a structure: load path to ground for every element, bearing, bracing, continuity, member sizes. List improvements with the reason for each.
+- **Against the reference** (rationale section 3b). Compare the last model with the photos, drawings or figures in `input/` and `references/`: plan layout, connection details, element dimensions and positions. Table: in the reference, in the model, change or kept with reason. When the reference shows a different building, state the mismatch in one line and limit the table to what transfers; when nothing transfers, skip it.
+- **Independent of the reference** (rationale section 6b). Review the model as a structure: load path to ground for every element, bearing, bracing, continuity, member sizes. List improvements with the reason for each.
 
 ### 6. Close out, in this order
 
-1. Write `Fable/experiment_NN_fable_design_rationale.md` following writing-design-rationale; section 0 of `experiments/13_Hip_Roof_Sheathing_Blender_Python/Fable/experiment_13_fable_design_rationale.md` is the template, with 2b and 5b added for the phase-2 tables. One document only.
+1. Write `Fable/experiment_NN_fable_design_rationale.md` following writing-design-rationale; `experiments/14_Becher_Studies_Amalgamated_Structure/Fable/experiment_14_fable_design_rationale.md` is the template (section 1 is the brief as understood, 3b and 6b hold the phase-2 tables, 3c a user review round if one happened). One document only.
 2. Export every version to the viewer: `python tools/export_all_models.py --only NN_` (Blender runs each `Fable/experiment_NN_fable_vXX.py`; the rationale is copied and `index.json` rebuilt).
 3. `python tools/layers.py --audit --only NN`. If any name family lands in `other`, add an `OVERRIDES` entry keyed `"NN"` in `tools/layers.py` and run `python tools/layers.py --bake --only NN`.
 4. Callouts, which need the exported models: `python tools/callouts.py --names NN` lists the element name patterns; write `Fable/experiment_NN_fable_callouts.json` (schema in the header of `tools/callouts.py`: each callout names element patterns and a numbered rationale section; the verbatim quote is optional but makes the tag jump to the passage); `python tools/callouts.py --check --only NN`; then `python tools/export_all_models.py --index-only` to copy the callouts next to the models.
@@ -105,7 +105,7 @@ The three `--only` filters match differently (exporter: substring of the script 
 
 ## Final report
 
-A single message a reader who saw nothing else can follow: the brief as understood; the sources used and what each fixed; the versions table (version, change, members, pairs); the final counts; what was verified and what was not (structural adequacy, connections, nailing are never proven by the check); every file created or changed, by path, including viewer models and index; the commit the user may want to make; anything left open; and that the transcript copy follows as the last step.
+A single message a reader who saw nothing else can follow: the brief as understood (the same paragraph as rationale section 1); the sources used and what each fixed; the versions table (version, change, members, pairs); the final counts; what was verified and what was not (structural adequacy, connections, nailing are never proven by the check); every file created or changed, by path, including viewer models and index; the commit the user may want to make; anything left open; and that the transcript copy follows as the last step.
 
 ## Outputs of a complete run
 
