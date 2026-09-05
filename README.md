@@ -16,14 +16,14 @@ A draft paper describing the project is in [`papers/`](papers/):
 
 ```
 papers/         Draft paper PDF
-experiments/    13 experiments, one folder each
+experiments/    14 experiments, one folder each
 manuals/        Timber construction manuals as extracted .md summaries, with INDEX.md (the PDFs themselves are gitignored)
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
 tools/          Shared modelling kits and harness scripts (see tools/README.md)
 viewer/         Web viewer: static site plus the exported models in viewer/models/
 visuals/        Figures used in this README
 outputs/        Default folder for headless renders (gitignored)
-.claude/        Claude Code command /run-experiment, which starts an experiment run
+.claude/        Claude Code command /run-experiment, which starts an experiment run, and the six agent definitions in .claude/agents/
 .github/        GitHub Pages workflow that publishes viewer/ on every push to main
 ```
 
@@ -31,7 +31,7 @@ Each experiment folder follows the same layout:
 
 - `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template. Experiments 04, 08, 09, 11 and 13 also used a construction manual PDF; it was removed from the repository for copyright reasons, an `original_pdf_provenance.txt` in the folder names it, and the extracted summary used during the run stays next to it.
 - `ChatGPT 5.1/` holds the outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models.
-- `Fable/` (ten experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation.
+- `Fable/` (eleven experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation. From experiment 15 on it also holds the hand-off files of the agent team (`brief.md`, `concept.md`, `sources.md`, `requirements.md`, `design_notes.md`, `version_notes.md`, inspection and close-out reports).
 - `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
 
 ## Experiments
@@ -40,7 +40,7 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 
 **Visual references.** 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
 
-**Hybrid references (images and text).** 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11 to 13 Hip Roof, Dormer Window and Roof Sheathing
+**Hybrid references (images and text).** 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11 to 13 Hip Roof, Dormer Window and Roof Sheathing, 14 Becher Studies (a timber coaling tower refurbished as a multi-storey home, from one photograph and five manuals)
 
 ## Skills
 
@@ -58,9 +58,46 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 | [modular-grids-and-panelization](skills/modular-grids-and-panelization/SKILL.md) | prefabrication, panels, sheet materials, CLT, multi-storey systems |
 | [extending-previous-models](skills/extending-previous-models/SKILL.md) | continuing or layering onto a previous experiment's model |
 | [writing-design-rationale](skills/writing-design-rationale/SKILL.md) | closing out a run, before archiving the transcript |
-| [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish (repo-specific: folders, `tools/`, viewer export) |
+| [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish: the agent team, its hand-off files, phases, rules and the repo mechanics |
 
-The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the Fable render harnesses. It runs on any saved `.blend`.
+The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the Fable render harnesses. It runs on any saved `.blend`. Its blind spot, geometry that is absent or touches nothing, is covered by [`tools/check_contacts.py`](tools/check_contacts.py) and by the Inspector agent below.
+
+## Agent team
+
+From experiment 15 on, a run is done by six Claude Code sub-agents defined in [`.claude/agents/`](.claude/agents/), one file each. The split follows a context audit of the experiment 14 run: of its 455 k tokens of context, 38 percent were render screenshots, 22 percent manuals and 8 percent the tools and the script itself, all read by one agent that then needed each of them only as a few lines of decisions. Each agent file is that agent's system prompt: its role, inputs, outputs, procedure and rules, and the list of skills in `skills/` it reads at startup. The domain knowledge stays in the skills, so there is one copy of every rule.
+
+```
+                                   USER
+                                     |
+                              +-------------+
+                              |  CraftBot   |   brief, scope, phases, rationale, report
+                              +-------------+
+                     spawns /       |        \ spawns
+                +-----------+  +---------+   +---------+
+                | Designer  |  | Builder |   | Runner  |   standing, background
+                +-----------+  +---------+   +---------+
+                  |       |         |             ^
+      spawns      |       |  spawns |             | "version rendered" / "phase converged"
+                  v       v         v             |
+          +------------+ +-----------+            |
+          | Researcher | | Inspector |<-----------+ (Builder, per version)
+          +------------+ +-----------+
+                              ^
+                              | (Designer, comparison round)
+```
+
+| Agent | Does | Reads | Writes |
+|---|---|---|---|
+| [CraftBot](.claude/agents/craftbot.md) | orchestrates, owns the brief and the scope, compiles the rationale, reports to the user; the session that receives `/run-experiment` plays this role | the invocation, `input/`, every hand-off file | `brief.md`, the rationale, the callouts, the prompt file |
+| [Designer](.claude/agents/designer.md) | spatial and construction concept, requirements checklist, photo comparison round, structural review | `brief.md`, `input/`, `references/`, `sources.md` | `concept.md`, `requirements.md`, `design_notes.md` |
+| [Researcher](.claude/agents/researcher.md) | searches the manuals for what the concept needs, crops figure snippets, asks the Designer before searching online | `concept.md`, `manuals/` | `sources.md`, snippets in `references/` |
+| [Builder](.claude/agents/builder.md) | implements the concept as versioned scripts, runs the render and check loop, triages the pair families, patches | the hand-off files, `tools/API.md`, inspection and close-out reports | the scripts, `views_fable.py`, `version_notes.md` |
+| [Inspector](.claude/agents/inspector.md) | looks at one version's renders against the requirements and the reference, reports absence and misplacement; images only | the PNGs, the view legend, `requirements.md` | `inspection_vXX.md` |
+| [Runner](.claude/agents/runner.md) | closes out every version and the run with [`tools/closeout.py`](tools/closeout.py), archives the transcript last | the close-out reports | `closeout_vXX.md`, `closeout_run.md` |
+
+Rules that hold the team together: the spawning tree is flat under CraftBot (the Designer may spawn Researchers and Inspectors, the Builder may spawn Inspectors); every hand-off is a file in the experiment's `Fable/` folder, so any agent can be restarted from disk; when the Builder cannot meet a requirement the Designer rewrites it, and when that changes scope CraftBot decides and records it in `brief.md`, so the Builder never narrows the brief on its own. The workflow itself, phases, files, rules and mechanics, is [`skills/running-craftbot-experiment/SKILL.md`](skills/running-craftbot-experiment/SKILL.md).
+
+To use the team, run `/run-experiment NN [brief]` in Claude Code from the repo root, or `claude --agent craftbot` for a whole session in the orchestrator role. The agents load from `.claude/agents/` (Claude Code's project agent folder); they read the repo skills by path, so nothing needs copying into `.claude/skills/`.
 
 ## Tools
 
@@ -74,7 +111,10 @@ The interpenetration check the skills refer to is [`tools/check_overlaps.py`](to
 | [`ruled.py`](tools/ruled.py) | bilinear surfaces for warped and leaning walls and roofs |
 | [`framing.py`](tools/framing.py) | stud walls with openings, cladding, decks, boards, solid walls with openings, roof layers, stairs |
 | [`sheathing.py`](tools/sheathing.py) | mitred board sheathing on planar facets, hip dropping, protrusion check |
-| [`render_views.py`](tools/render_views.py) | headless renders with outlines, colours, hidden layers, close-ups and section cuts, plus the overlap check |
+| [`render_views.py`](tools/render_views.py) | headless renders with outlines, colours, hidden layers, close-ups and section cuts, plus the overlap check, the pair families and the contact check |
+| [`check_contacts.py`](tools/check_contacts.py), [`triage.py`](tools/triage.py) | members that touch nothing; penetrating pairs grouped by cause |
+| [`api_card.py`](tools/api_card.py), [`API.md`](tools/API.md) | the generated one-page card of the kits that the Builder reads instead of the modules |
+| [`closeout.py`](tools/closeout.py) | one command to close out a version or a run: viewer export, layers, index, view set, screenshot, rationale and callout checks, transcript |
 | [`experiment_template.py`](tools/experiment_template.py) | starting point for a new experiment script |
 
 Point your agent at both folders in its project instructions, one line each, as described under Skills above.
@@ -134,6 +174,8 @@ python tools/layers.py --audit                  # every element name family -> v
 python tools/layers.py --bake                   # re-bake layers into viewer/models/*.json
 python tools/callouts.py --check                # validate the rationale callout files
 python tools/callouts.py --names 04             # element name patterns, for authoring callouts
+python tools/closeout.py version 14 v09         # all of the above for one version, plus view set and viewer screenshot
+python tools/closeout.py run 14 --session-id ID # run-level checks, then the transcript copy
 ```
 
 The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.

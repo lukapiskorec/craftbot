@@ -1,14 +1,17 @@
 # Headless render harness for CraftBot experiments: runs an experiment
 # script in background Blender, renders Workbench views with object
 # outlines on (coplanar pieces stay distinguishable), saves the .blend and
-# runs the separating-axis overlap check on every pair of members.
+# runs the separating-axis overlap check on every pair of members, prints
+# the pair families (tools/triage.py) and the contact check (members that
+# touch nothing, tools/check_contacts.py).
 #
 # Usage:
 #   blender --background --python tools/render_views.py -- <experiment.py> <out_prefix>
 #          [--lib <dir>]... [--views <views.py>] [--only 01,03] [--tol 1.0] [--no-check]
 #
 #   <experiment.py>  script to execute (tools/ and its own folder are put on sys.path)
-#   <out_prefix>     absolute path prefix: <prefix>_view_01.png ..., <prefix>.blend
+#   <out_prefix>     absolute path prefix: <prefix>_view_01.png ..., <prefix>.blend,
+#                    <prefix>_pairs.txt (every penetrating pair, for triage)
 #                    (Blender resolves relative paths against its own cwd)
 #   --lib <dir>      extra sys.path entries (an experiment's input/ folder, a base script)
 #   --views <file>   Python file defining VIEWS (and optionally COLORS, RESOLUTION);
@@ -206,6 +209,17 @@ bpy.ops.wm.save_as_mainfile(filepath=f"{out_prefix}.blend")
 
 if do_check:
     from check_overlaps import find_overlaps, report
+    from check_contacts import find_floating, report_floating
+    from triage import families, format_families
     tol = tol_mm / 1000.0
-    report(find_overlaps(meshes, tol), len(meshes), tol, limit=80)
+    hits = find_overlaps(meshes, tol)
+    report(hits, len(meshes), tol, limit=80)
+    # every pair, for the Builder's triage, and the family table (one row per cause)
+    with open(f"{out_prefix}_pairs.txt", "w", encoding="utf-8") as f:
+        f.write(f"{len(meshes)} members, {len(hits)} pairs (> {tol_mm:.0f} mm)\n")
+        for p, a, b in hits:
+            f.write(f"{p * 1000:8.1f} mm  {a}  x  {b}\n")
+    print(format_families(families(hits)))
+    # contact check: members that touch nothing (the overlap check cannot see them)
+    report_floating(find_floating(meshes, 0.002), len(meshes), 0.002, limit=80)
 print("DONE")

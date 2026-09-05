@@ -35,9 +35,13 @@ same name (name every piece with all its loop indices).
 
 | Script | Purpose |
 |---|---|
-| `render_views.py` | Run an experiment headless, render Workbench views (outlines on, per-collection colours, hide lists, close-ups, section cuts), save the `.blend`, run the overlap check. Views come from a small Python file passed with `--views`; the default is four orbit views. |
+| `render_views.py` | Run an experiment headless, render Workbench views (outlines on, per-collection colours, hide lists, close-ups, section cuts), save the `.blend`, run the overlap check, print the pair families and the contact check, write every pair to `<prefix>_pairs.txt`. Views come from a small Python file passed with `--views`; the default is four orbit views. |
 | `run_experiment_headless.py` | The original minimal runner (four views, no outlines, no check). Kept for the README examples. |
 | `check_overlaps.py` | Separating-axis interpenetration check over every pair of mesh objects; run on a saved `.blend` or import `find_overlaps`. Cannot see missing geometry, so always look at the renders too. |
+| `check_contacts.py` | Contact check: every mesh object must have another within 2 mm (touching counts). Lists floating members, which the overlap check cannot see: treads on nothing, boards nailed to nothing, studs short of their plate. |
+| `triage.py` | Groups penetrating pairs into name families (pure Python): one row per geometric cause with a count, depth and example, so a version with hundreds of pairs reads as three or four fixes. |
+| `api_card.py` | Generates `API.md`, the compact card of every kit function and class with signature and first docstring sentence, from the source with `ast`. `--check` fails when the card is stale. Agents read the card, not the modules. |
+| `closeout.py` | One command per close-out: `version NN vXX` (export, layers bake and audit, index, view set, renders, viewer screenshot) and `run NN --session-id ID` (rationale sections, hand-off files, prompt file, callouts, API card, index, transcript copy last). Writes `closeout_*.md` with pass or fail per step. |
 | `experiment_template.py` | Starting point for a new experiment script (parameter block, derived levels, kits, named collections). Renders clean through `render_views.py`. |
 | `views_template.py` | Starting point for an experiment's `views_fable.py` (view keys explained, mandatory views, colours). |
 | `export_model_json.py`, `export_all_models.py`, `model_export_core.py`, `layers.py`, `callouts.py` | Web viewer export pipeline (see the root README). |
@@ -45,6 +49,10 @@ same name (name every piece with all its loop indices).
 ```
 blender --background --python tools/render_views.py -- <experiment.py> <abs_out_prefix> [--views views.py] [--lib <dir>] [--only 01,02] [--tol 1.0]
 blender --background model.blend --python tools/check_overlaps.py -- [tolerance_mm]
+blender --background model.blend --python tools/check_contacts.py -- [tolerance_mm] [ignore_prefix,...]
+python tools/api_card.py [--check]
+python tools/closeout.py version 14 v09
+python tools/closeout.py run 14 --session-id <id>
 ```
 
 A views file is plain Python with a `VIEWS` list (and optional `COLORS`,
@@ -52,6 +60,9 @@ A views file is plain Python with a `VIEWS` list (and optional `COLORS`,
 namespace so a section cut can be placed at `M["z_floor"](3) + 1.3`. The
 per-experiment `Fable/render_fable.py` files are the pre-tools renderer;
 their `VIEWS` lists show a full view set for each building.
+
+`API.md` is the generated card of the kits; regenerate it after changing a
+docstring or a signature (`closeout.py run` checks that it is current).
 
 ## Tests
 

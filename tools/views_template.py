@@ -18,11 +18,14 @@
 #          a true section only at elev 0 (vertical) or +-89.9 (plan)
 #
 # Mandatory for every model: the four orbits, one frame-only view (sheathing,
-# cladding and decks hidden), one from below. Add elevations and top when the
-# reference is a drawing, section cuts per storey when there is more than one,
-# a view matched to the reference photo when the model is meant to resemble
-# one, and a close-up for every joint that needs judgement. Add a view in the
-# same version that adds the feature it shows.
+# cladding and decks hidden), one from below, and at least one interior view
+# (a section cut at eye height of every storey, or a view with the envelope
+# hidden); tools/closeout.py refuses a version without them. Add elevations
+# and top when the reference is a drawing, a view matched to the reference
+# photo when the model is meant to resemble one, and a close-up for every
+# joint that needs judgement. Add a view in the same version that adds the
+# feature it shows. Collection names in hide lists are the bare child names
+# ("Shed_Walls", not "Existing/Shed_Walls"): Blender collection names are global.
 
 VIEWS = [
     dict(name="01", azim=45, elev=30, hide=[]),
