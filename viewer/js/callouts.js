@@ -26,6 +26,7 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
   let data = null; // authored callouts of the current run
   let model = null;
   let visible = false;
+  let suspended = false; // elements are knolled: their anchors are wrong until they return
   let items = []; // resolved: {c, ids, layers, centroid, el, line, dot, sx, sy, tx, ty, on}
   let tinted = null; // item whose elements are currently highlighted
   let hovered = null; // pointer is over this tag (or its heading in the doc)
@@ -142,6 +143,8 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
       if (!on) { hideAll(); setHovered(null); setPinned(null); }
     },
 
+    setSuspended(on) { suspended = on; },
+
     setData(d) { data = d; resolve(); },
 
     setModel(m) { model = m; resolve(); },
@@ -152,7 +155,7 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
     },
 
     tick() {
-      if (!visible || !items.length || views.quad || !getSceneApi()) { hideAll(); return; }
+      if (!visible || suspended || !items.length || views.quad || !getSceneApi()) { hideAll(); return; }
       const camera = views.camera;
       const r = canvas.getBoundingClientRect();
       getSceneApi().bounds.getCenter(_v).project(camera);

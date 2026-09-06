@@ -6,12 +6,16 @@ import { buildModelGroup } from "./scene.js";
 import { makeViews, VIEWS } from "./views.js";
 import { makePanel, makeTable, fmtBytes, isMobile } from "./gui.js";
 import { makeStyles, STYLES } from "./styles.js";
-import { makeAnimations, ANIMS, ORDERS } from "./animations.js";
+import { makeAnimations, ANIMS, ORDERS, KNOLL_STAGGER } from "./animations.js";
+import {
+  ARRANGEMENTS, layoutSteps, transitionDelays, interpolateLayout, unionBounds,
+} from "./knolling.js";
 import { makeSections } from "./sections.js";
 import { makePicking, makeInspector } from "./picking.js";
 import { makeViewCube } from "./viewcube.js";
 import { makeDocPanel } from "./rationale.js";
 import { makeCallouts } from "./callouts.js";
+import { makeBandLabels } from "./band-labels.js";
 
 // Always revalidate data files (304 when unchanged): local http.server and
 // GitHub Pages both let the browser serve stale JSON otherwise.
@@ -51,7 +55,7 @@ const styles = makeStyles(renderer, scene, {
   onMaterials: (mats) => {
     for (const m of mats) anims.patchMaterial(m);
     sections.refresh();
-    if (selected !== null && sceneApi) sceneApi.setSelected(selected, styles.selectColor);
+    if (selected !== null && sceneApi) sceneApi.setSelected(selected, styles.selectColor, selectedPose());
     picking.refreshHover();
     if (inspector) inspector.refresh();
   },
@@ -65,21 +69,28 @@ const styles = makeStyles(renderer, scene, {
 const picking = makePicking(canvas, (x, y) => views.pickCamera(x, y), () => sceneApi,
   () => styles, (eid) => {
     if (!inspector) return;
-    selected = eid;
-    if (eid === null) {
-      inspector.hide();
-      if (sceneApi) sceneApi.setSelected(null);
-    } else {
-      inspector.show(eid);
-      if (sceneApi) sceneApi.setSelected(eid, styles.selectColor);
-    }
+    if (eid === null) clearSelection(); else selectElement(eid);
   }, { getModel: () => currentModel, getClipPlanes: () => sections.activePlanes() });
+function clearSelection() {
+  if (inspector) inspector.hide();
+  selected = null;
+  if (sceneApi) sceneApi.setSelected(null);
+}
+function selectElement(eid) {
+  selected = eid;
+  inspector.show(eid);
+  sceneApi.setSelected(eid, styles.selectColor, selectedPose());
+}
+// Where the selected element is drawn when the elements sit in a grid
+// (null in the model): the outline has to follow it there.
+function selectedPose() {
+  const layout = settledLayout();
+  if (!layout || selected === null) return null;
+  return { q: layout.quats.subarray(selected * 4, selected * 4 + 4),
+    p: layout.positions.subarray(selected * 3, selected * 3 + 3) };
+}
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && inspector) {
-    inspector.hide();
-    selected = null;
-    if (sceneApi) sceneApi.setSelected(null);
-  }
+  if (e.key === "Escape") clearSelection();
 });
 
 const viewCube = makeViewCube(views);
@@ -118,6 +129,7 @@ async function loadModel(file, { keepView = false } = {}) {
     if (sceneApi) sceneApi.dispose();
     currentModel = model;
     selected = null;
+    resetKnolling(); // the layouts belonged to the previous model
     sceneApi = buildModelGroup(model);
     sceneApi.setOutlineResolution(canvas.clientWidth, canvas.clientHeight);
     for (let li = 0; li < LAYERS.length; li++) sceneApi.setLayerVisible(li, layerVisible[li]);
@@ -131,11 +143,7 @@ async function loadModel(file, { keepView = false } = {}) {
     if (inspector) inspector.destroy();
     inspector = makeInspector(model, styles.theme,
       { getSceneApi: () => sceneApi, styles, renderer, mainCanvas: canvas });
-    if (carried !== null) {
-      selected = carried;
-      inspector.show(carried);
-      sceneApi.setSelected(carried, styles.selectColor);
-    }
+    if (carried !== null) selectElement(carried);
     views.fit(sceneApi.bounds, { keepView });
     banner.hidden = true;
     const url = new URL(location);
@@ -172,8 +180,121 @@ const animRow = secAnim.addRow();
 const selAnim = secAnim.addStepper("Entry", ANIMS, (v) => anims.setAnim(v), animRow);
 const selOrder = secAnim.addStepper("Order", ORDERS, (v) => anims.setOrder(v), animRow);
 secAnim.addButtons(["replay"], () => {
-  if (currentModel) anims.play(currentModel, sceneApi);
+  if (!currentModel) return;
+  if (knolling.to) { // arranged: snap home first, the entry animation starts from the model
+    resetKnolling();
+    views.fit(sceneApi.bounds, { keepView: true });
+  }
+  anims.play(currentModel, sceneApi);
 });
+
+// ---- knolling: rearrange every element onto a grid (knolling.js) ----
+// Picking an arrangement solves the flat and stacked layouts of this model
+// once (chunked, with a progress line), then blends the elements from
+// wherever they are to the new poses; the slider scrubs that blend.
+const arrangeButtons = secAnim.addButtons(ARRANGEMENTS, (name) => arrange(name),
+  { radio: true, active: "model" });
+const knollRow = secAnim.addRow();
+knollRow.hidden = true;
+const knollSlider = secAnim.addSlider(null, 0, 1, 0, (t) => anims.seekKnoll(t),
+  { host: knollRow, readout: (t) => `${Math.round(t * 100)}%` });
+const knollProgress = secAnim.addInfo();
+const knolling = { layouts: null, from: null, to: null, toName: "model", delays: null, lift: 0, busy: false };
+const KNOLL_VIEW = { model: [1, -1, 0.8], flat: [0, 0, 1], stacked: [1, -1, 0.8] };
+const box3 = (b) => new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max));
+
+function resetKnolling() {
+  anims.resetKnoll();
+  Object.assign(knolling, { layouts: null, from: null, to: null, toName: "model", delays: null });
+  arrangeButtons.setActive("model");
+  knollRow.hidden = true;
+  knollSlider.set(0);
+  knollProgress.set("");
+}
+
+// Runs the layout generator in slices of one frame so the progress line can
+// repaint; a desktop finishes a 4 500 element model within a frame or two.
+function precomputeLayouts(model, bounds) {
+  const b = { min: [bounds.min.x, bounds.min.y, bounds.min.z], max: [bounds.max.x, bounds.max.y, bounds.max.z] };
+  const steps = layoutSteps(model, b);
+  const bar = (f) => {
+    const n = 20, k = Math.round(f * n);
+    return `computing paths [${"#".repeat(k)}${".".repeat(n - k)}] ${Math.round(f * 100)}%`;
+  };
+  knollProgress.set(bar(0));
+  return new Promise((resolve) => {
+    const slice = () => {
+      const started = performance.now();
+      for (;;) {
+        const r = steps.next();
+        if (r.done) { knollProgress.set(""); resolve(r.value); return; }
+        knollProgress.set(bar(r.value));
+        if (performance.now() - started > 12) { requestAnimationFrame(slice); return; }
+      }
+    };
+    requestAnimationFrame(slice);
+  });
+}
+
+async function arrange(name) {
+  if (!currentModel || !sceneApi || knolling.busy) return;
+  if (name === knolling.toName && !anims.knollPlaying) return;
+  const model = currentModel;
+  if (!knolling.layouts) {
+    knolling.busy = true;
+    const layouts = await precomputeLayouts(model, sceneApi.bounds);
+    knolling.busy = false;
+    if (model !== currentModel) return; // another model landed meanwhile
+    knolling.layouts = layouts;
+  }
+  // Mid-flight: leave from where the elements are drawn right now
+  const from = anims.knollOn && anims.knollT < 1 && knolling.to
+    ? interpolateLayout(knolling.from, knolling.to, knolling.delays, anims.knollT,
+      { stagger: KNOLL_STAGGER, lift: knolling.lift })
+    : (knolling.to ?? knolling.layouts.model);
+  const to = knolling.layouts[name];
+  const delays = transitionDelays(model, knolling.toName, name, from, to);
+  const size = sceneApi.bounds.getSize(new THREE.Vector3());
+  const lift = Math.max(0.5, 0.5 * size.z);
+  Object.assign(knolling, { from, to, toName: name, delays, lift });
+  clearSelection();
+  arrangeButtons.setActive(name);
+  knollRow.hidden = false;
+  knollSlider.set(0);
+  anims.startKnoll(sceneApi, from, to, delays, { lift, duration: KNOLL_SECONDS, settleOff: name === "model" });
+  // One camera move over the whole transition, landing framed exactly on
+  // the arrangement from its own view (straight down onto the flat sheet,
+  // axo for the stacks and the model); half-way it widens to keep both
+  // ends and the lifted elements in view.
+  const mid = unionBounds(from.bounds, to.bounds);
+  mid.max[2] += lift;
+  views.frameTo(box3(to.bounds), new THREE.Vector3(...KNOLL_VIEW[name]), KNOLL_SECONDS,
+    { midBounds: box3(mid), insets: frameInsets() });
+}
+const KNOLL_SECONDS = 3;
+
+// Canvas px the panels cover left and right, so an arrangement is framed
+// between them: the GUI column; the rationale panel or the view cube column,
+// plus room for the band labels down the right of the sheet.
+function frameInsets() {
+  if (isMobile()) return { left: 0, right: 0 };
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  // The rationale panel (24rem wide, style.css) may still be loading; a
+  // collapsed one is just its title
+  const doc = document.getElementById("doc");
+  const docOpen = !!currentRun()?.rationale && !doc?.classList.contains("closed");
+  return {
+    left: document.getElementById("gui").getBoundingClientRect().width,
+    right: (docOpen ? 24 * rem + 12 : 7 * rem) + 14 * rem,
+  };
+}
+
+// The arrangement the elements have come to rest in (flat or stacked
+// layout), null in the model or while they are in flight
+function settledLayout() {
+  if (!anims.knollOn || anims.knollPlaying || anims.knollT < 1) return null;
+  return knolling.toName === "model" ? null : knolling.to;
+}
 
 const secSection = panel.section("SECTION", false);
 const cutToggles = [];
@@ -234,7 +355,12 @@ const iterSlider = secModel.addSlider("Iteration", 1, 1, 1, (i) => {
 const modelInfo = secModel.addInfo();
 // Rationale callouts: shown only while this is on. Expanding the DESIGN
 // RATIONALE panel switches it off (the panel covers the model on phones).
-const calloutToggle = secModel.addToggle("callouts", false, (on) => callouts.setVisible(on));
+// In the knolled arrangements the same toggle shows the band labels instead
+function showCallouts(on) {
+  callouts.setVisible(on);
+  bandLabels.setVisible(on);
+}
+const calloutToggle = secModel.addToggle("callouts", false, showCallouts);
 
 // newest: land on the last iteration of the picked run. Switching model or
 // agent always does - without it a run that happens to have the same version
@@ -290,9 +416,12 @@ const docPanel = makeDocPanel(document.body);
 const callouts = makeCallouts(document.body, {
   views, canvas, getSceneApi: () => sceneApi, getStyles: () => styles, docPanel,
 });
+const bandLabels = makeBandLabels(document.body, {
+  views, canvas, getSceneApi: () => sceneApi, getStyles: () => styles,
+});
 docPanel.onExpand(() => {
   calloutToggle.set(false);
-  callouts.setVisible(false);
+  showCallouts(false);
 });
 docPanel.onSectionHover((section) => callouts.highlightSection(section));
 document.addEventListener("craftbot:model", (ev) => callouts.setModel(ev.detail.model));
@@ -329,12 +458,26 @@ function resize() {
 new ResizeObserver(resize).observe(canvas);
 
 const clock = new THREE.Clock();
+let wasMoving = false;
 renderer.setAnimationLoop(() => {
   anims.tick(Math.min(clock.getDelta(), 0.1));
-  if (sceneApi) sceneApi.setCapsPaused(anims.playing);
+  // Knolled elements are drawn away from their model pose. In flight, all
+  // that reads model-space geometry stands down; settled in a grid, picking
+  // works on the arranged boxes and band labels replace the callouts.
+  const settled = settledLayout();
+  const moving = anims.knollOn && !settled;
+  if (moving && !wasMoving) clearSelection();
+  wasMoving = moving;
+  if (sceneApi) sceneApi.setCapsPaused(anims.playing || anims.knollOn);
+  picking.setEnabled(!moving);
+  picking.setArranged(settled);
+  callouts.setSuspended(anims.knollOn);
+  bandLabels.setLayout(settled);
+  if (anims.knollPlaying) knollSlider.set(anims.knollT);
   views.tick();
   picking.tick();
   callouts.tick();
+  bandLabels.tick();
   views.render(styles.render);
   viewCube.render();
   if (inspector) inspector.render(clock.elapsedTime);
@@ -388,9 +531,7 @@ if (cutParam.length === 2) {
 const selectParam = parseInt(bootParams.get("select"), 10);
 if (!Number.isNaN(selectParam)) {
   document.addEventListener("craftbot:model", () => {
-    selected = selectParam;
-    inspector.show(selectParam);
-    sceneApi.setSelected(selectParam, styles.selectColor);
+    selectElement(selectParam);
   });
 }
 // Testing: ?callouts=1 switches the rationale callouts on after load,
@@ -398,7 +539,7 @@ if (!Number.isNaN(selectParam)) {
 if (bootParams.get("callouts") === "1") {
   document.addEventListener("craftbot:model", () => {
     calloutToggle.set(true);
-    callouts.setVisible(true);
+    showCallouts(true);
     // the click has to land after the rationale document itself
     const pin = bootParams.get("pin");
     if (pin) setTimeout(() =>
@@ -410,6 +551,22 @@ const hoverParam = parseInt(bootParams.get("hover"), 10);
 if (!Number.isNaN(hoverParam)) {
   document.addEventListener("craftbot:model", () =>
     picking.debugHover(hoverParam, canvas.clientWidth / 2, canvas.clientHeight / 2));
+}
+// Testing: ?knoll=flat|stacked arranges the model after load; &kt=0.5 holds
+// the transition at that progress with the camera already on the end view
+const knollParam = bootParams.get("knoll");
+const ktParam = parseFloat(bootParams.get("kt"));
+if (ARRANGEMENTS.includes(knollParam)) {
+  document.addEventListener("craftbot:model", async () => {
+    await arrange(knollParam);
+    if (Number.isNaN(ktParam) || !knolling.to) return;
+    anims.seekKnoll(ktParam);
+    knollSlider.set(ktParam);
+    const b = ktParam >= 1 ? knolling.to.bounds : unionBounds(knolling.from.bounds, knolling.to.bounds);
+    views.frameTo(box3(b), new THREE.Vector3(...KNOLL_VIEW[knollParam]), 0, { insets: frameInsets() });
+    // &select=eid on top: select it in the arrangement (settled only)
+    if (!Number.isNaN(selectParam) && ktParam >= 1) selectElement(selectParam);
+  }, { once: true });
 }
 const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {

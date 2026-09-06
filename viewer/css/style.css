@@ -243,9 +243,13 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 .md .flash, .md mark.ref.flash, .md mark.ref.pinned { background: var(--accent); color: var(--bg); }
 
 /* ---- rationale callouts: tags pointing at passages of the document ---- */
-#callout-lines { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
-#callout-lines line { stroke: var(--ink); stroke-width: 1; }
-#callout-lines circle { fill: var(--accent); }
+#callout-lines, #band-lines { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
+#callout-lines line, #band-lines line { stroke: var(--ink); stroke-width: 1; }
+#callout-lines circle, #band-lines circle { fill: var(--accent); }
+/* Band labels of the knolled arrangements (band-labels.js): one per layer,
+   listed down the right of the sheet, so they never wrap */
+.callout.band { max-width: none; white-space: nowrap; }
+.callout.band b { font-weight: normal; text-transform: uppercase; }
 .callout {
   position: fixed; z-index: 10; transform: translate(-50%, -50%);
   max-width: 14rem; padding: 0.2rem 0.5rem; font-size: 0.8rem; line-height: 1.3;

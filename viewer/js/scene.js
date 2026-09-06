@@ -16,6 +16,20 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LAYERS, LAYER_COLORS } from "./model-data.js";
 import { buildCaps, CUBE_CORNERS, CUBE_EDGES } from "./section-caps.js";
 
+// Knolling pose attributes read by the vertex patch in animations.js: the
+// "from" and "to" pose (quaternion + centre) and a start delay per element,
+// per instance for boxes and per vertex for merged geometry. Identity poses
+// until setPoses() writes a transition.
+const POSE_ATTRIBUTES = [["aFromQ", 4], ["aFromP", 3], ["aToQ", 4], ["aToP", 3], ["aDelay", 1]];
+function addPoseAttributes(geom, n, instanced) {
+  for (const [name, size] of POSE_ATTRIBUTES) {
+    const arr = new Float32Array(n * size);
+    if (size === 4) for (let i = 0; i < n; i++) arr[i * 4 + 3] = 1;
+    geom.setAttribute(name, instanced
+      ? new THREE.InstancedBufferAttribute(arr, size) : new THREE.BufferAttribute(arr, size));
+  }
+}
+
 export function buildModelGroup(model) {
   const group = new THREE.Group();
   const materials = {
@@ -66,6 +80,7 @@ export function buildModelGroup(model) {
         geom.setAttribute("color", new THREE.BufferAttribute(white, 3));
         const spawn = new THREE.InstancedBufferAttribute(new Float32Array(n), 1);
         geom.setAttribute("aSpawn", spawn);
+        addPoseAttributes(geom, n, true);
         const mesh = new THREE.InstancedMesh(geom, partMaterial, n);
         const elementIds = new Uint32Array(n);
         for (let i = 0; i < n; i++) {
@@ -107,6 +122,7 @@ export function buildModelGroup(model) {
         egeom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
         egeom.setAttribute("aSpawn", new THREE.BufferAttribute(espawn, 1));
         egeom.setAttribute("aCenter", new THREE.BufferAttribute(ecenter, 3));
+        addPoseAttributes(egeom, n * 24, false);
         const lines = new THREE.LineSegments(egeom, materials.line);
         lines.frustumCulled = false;
         lines.raycast = () => {};
@@ -165,6 +181,7 @@ export function buildModelGroup(model) {
         geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
         geom.setAttribute("aSpawn", new THREE.BufferAttribute(spawn, 1));
         geom.setAttribute("aCenter", new THREE.BufferAttribute(center, 3));
+        addPoseAttributes(geom, nv, false);
         geom.setIndex(new THREE.BufferAttribute(index, 1));
         geom.computeVertexNormals();
         const mesh = new THREE.Mesh(geom, partMaterial);
@@ -179,6 +196,7 @@ export function buildModelGroup(model) {
         egeom.setAttribute("position", new THREE.BufferAttribute(Float32Array.from(edgePos), 3));
         egeom.setAttribute("aSpawn", new THREE.BufferAttribute(Float32Array.from(edgeSpawn), 1));
         egeom.setAttribute("aCenter", new THREE.BufferAttribute(Float32Array.from(edgeCenter), 3));
+        addPoseAttributes(egeom, edgeSpawn.length, false);
         const lines = new THREE.LineSegments(egeom, materials.line);
         lines.frustumCulled = false;
         lines.raycast = () => {};
@@ -250,6 +268,39 @@ export function buildModelGroup(model) {
     return a.slice(range[0] * 3, range[1] * 3);
   }
 
+  // Copy a per-element value (size floats each) into the vertex attribute of
+  // every part: per instance for boxes, per vertex for their baked edges and
+  // for the merged meshes.
+  function fillElementAttribute(name, size, values) {
+    const put = (attr, vi, eid) => {
+      for (let k = 0; k < size; k++) attr.array[vi * size + k] = values[eid * size + k];
+    };
+    for (const p of allParts) {
+      if (p.boxMesh) {
+        const a = p.boxMesh.geometry.getAttribute(name);
+        for (let i = 0; i < p.boxElementIds.length; i++) put(a, i, p.boxElementIds[i]);
+        a.needsUpdate = true;
+      }
+      if (p.boxEdges) {
+        const a = p.boxEdges.geometry.getAttribute(name);
+        for (let i = 0; i < p.boxElementIds.length; i++) {
+          for (let k = 0; k < 24; k++) put(a, i * 24 + k, p.boxElementIds[i]);
+        }
+        a.needsUpdate = true;
+      }
+      if (p.meshMesh) {
+        const a = p.meshMesh.geometry.getAttribute(name);
+        for (const [eid, [v0, v1]] of p.vertexRanges) for (let i = v0; i < v1; i++) put(a, i, eid);
+        a.needsUpdate = true;
+      }
+      if (p.meshEdges) {
+        const a = p.meshEdges.geometry.getAttribute(name);
+        for (const [eid, [v0, v1]] of p.edgeRanges) for (let i = v0; i < v1; i++) put(a, i, eid);
+        a.needsUpdate = true;
+      }
+    }
+  }
+
   function setElementColor(eid, color) {
     const loc = locate[eid];
     if (!loc) return;
@@ -299,10 +350,21 @@ export function buildModelGroup(model) {
     },
 
     // eid=null clears. Draws a thick outline around the selected element.
-    setSelected(eid, color) {
+    // pose ({q: [x,y,z,w], p: [x,y,z]}, optional): the element is drawn
+    // knolled - rotated about its centre and moved there (knolling.js).
+    setSelected(eid, color, pose = null) {
       if (eid === null) { outline.visible = false; return; }
       const pts = edgePositions(eid);
       if (!pts) { outline.visible = false; return; }
+      if (pose) {
+        const q = new THREE.Quaternion(pose.q[0], pose.q[1], pose.q[2], pose.q[3]);
+        const c = new THREE.Vector3(model.centers[eid * 3], model.centers[eid * 3 + 1], model.centers[eid * 3 + 2]);
+        const p = new THREE.Vector3(pose.p[0], pose.p[1], pose.p[2]);
+        for (let i = 0; i < pts.length; i += 3) {
+          _v.set(pts[i], pts[i + 1], pts[i + 2]).sub(c).applyQuaternion(q).add(p);
+          pts[i] = _v.x; pts[i + 1] = _v.y; pts[i + 2] = _v.z;
+        }
+      }
       outline.geometry.dispose();
       outline.geometry = new LineSegmentsGeometry();
       outline.geometry.setPositions(Array.from(pts));
@@ -357,34 +419,27 @@ export function buildModelGroup(model) {
     },
 
     setSpawnTimes(times) { // Float32Array per element
-      for (const p of allParts) {
-        if (p.boxMesh) {
-          const a = p.boxMesh.geometry.getAttribute("aSpawn");
-          for (let i = 0; i < p.boxElementIds.length; i++) a.setX(i, times[p.boxElementIds[i]]);
-          a.needsUpdate = true;
-        }
-        if (p.boxEdges) {
-          const a = p.boxEdges.geometry.getAttribute("aSpawn");
-          for (let i = 0; i < p.boxElementIds.length; i++) {
-            for (let k = 0; k < 24; k++) a.setX(i * 24 + k, times[p.boxElementIds[i]]);
-          }
-          a.needsUpdate = true;
-        }
-        if (p.meshMesh) {
-          const a = p.meshMesh.geometry.getAttribute("aSpawn");
-          for (const [eid, [v0, v1]] of p.vertexRanges) {
-            for (let i = v0; i < v1; i++) a.setX(i, times[eid]);
-          }
-          a.needsUpdate = true;
-        }
-        if (p.meshEdges) {
-          const a = p.meshEdges.geometry.getAttribute("aSpawn");
-          for (const [eid, [v0, v1]] of p.edgeRanges) {
-            for (let i = v0; i < v1; i++) a.setX(i, times[eid]);
-          }
-          a.needsUpdate = true;
-        }
+      fillElementAttribute("aSpawn", 1, times);
+    },
+
+    // Knolling transition: from/to are layouts ({quats, positions} per
+    // element, see knolling.js), delays the per-element start (0..1). The
+    // "to" quaternion is flipped where it sits on the far side of the
+    // "from" one so the shader's blend takes the short way round.
+    setPoses(from, to, delays) {
+      const n = delays.length;
+      const toQ = new Float32Array(n * 4);
+      for (let e = 0; e < n; e++) {
+        let dot = 0;
+        for (let k = 0; k < 4; k++) dot += from.quats[e * 4 + k] * to.quats[e * 4 + k];
+        const s = dot < 0 ? -1 : 1;
+        for (let k = 0; k < 4; k++) toQ[e * 4 + k] = s * to.quats[e * 4 + k];
       }
+      fillElementAttribute("aFromQ", 4, from.quats);
+      fillElementAttribute("aFromP", 3, from.positions);
+      fillElementAttribute("aToQ", 4, toQ);
+      fillElementAttribute("aToP", 3, to.positions);
+      fillElementAttribute("aDelay", 1, delays);
     },
 
     pickables() {

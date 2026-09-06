@@ -32,10 +32,70 @@ export function makeViews(renderer, canvas) {
   let center = new THREE.Vector3();
   let quad = false;
   const quadLines = document.getElementById("quad-lines");
-  // In-flight camera move (view cube click): slerp between orientations so the
-  // up vector never flips mid-way. Orbit controls are paused until it lands.
-  let fly = null; // {q0, q1, up, dist, t0, dur}
+  // In-flight camera move (view cube click, knolling): orientation slerps so
+  // the up vector never flips mid-way, while the look-at point and the
+  // framing radius ease along with it. Orbit controls are paused until it
+  // lands. bump widens the framing mid-flight (elements in transit need more
+  // room than either end state).
+  let fly = null; // {q0, q1, up, c0, c1, r0, r1, bump, t0, dur}
   const FLY_SECONDS = 0.5;
+  const FRAME_MARGIN = 1.15; // framing: the bounds fill the canvas up to this
+
+  // Straight down/up has no meaningful +Z up vector - fall back to +Y
+  function upFor(dir) {
+    return Math.abs(dir.z) > 0.999 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1);
+  }
+
+  // Frustum radius (see frustum()) at which `bounds` seen from `dir` fills
+  // the canvas within the margin, and the point to look at: the bounds
+  // centre moved to the middle of the projected extent. insets: CSS px of
+  // canvas covered by panels on the left and right - the bounds are framed
+  // into, and centred on, the strip between them.
+  function framing(bounds, dir, insets = { left: 0, right: 0 }) {
+    const z = dir.clone().normalize();
+    const x = new THREE.Vector3().crossVectors(upFor(z), z).normalize();
+    const y = new THREE.Vector3().crossVectors(z, x);
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    const corner = new THREE.Vector3();
+    for (let i = 0; i < 8; i++) {
+      corner.set(i & 1 ? bounds.max.x : bounds.min.x, i & 2 ? bounds.max.y : bounds.min.y,
+        i & 4 ? bounds.max.z : bounds.min.z);
+      const px = corner.dot(x), py = corner.dot(y);
+      if (px < minX) minX = px; if (px > maxX) maxX = px;
+      if (py < minY) minY = py; if (py > maxY) maxY = py;
+    }
+    const cw = canvas.clientWidth || 1, ch = canvas.clientHeight || 1;
+    const aspect = cw / ch;
+    const freeW = Math.max(cw - insets.left - insets.right, cw * 0.3);
+    const half = Math.max((maxX - minX) / 2 * (cw / freeW) / Math.max(aspect, 1),
+      (maxY - minY) / 2 / Math.max(1 / aspect, 1)) * FRAME_MARGIN;
+    const c = bounds.getCenter(new THREE.Vector3());
+    c.addScaledVector(x, (minX + maxX) / 2 - c.dot(x)).addScaledVector(y, (minY + maxY) / 2 - c.dot(y));
+    // Look left of the content by the strip's offset so it sits in the strip
+    const worldPerPx = (2 * half * Math.max(aspect, 1)) / cw;
+    c.addScaledVector(x, -((insets.left - insets.right) / 2) * worldPerPx);
+    return { radius: Math.max(half / 1.2, 0.001), center: c };
+  }
+
+  // Begin a flight to look from dir at c1 with framing radius r1. The
+  // current zoom is folded into the start radius so the view does not jump
+  // and the flight always lands on zoom 1.
+  function startFlight(dir, c1, r1, seconds, bump = 0) {
+    const d = dir.clone().normalize();
+    const up = upFor(d);
+    const endPos = c1.clone().addScaledVector(d, r1 * 4);
+    const q1 = new THREE.Quaternion().setFromRotationMatrix(
+      new THREE.Matrix4().lookAt(endPos, c1, up));
+    radius /= camera.zoom;
+    camera.zoom = 1;
+    updateFrustums();
+    fly = {
+      q0: camera.quaternion.clone(), q1, up, c0: center.clone(), c1: c1.clone(),
+      r0: radius, r1, bump, t0: performance.now(), dur: seconds * 1000,
+    };
+    controls.enabled = false;
+    if (seconds <= 0) endFlight();
+  }
   // One zoom shared by the three fixed 4-view cameras so they stay on grid
   let fixedZoom = 1;
 
@@ -104,6 +164,13 @@ export function makeViews(renderer, canvas) {
     if (!fly) return;
     camera.quaternion.copy(fly.q1);
     camera.up.copy(fly.up);
+    radius = fly.r1;
+    center.copy(fly.c1);
+    camera.position.copy(center).add(
+      new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion).multiplyScalar(radius * 4));
+    controls.target.copy(center);
+    for (const name of Object.keys(fixedCams)) place(fixedCams[name], name);
+    updateFrustums();
     fly = null;
     controls.enabled = true;
     controls.update();
@@ -171,22 +238,25 @@ export function makeViews(renderer, canvas) {
       controls.update();
     },
 
-    // Fly to look at the model from an arbitrary unit direction (view cube).
+    // Fly to look at the model from an arbitrary unit direction (view cube),
+    // keeping the current framing.
     flyTo(dir) {
-      const d = dir.clone().normalize();
-      // Straight down/up has no meaningful +Z up vector - fall back to +Y
-      const up = new THREE.Vector3(0, 0, 1);
-      if (Math.abs(d.z) > 0.999) up.set(0, 1, 0);
-      controls.target.copy(center);
-      const dist = camera.position.distanceTo(center) || radius * 4;
-      const endPos = center.clone().addScaledVector(d, dist);
-      const q1 = new THREE.Quaternion().setFromRotationMatrix(
-        new THREE.Matrix4().lookAt(endPos, center, up));
-      fly = {
-        q0: camera.quaternion.clone(), q1, up, dist,
-        t0: performance.now(), dur: FLY_SECONDS * 1000,
-      };
-      controls.enabled = false;
+      endFlight();
+      startFlight(dir, center, radius / camera.zoom, FLY_SECONDS);
+    },
+
+    // Fly to look from dir at bounds, framed to fit exactly, over `seconds`
+    // (0 = at once). midBounds: what has to stay in view half-way. insets:
+    // canvas px covered by panels left and right (see framing()).
+    frameTo(bounds, dir, seconds, { midBounds = null, insets = undefined } = {}) {
+      endFlight();
+      const end = framing(bounds, dir, insets);
+      let bump = 0;
+      if (midBounds) {
+        const mid = framing(midBounds, dir, insets).radius;
+        bump = Math.max(0, mid - (radius / camera.zoom + end.radius) / 2);
+      }
+      startFlight(dir, end.center, end.radius, seconds, bump);
     },
 
     // Camera + normalised device coords for picking at a client point;
@@ -250,8 +320,11 @@ export function makeViews(renderer, canvas) {
       const t = Math.min((performance.now() - fly.t0) / fly.dur, 1);
       const e = t * t * (3 - 2 * t);
       camera.quaternion.slerpQuaternions(fly.q0, fly.q1, e);
+      center.lerpVectors(fly.c0, fly.c1, e);
+      radius = fly.r0 + (fly.r1 - fly.r0) * e + fly.bump * Math.sin(Math.PI * e);
       camera.position.copy(center).add(
-        new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion).multiplyScalar(fly.dist));
+        new THREE.Vector3(0, 0, 1).applyQuaternion(camera.quaternion).multiplyScalar(radius * 4));
+      updateFrustums();
       if (t >= 1) endFlight();
     },
   };

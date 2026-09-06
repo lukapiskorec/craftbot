@@ -16,6 +16,36 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
   const pointer = new THREE.Vector2();
   let hovered = null;
   let queued = null;
+  let enabled = true; // off while the elements are in flight (raycasts hit the model pose)
+  // Elements settled in a grid (knolling.js layout): every one is an
+  // axis-aligned box of its own dims at positions[e], picked by slab test
+  let arranged = null;
+
+  function pickArranged(api, planes) {
+    const model = getModel();
+    const o = raycaster.ray.origin, d = raycaster.ray.direction;
+    const oc = [o.x, o.y, o.z], dc = [d.x, d.y, d.z];
+    let best = Infinity, hit = null;
+    for (let e = 0; e < model.count; e++) {
+      if (!api.buckets[model.layer[e]].layerGroup.visible) continue;
+      let tmin = -Infinity, tmax = Infinity;
+      for (let k = 0; k < 3 && tmin <= tmax; k++) {
+        const c = arranged.positions[e * 3 + k], h = model.dims[e * 3 + k] / 2;
+        if (Math.abs(dc[k]) < 1e-9) {
+          if (oc[k] < c - h || oc[k] > c + h) tmin = Infinity;
+          continue;
+        }
+        let t1 = (c - h - oc[k]) / dc[k], t2 = (c + h - oc[k]) / dc[k];
+        if (t1 > t2) { const s = t1; t1 = t2; t2 = s; }
+        if (t1 > tmin) tmin = t1;
+        if (t2 < tmax) tmax = t2;
+      }
+      if (tmin > tmax || tmax < 0 || tmin >= best) continue;
+      const p = o.clone().addScaledVector(d, tmin);
+      if (planes.every((pl) => pl.distanceToPoint(p) >= 0)) { best = tmin; hit = e; }
+    }
+    return hit;
+  }
 
   // Name + layer next to the cursor while an element is hovered
   const tag = document.createElement("div");
@@ -38,8 +68,9 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
     const { camera, x, y } = getPickCamera(ev.clientX, ev.clientY);
     pointer.set(x, y);
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(api.pickables(), false);
     const planes = getClipPlanes();
+    if (arranged) return pickArranged(api, planes);
+    const hits = raycaster.intersectObjects(api.pickables(), false);
     // Nearest hit that is not cut away by a section plane
     for (const hit of hits) {
       if (planes.every((p) => p.distanceToPoint(hit.point) >= 0)) return api.elementOf(hit);
@@ -75,6 +106,7 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
     setHover(null);
   });
   function tick() {
+    if (queued && !enabled) queued = null;
     if (queued) {
       setHover(pick(queued));
       if (hovered !== null) placeTag(queued);
@@ -88,13 +120,19 @@ export function makePicking(canvas, getPickCamera, getSceneApi, getStyles, onSel
     if (!downAt) return;
     const moved = Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]);
     downAt = null;
-    if (moved > 4) return; // was an orbit drag
+    if (moved > 4 || !enabled) return; // was an orbit drag, or elements are knolled
     onSelect(pick(ev));
   });
 
   return {
     tick,
     clearHover() { setHover(null); },
+    setEnabled(on) {
+      enabled = on;
+      if (!on) { queued = null; setHover(null); }
+    },
+    // layout ({positions} per element) while the elements sit in a grid, null otherwise
+    setArranged(layout) { arranged = layout; },
     resetAfterModelChange() { hovered = null; tag.hidden = true; },
     // Testing: ?hover=eid - hover an element with the tag at a client position
     debugHover(eid, clientX, clientY) { setHover(eid); placeTag({ clientX, clientY }); },
