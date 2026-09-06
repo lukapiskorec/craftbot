@@ -105,6 +105,19 @@ input[type=checkbox] {
 }
 input[type=checkbox]:checked { background: var(--accent); border-color: var(--accent); }
 
+/* Cut-face colour swatches: the square is the colour itself, so it carries its
+   own outline (--swb, set in gui.js) - black would vanish on a black page and
+   white on a white one. The active one gets a ring outside that. */
+.swatch { flex: 0 0 auto; width: 1rem; height: 1rem; padding: 0; }
+/* listed together to outrank button:hover / button.active, which would
+   repaint the square with the accent colour */
+.swatch, .swatch:hover, .swatch.active {
+  background: var(--sw); border: 1px solid var(--swb);
+}
+.swatch:hover { outline: 1px solid var(--accent); outline-offset: 2px; }
+.swatch.active { outline: 1px solid var(--ink); outline-offset: 2px; }
+.swatch.active:hover { outline-color: var(--accent); }
+
 input[type=range] {
   appearance: none; height: 2px; background: var(--ink); cursor: ew-resize;
 }
@@ -227,7 +240,7 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
 /* Callout targets: numbered headings (hover = show the callouts) and quotes */
 .md [data-section]:hover { text-decoration: underline; }
 .md mark.ref { background: none; color: inherit; border-bottom: 2px solid var(--accent); }
-.md .flash, .md mark.ref.flash { background: var(--accent); color: var(--bg); }
+.md .flash, .md mark.ref.flash, .md mark.ref.pinned { background: var(--accent); color: var(--bg); }
 
 /* ---- rationale callouts: tags pointing at passages of the document ---- */
 #callout-lines { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
@@ -240,7 +253,11 @@ table.stats tr.total td { color: var(--accent); border-top: 1px solid var(--ink)
   cursor: pointer; user-select: none; box-shadow: var(--shadow) var(--shadow) 0 var(--bg);
 }
 .callout[hidden] { display: none; }
-.callout:hover, .callout.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.callout:hover, .callout.active, .callout.pinned {
+  background: var(--accent); color: var(--bg); border-color: var(--accent);
+}
+/* Clicked callout: pinned open, larger and over its neighbours */
+.callout.pinned { z-index: 11; font-size: 1rem; padding: 0.35rem 0.7rem; max-width: 18rem; }
 
 /* ---- footer ---- */
 #footer {

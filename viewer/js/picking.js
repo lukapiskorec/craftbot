@@ -153,6 +153,7 @@ export function makeInspector(model, theme, { getSceneApi, styles, renderer, mai
   let dimAnchors = []; // {mid: Vector3, text: string}
   let active = false;
   let currentEid = null;
+  let ownMaterials = []; // unclipped copies of the style materials
   let radius = 1;
 
   function clearLabels() {
@@ -168,7 +169,22 @@ export function makeInspector(model, theme, { getSceneApi, styles, renderer, mai
       group = null;
       edges = null;
     }
+    for (const m of ownMaterials) m.dispose();
+    ownMaterials = [];
     clearLabels();
+  }
+
+  // The inspector draws the element re-centred on the origin, where the
+  // world-space section planes would clip it at random (and cut it away
+  // entirely for half of the slider). So it renders with copies of the style
+  // materials that carry no clipping planes.
+  function unclipped(mat) {
+    const copy = mat.clone();
+    copy.onBeforeCompile = mat.onBeforeCompile; // clone() drops the animation patch
+    copy.customProgramCacheKey = mat.customProgramCacheKey;
+    copy.clippingPlanes = null;
+    ownMaterials.push(copy);
+    return copy;
   }
 
   // Geometry in the element's own frame: longest axis along X, centred.
@@ -246,8 +262,9 @@ export function makeInspector(model, theme, { getSceneApi, styles, renderer, mai
       const mats = getSceneApi().materials;
       group = new THREE.Group();
       group.rotation.z = rotation;
-      group.add(new THREE.Mesh(geom, model.isGlass[eid] ? mats.glass : mats.fill));
-      edges = new THREE.LineSegments(addAnimAttributes(new THREE.EdgesGeometry(geom, 10)), mats.line);
+      group.add(new THREE.Mesh(geom, unclipped(model.isGlass[eid] ? mats.glass : mats.fill)));
+      edges = new THREE.LineSegments(
+        addAnimAttributes(new THREE.EdgesGeometry(geom, 10)), unclipped(mats.line));
       edges.visible = styles.edgesVisible;
       group.add(edges);
       addDimLines(dims);

@@ -34,9 +34,15 @@ function mulberry32(seed) {
 const LIGHT = { ink: "#000000" };
 const DARK = { ink: "#ffffff" };
 const MAGENTA = "#e5195b";
+const YELLOW = "#ffd54a";
+const BLACK = "#000000";
+const WHITE = "#ffffff";
 
-function theme(base, bg, accent, { hover = accent, select = accent } = {}) {
-  return { ...base, bg, accent, hover, select };
+// cut = colour the faces a section plane cuts open start on; cuts = the three
+// the SECTION panel offers, the style's highlight followed by black and white.
+function theme(base, bg, accent,
+  { hover = accent, select = accent, cut = WHITE, highlight = MAGENTA } = {}) {
+  return { ...base, bg, accent, hover, select, cut, cuts: [highlight, BLACK, WHITE] };
 }
 
 // ------------------------------------------------------------------
@@ -242,7 +248,8 @@ const DEFS = {
     },
     {
       bg: 0x000000, colors: 0xffffff, edges: true,
-      theme: theme(DARK, "#000000", "#ffffff", { hover: "#8a8a8a", select: "#000000" }),
+      theme: theme(DARK, "#000000", "#ffffff",
+        { hover: "#8a8a8a", select: "#000000", cut: BLACK }),
       fill: flat,
       line: () => new THREE.LineBasicMaterial({ color: 0x000000 }),
     },
@@ -256,14 +263,14 @@ const DEFS = {
     },
     {
       bg: 0x000000, colors: 0x000000, edges: true,
-      theme: theme(DARK, "#000000", "#ffffff"),
+      theme: theme(DARK, "#000000", "#ffffff", { cut: BLACK }),
       fill: hidden,
       line: () => new THREE.LineBasicMaterial({ color: 0xffffff }),
     },
   ],
   blueprint: [{
     bg: 0x102a66, colors: 0x16337a, edges: true,
-    theme: theme(DARK, "#102a66", "#ffd54a"),
+    theme: theme(DARK, "#102a66", YELLOW, { cut: YELLOW, highlight: YELLOW }),
     fill: flat,
     line: () => new THREE.LineBasicMaterial({ color: 0xdce8ff }),
   }],
@@ -272,7 +279,7 @@ const DEFS = {
   dither: [
     {
       bg: 0xffffff, colors: 0xffffff, edges: false, passes: ["ao", "dither"],
-      theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#909090" }),
+      theme: theme(LIGHT, "#ffffff", "#000000", { hover: "#909090", cut: BLACK }),
       fill: plasterFill,
       line: () => new THREE.LineBasicMaterial({ color: 0x555555 }),
     },
@@ -303,6 +310,8 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
   let active = "solid";
   let mode = 0;
   let randomSeed = 12345;
+  let cutIndex = null; // cut colour picked in the SECTION panel (null: the mode's own)
+  let capMaterial = null;
   // Render targets are cached by size: the quad view renders four viewports of
   // two different sizes per frame, and a single slot would dispose/recreate the
   // target four times a frame.
@@ -318,6 +327,12 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
   let lastModel = null;
 
   function def() { return DEFS[active][mode]; }
+
+  // Index into theme.cuts of the colour the cut faces are drawn in
+  function cutChoice() {
+    const t = def().theme;
+    return cutIndex ?? Math.max(0, t.cuts.indexOf(t.cut));
+  }
 
   // tag separates the scene target from pass intermediates of the same size
   function ensureRT(w, h, needDepth, tag) {
@@ -364,6 +379,14 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
     get edgesVisible() { return def().edges; },
     get selectColor() { return new THREE.Color(def().theme.select); },
 
+    // Cut-face colours of the active style, and the one in use
+    get cutColors() { return def().theme.cuts; },
+    get cutIndex() { return cutChoice(); },
+    setCut(i) {
+      cutIndex = i;
+      if (capMaterial) capMaterial.color.set(def().theme.cuts[i]);
+    },
+
     // Radius of the model's bounding sphere - scales the AO kernel to the model
     setSceneRadius(r) {
       passes.ao.mat.uniforms.uRadius.value = Math.max(r * 0.022, 0.05);
@@ -375,8 +398,10 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
       if (advance && name === active) {
         mode = (mode + 1) % DEFS[name].length;
         if (name === "random") randomSeed = (randomSeed * 1664525 + 1013904223) >>> 0;
+        cutIndex = null; // every mode starts on its own cut colour
       } else if (name !== active) {
         mode = 0;
+        cutIndex = null;
       }
       active = name;
       if (sceneApi) lastSceneApi = sceneApi;
@@ -391,7 +416,13 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
       glass.opacity = 0.5;
       glass.depthWrite = false;
       const line = d.line();
-      lastSceneApi.setMaterials({ fill, glass, line });
+      // Cut faces (section-caps.js): flat and unlit, the poche of a section
+      // drawing. DoubleSide - the cut polygons face into the kept half.
+      capMaterial = new THREE.MeshBasicMaterial({
+        color: d.theme.cuts[cutChoice()], side: THREE.DoubleSide,
+      });
+      const cap = capMaterial;
+      lastSceneApi.setMaterials({ fill, glass, line, cap });
       lastSceneApi.setEdgesVisible(d.edges);
       lastSceneApi.setSelected(null);
       const c = new THREE.Color();
@@ -406,7 +437,7 @@ export function makeStyles(renderer, scene, { onMaterials, onTheme } = {}) {
         c.setHex(d.colors); // a plain hex: one constant colour for every element
         lastSceneApi.setElementColors(() => c);
       }
-      if (onMaterials) onMaterials([fill, glass, line]);
+      if (onMaterials) onMaterials([fill, glass, line, cap].filter(Boolean));
     },
 
     // Render honoring the active post pass. viewport: {x,y,w,h} in device px

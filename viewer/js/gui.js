@@ -1,6 +1,11 @@
 // Retro terminal GUI panel. Pure DOM - no three.js imports.
 // makePanel(root) returns a section factory; callers compose controls.
 
+// A swatch needs its own outline colour: black would vanish on a black page
+// and white on a white one.
+const OUTLINES = { "#000000": "#ffffff", "#ffffff": "#000000" };
+const outlineFor = (c) => OUTLINES[String(c).toLowerCase()] ?? "var(--ink)";
+
 // Narrow screens get the compact layout (see the media query in style.css)
 export const isMobile = () => window.matchMedia("(max-width: 760px)").matches;
 
@@ -166,6 +171,33 @@ export function makePanel(root, title = "CRAFTBOT VIEWER", { exclusive = false }
           },
         };
         if (active) api.setActive(active);
+        return api;
+      },
+
+      // Colour picker: one filled square per colour, radio style. set() takes
+      // a fresh list because the choices change with the render style.
+      addSwatches(label, colors, onPick, active = 0) {
+        const r = row(label);
+        const btns = [];
+        let current = colors;
+        const api = {
+          set(list, index) {
+            current = list;
+            for (let i = 0; i < btns.length; i++) {
+              btns[i].style.setProperty("--sw", list[i]);
+              btns[i].style.setProperty("--swb", outlineFor(list[i]));
+              btns[i].classList.toggle("active", i === index);
+            }
+          },
+        };
+        for (let i = 0; i < colors.length; i++) {
+          const b = document.createElement("button");
+          b.className = "swatch";
+          b.addEventListener("click", () => { api.set(current, i); onPick(i); });
+          r.appendChild(b);
+          btns.push(b);
+        }
+        api.set(colors, active);
         return api;
       },
 

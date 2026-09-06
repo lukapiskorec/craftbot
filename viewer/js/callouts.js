@@ -7,7 +7,9 @@
 // Tag = DOM box (hover-tag style) with an SVG leader line to the anchor:
 // the centroid of the matched elements, or the matched element nearest the
 // camera ("nearest" - for scattered sets like every bead). Hovering a tag
-// tints its elements; clicking scrolls the document to the passage.
+// tints its elements; clicking pins the tag (bigger, keeps the hover colour,
+// its quote stays lit in the document) and scrolls to the passage. Clicking
+// the pinned tag again releases it.
 
 import * as THREE from "three";
 import { resolveMatch } from "./callout-data.js";
@@ -25,14 +27,17 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
   let model = null;
   let visible = false;
   let items = []; // resolved: {c, ids, layers, centroid, el, line, dot, sx, sy, tx, ty, on}
-  let tinted = null; // item whose elements are highlighted
+  let tinted = null; // item whose elements are currently highlighted
+  let hovered = null; // pointer is over this tag (or its heading in the doc)
+  let pinned = null; // item clicked open; survives the pointer leaving
   const _v = new THREE.Vector3();
   const _p = new THREE.Vector3();
 
   function clear() {
     for (const it of items) { it.el.remove(); it.line.remove(); it.dot.remove(); }
     items = [];
-    tinted = null;
+    tinted = hovered = null;
+    setPinned(null);
   }
 
   function tint(item, on) {
@@ -42,11 +47,27 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
     for (const eid of item.ids) api.highlight(eid, color);
   }
 
-  function setTinted(item) {
-    if (tinted === item) return;
+  // The hovered tag wins over the pinned one, so only one set is ever tinted
+  function refreshTint() {
+    const want = hovered ?? pinned;
+    if (tinted === want) return;
     if (tinted) { tint(tinted, false); tinted.el.classList.remove("active"); }
-    tinted = item;
-    if (item) { tint(item, true); item.el.classList.add("active"); }
+    tinted = want;
+    if (want) { tint(want, true); want.el.classList.add("active"); }
+  }
+
+  function setHovered(item) {
+    hovered = item;
+    refreshTint();
+  }
+
+  function setPinned(item) {
+    if (pinned === item) return;
+    if (pinned) pinned.el.classList.remove("pinned");
+    pinned = item;
+    if (pinned) pinned.el.classList.add("pinned");
+    docPanel.setPinnedCallout(pinned ? pinned.c.id : null);
+    refreshTint();
   }
 
   function resolve() {
@@ -66,6 +87,7 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
       centroid.divideScalar(ids.length);
       const el = document.createElement("div");
       el.className = "callout";
+      el.dataset.callout = c.id;
       el.textContent = c.label;
       el.hidden = true;
       host.appendChild(el);
@@ -74,9 +96,13 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
       dot.setAttribute("r", "3");
       svg.append(line, dot);
       const item = { c, ids, layers, centroid, el, line, dot, sx: 0, sy: 0, tx: 0, ty: 0, on: false };
-      el.addEventListener("pointerenter", () => setTinted(item));
-      el.addEventListener("pointerleave", () => setTinted(null));
-      el.addEventListener("click", () => docPanel.scrollToSection(c.section, c.id));
+      el.addEventListener("pointerenter", () => setHovered(item));
+      el.addEventListener("pointerleave", () => setHovered(null));
+      el.addEventListener("click", () => {
+        const pin = pinned !== item;
+        setPinned(pin ? item : null);
+        if (pin) docPanel.scrollToSection(c.section, c.id);
+      });
       items.push(item);
     }
   }
@@ -113,7 +139,7 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
 
     setVisible(on) {
       visible = on;
-      if (!on) { hideAll(); setTinted(null); }
+      if (!on) { hideAll(); setHovered(null); setPinned(null); }
     },
 
     setData(d) { data = d; resolve(); },
@@ -122,7 +148,7 @@ export function makeCallouts(host, { views, canvas, getSceneApi, getStyles, docP
 
     // Doc heading hover -> emphasise the callouts of that section
     highlightSection(section) {
-      setTinted(section ? items.find((it) => it.c.section === section) ?? null : null);
+      setHovered(section ? items.find((it) => it.c.section === section) ?? null : null);
     },
 
     tick() {

@@ -39,6 +39,7 @@ export function makeSections() {
       mat.clippingPlanes = active.length ? active : null;
       mat.clipShadows = true;
     });
+    sceneApi.setCutPlanes(active); // rebuilds the filled cut faces, see scene.js
   }
 
   return {

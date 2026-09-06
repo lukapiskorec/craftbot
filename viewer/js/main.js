@@ -58,6 +58,7 @@ const styles = makeStyles(renderer, scene, {
   onTheme: (theme) => {
     viewCube.setTheme(theme);
     if (inspector) inspector.setTheme(theme);
+    cutSwatches.set(styles.cutColors, styles.cutIndex);
   },
 });
 
@@ -191,6 +192,10 @@ secSection.addButtons(["flip x", "flip y", "flip z", "reset"], (label) => {
   const axis = { "flip x": 0, "flip y": 1, "flip z": 2 }[label];
   sections.set(axis, { flip: !sections.getState(axis).flip });
 });
+// Cut-face colour: the style's highlight, black or white. Each style mode
+// starts on its own (styles.js), so the row is re-read on every theme change.
+const cutSwatches = secSection.addSwatches("color", styles.cutColors,
+  (i) => styles.setCut(i), styles.cutIndex);
 
 let index = null;
 const pick = { exp: null, agent: null, v: null };
@@ -213,12 +218,12 @@ const last = (arr) => arr[arr.length - 1];
 const selExp = secModel.addSelect("Model", [], (v) => {
   pick.exp = v;
   pick.agent = last(currentRuns())?.agent ?? null;
-  refreshPickers();
+  refreshPickers({ newest: true });
   loadPicked();
 });
 const selAgent = secModel.addSelect("Agent", [], (v) => {
   pick.agent = v;
-  refreshPickers();
+  refreshPickers({ newest: true });
   loadPicked();
 });
 // Iterations as a slider: 1..n over the versions of the picked run
@@ -231,11 +236,14 @@ const modelInfo = secModel.addInfo();
 // RATIONALE panel switches it off (the panel covers the model on phones).
 const calloutToggle = secModel.addToggle("callouts", false, (on) => callouts.setVisible(on));
 
-function refreshPickers() {
+// newest: land on the last iteration of the picked run. Switching model or
+// agent always does - without it a run that happens to have the same version
+// name (v03 -> v03) would keep the old slider position instead of the newest.
+function refreshPickers({ newest = false } = {}) {
   selExp.setOptions(index.experiments.map((e) => ({ value: e.id, label: e.title })), pick.exp);
   selAgent.setOptions(currentRuns().map((r) => ({ value: r.agent, label: r.agent })), pick.agent);
   const versions = currentVersions();
-  if (!versions.some((x) => x.v === pick.v)) pick.v = last(versions)?.v ?? null;
+  if (newest || !versions.some((x) => x.v === pick.v)) pick.v = last(versions)?.v ?? null;
   iterSlider.setRange(1, Math.max(versions.length, 1));
   iterSlider.set(versions.findIndex((x) => x.v === pick.v) + 1);
 }
@@ -323,6 +331,7 @@ new ResizeObserver(resize).observe(canvas);
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
   anims.tick(Math.min(clock.getDelta(), 0.1));
+  if (sceneApi) sceneApi.setCapsPaused(anims.playing);
   views.tick();
   picking.tick();
   callouts.tick();
@@ -384,11 +393,16 @@ if (!Number.isNaN(selectParam)) {
     sceneApi.setSelected(selectParam, styles.selectColor);
   });
 }
-// Testing: ?callouts=1 switches the rationale callouts on after load
+// Testing: ?callouts=1 switches the rationale callouts on after load,
+// ?pin=calloutId then clicks that tag open
 if (bootParams.get("callouts") === "1") {
   document.addEventListener("craftbot:model", () => {
     calloutToggle.set(true);
     callouts.setVisible(true);
+    // the click has to land after the rationale document itself
+    const pin = bootParams.get("pin");
+    if (pin) setTimeout(() =>
+      document.querySelector(`.callout[data-callout="${CSS.escape(pin)}"]`)?.click(), 300);
   }, { once: true });
 }
 // Testing: ?hover=elementId shows the hover tag at the canvas centre

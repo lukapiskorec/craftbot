@@ -24,6 +24,14 @@ export function makeDocPanel(host, title = "DESIGN RATIONALE") {
   const expandListeners = [];
   const sectionListeners = [];
   let hoveredSection = null;
+  let pinnedCallout = null; // id of the pinned callout, its quote stays lit
+
+  function applyPinned() {
+    for (const el of md.querySelectorAll("mark.pinned")) el.classList.remove("pinned");
+    if (!pinnedCallout) return;
+    md.querySelector(`mark[data-callout="${CSS.escape(pinnedCallout)}"]`)
+      ?.classList.add("pinned");
+  }
 
   const isOpen = () => !root.hidden && !root.classList.contains("closed");
   // Fired when the collapsed panel is expanded (header click or a callout)
@@ -78,8 +86,15 @@ export function makeDocPanel(host, title = "DESIGN RATIONALE") {
       }
       if (current !== path) return; // superseded while loading
       md.innerHTML = renderMarkdown(markQuotes(source, callouts?.callouts));
+      applyPinned();
       md.scrollTop = 0;
       root.hidden = false;
+    },
+
+    // Quote of the pinned callout (callouts.js), lit until it is released
+    setPinnedCallout(calloutId) {
+      pinnedCallout = calloutId;
+      applyPinned();
     },
 
     // Open the panel and scroll to a section heading (or to the callout's

@@ -65,6 +65,7 @@ export function makeAnimations() {
 
   const api = {
     get anim() { return anim; },
+    get playing() { return playing; },
     get order() { return order; },
     setAnim(name) { anim = name; },
     setOrder(name) { order = name; },
