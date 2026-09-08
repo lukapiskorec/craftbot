@@ -572,6 +572,15 @@ const freezeAt = parseFloat(bootParams.get("freeze"));
 if (!Number.isNaN(freezeAt)) {
   document.addEventListener("craftbot:model", () => anims.freeze(freezeAt));
 }
+// Testing: ?debug=1 puts the module internals a driver script needs on the
+// window, so an outside process can choreograph the viewer over CDP
+// (tools/capture_knoll.mjs records the knolling transition that way).
+if (bootParams.get("debug") === "1") {
+  window.craftbot = {
+    THREE, views, anims, arrange, knolling, KNOLL_VIEW, frameInsets,
+    panel, docPanel, getSceneApi, getModel,
+  };
+}
 fetch("models/index.json", FETCH_OPTS)
   .then((r) => r.json())
   .then((idx) => {

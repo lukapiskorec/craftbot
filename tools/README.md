@@ -45,6 +45,7 @@ same name (name every piece with all its loop indices).
 | `experiment_template.py` | Starting point for a new experiment script (parameter block, derived levels, kits, named collections). Renders clean through `render_views.py`. |
 | `views_template.py` | Starting point for an experiment's `views_fable.py` (view keys explained, mandatory views, colours). |
 | `export_model_json.py`, `export_all_models.py`, `model_export_core.py`, `layers.py`, `callouts.py` | Web viewer export pipeline (see the root README). |
+| `capture_knoll.mjs` | Records the viewer's knolling sequence to an mp4 (model, stacked, flat, back to the model) by driving headless Chrome over the DevTools protocol. Node, no dependencies; needs ffmpeg on PATH. `--help` lists the style, view, timing and frame-size options; the root README has the table. |
 
 ```
 blender --background --python tools/render_views.py -- <experiment.py> <abs_out_prefix> [--views views.py] [--lib <dir>] [--only 01,02] [--tol 1.0]
@@ -53,6 +54,7 @@ blender --background model.blend --python tools/check_contacts.py -- [tolerance_
 python tools/api_card.py [--check]
 python tools/closeout.py version 14 v09
 python tools/closeout.py run 14 --session-id <id>
+node tools/capture_knoll.mjs [--model <exp>/<agent>_<v>.json] [--style mono] [--help]
 ```
 
 A views file is plain Python with a `VIEWS` list (and optional `COLORS`,

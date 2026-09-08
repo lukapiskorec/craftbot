@@ -181,6 +181,40 @@ python tools/closeout.py run 14 --session-id ID # run-level checks, then the tra
 
 The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
 
+### Recording a video of the viewer
+
+[`tools/capture_knoll.mjs`](tools/capture_knoll.mjs) records the knolling sequence to an mp4: the model, every element rearranged into stacked bundles, then flat on its widest face, then back to the model on the opening framing so the clip loops. It drives the real viewer in headless Chrome over the DevTools protocol, so what you get is the page itself, GUI included.
+
+**ffmpeg has to be installed and on PATH**, and Chrome at the usual install path or in `CRAFTBOT_CHROME`. Both are checked before a frame is captured. The script starts and stops the static server itself; nothing else needs to be running.
+
+```
+node tools/capture_knoll.mjs                    # every default: exp 08 Fable v06, mono, 1344x1080, 30 fps, 12.6 s
+node tools/capture_knoll.mjs --style blueprint --stacked-view top-front-right
+node tools/capture_knoll.mjs --model 06_Prouve_Cabanon_Blender_Python/fable_v07.json --no-loop
+node tools/capture_knoll.mjs --help
+```
+
+| Option | Default | What it does |
+|---|---|---|
+| `--model REL` | exp 08 Fable v06 | model file under `viewer/models/` |
+| `--style NAME` | `mono` | `plaster`, `solid`, `random`, `mono`, `wireframe`, `blueprint`, `dither` |
+| `--mode N` | `0` | style variant: `0` light, `1` dark for mono, wireframe and dither, which have two each; the other styles have one, and on `random` each step re-rolls the palette |
+| `--model-view NAME` | `axo` | direction the model beats are framed from |
+| `--stacked-view NAME` | `top-front` | direction the stacked arrangement is framed from |
+| `--flat-view NAME` | `top` | direction the flat sheet is framed from |
+| `--hold S` | `1.0` | seconds held on each arrangement; the opening beat holds 60 % of it, so a loop does not stall |
+| `--no-loop` | off | stop on the flat sheet instead of returning to the model |
+| `--fps N` | `30` | frames per second |
+| `--width N`, `--height N` | `1344`, `1080` | frame size in CSS px |
+| `--scale N` | `2` | pixel ratio to render at; frames are downsampled to the frame size, which antialiases the outlines |
+| `--out FILE` | `outputs/knolling_<model>_<timestamp>.mp4` | dated, so runs never overwrite each other |
+| `--frames DIR`, `--keep-frames` | a temp folder, deleted after stitching | the PNG frames |
+| `--port N` | `8123` | port for the static server |
+
+View names are the navigation cube's own regions: `top`, `bottom`, `front`, `back`, `left`, `right`, the edges and corners between them (`top-front`, `top-front-right`, ...) and `axo`, the viewer's three-quarter view. A transition always runs 3 s, the length `main.js` gives it.
+
+The capture is frame-exact rather than a real-time screen grab: `performance.now()` is frozen when the page loads and stepped by exactly 1/fps per frame, and both clocks the viewer animates on read it. Recording the animation as it plays does not work, since headless Chrome will not paint a timed animation faster than it can screenshot it. The driver reaches the viewer's arrangements and camera through a `?debug=1` hook in `main.js` that puts them on `window.craftbot`; nothing is exposed without that parameter.
+
 Deployment: pushes to `main` publish `viewer/` via `.github/workflows/pages.yml`. One-time repo setting: *Settings, Pages, Source: GitHub Actions*.
 
 ## Notes
