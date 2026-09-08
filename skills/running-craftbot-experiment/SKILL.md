@@ -9,7 +9,45 @@ description: Use when asked to run, start, redo, continue or resume a CraftBot e
 
 One run turns a brief plus reference materials into versioned Blender Python scripts, renders, a design rationale with callouts, models in the web viewer and an archived transcript. Since experiment 15 the run is done by a team of six agents defined in `.claude/agents/`; the session that receives `/run-experiment` acts as CraftBot, the orchestrator, and spawns the others. The user reads the narration while it runs and a full report at the end. This skill is the shared workflow; each agent's own procedure is in its agent file, and the modelling knowledge lives in the other skills and in `tools/`.
 
+A run belongs to one model, and everything it writes lives in a run folder named after that model (`<Agent>`, see "Run folder and agent name" below). Nothing in the workflow assumes Fable; Fable is one agent among others.
+
 Experiments 01 to 14 were single-agent runs of the same workflow; their outputs have the same shape minus the hand-off files.
+
+## Run folder and agent name
+
+Every subfolder of `experiments/NN_*/` except `input/` and `references/` is a run folder, one per model that has run the experiment. The tools (`tools/export_all_models.py`, `closeout.py`, `callouts.py`) discover run folders this way; nothing is registered anywhere else.
+
+`<Agent>` is the folder name, `<slug>` the file slug used in every file name of the run: the folder name lower-cased with everything but letters and digits removed.
+
+| The harness reports | `<Agent>` (folder) | `<slug>` |
+|---|---|---|
+| Fable 5.1, `claude-fable-5-1` (any Fable version) | `Fable` | `fable` |
+| Opus 5.1, `claude-opus-5-1` | `Opus 5.1` | `opus51` |
+| Opus 5, `claude-opus-5` | `Opus 5` | `opus5` |
+| Sonnet 5, `claude-sonnet-5` | `Sonnet 5` | `sonnet5` |
+| GPT-5.1 in ChatGPT | `ChatGPT 5.1` | `chatgpt51` |
+| anything else | product name and version as reported, no vendor prefix (`Astra`, `Gemini 3 Pro`) | letters and digits of it |
+
+Fable keeps its bare name because eleven experiments already use `Fable/`; every other model carries its version so that two generations of the same product get separate runs.
+
+How CraftBot finds the name, before creating any file: in Claude Code the system prompt's environment section reads "You are powered by the model named X. The exact model ID is Y." Another harness states it in its own way or prints it with its model command (`/model` in Claude Code). If neither is available, CraftBot asks the user once and waits; a guessed folder name is the one mistake this section exists to prevent. The run is named after the model that runs CraftBot; the spawned agents inherit that model and never rename the folder.
+
+The record is `<Agent>/agent.md`, written by CraftBot when it creates the folder and read by every agent it spawns:
+
+```
+# Agent
+
+- agent: Opus 5.1
+- slug: opus51
+- model: Opus 5.1
+- model id: claude-opus-5-1
+- harness: Claude Code
+- started: 2026-09-08
+```
+
+If `<Agent>/` already exists for the detected model, the run is a continuation and `agent.md` is appended with a `- continued: <date>` line, not rewritten. A run folder of a different model in the same experiment is another agent's run: never opened, never written (the independence rule).
+
+File names carry the slug: `experiment_NN_<slug>_vXX.py`, `views_<slug>.py`, `experiment_NN_<slug>_design_rationale.md`, `experiment_NN_<slug>_callouts.json`, `experiment_NN_<slug>_conversation.jsonl`, `input/experiment_NN_prompts_<slug>.txt`. In the viewer the run's models are `viewer/models/<exp>/<slug>_vXX.json` with `<slug>_rationale.md` and `<slug>_callouts.json` beside them, and the index lists the run under the folder name.
 
 ## Roles and hand-off files
 
@@ -22,10 +60,11 @@ Experiments 01 to 14 were single-agent runs of the same workflow; their outputs 
 | Inspector | visual verification of one version, photo fidelity, comparison table | Builder or Designer | Builder or Designer | none |
 | Runner | close-out of every version and of the run | CraftBot | CraftBot (standing, background) | none |
 
-Every hand-off is a file in `experiments/NN_*/Fable/`, so any agent can be restarted from disk and no agent depends on another agent's chat:
+Every hand-off is a file in `experiments/NN_*/<Agent>/`, so any agent can be restarted from disk and no agent depends on another agent's chat:
 
 | File | Written by | Read by |
 |---|---|---|
+| `agent.md` (agent, slug, model, model id, harness, date) | CraftBot, first file of the run | everyone |
 | `brief.md` | CraftBot | everyone |
 | `concept.md` (spatial concept, construction concept, photo rule set) | Designer | Researcher, Builder, Inspector |
 | `sources.md` and snippets in `references/` with `captions.md` | Researcher | Designer, Builder |
@@ -34,10 +73,10 @@ Every hand-off is a file in `experiments/NN_*/Fable/`, so any agent can be resta
 | `version_notes.md` (per version: change, counts, families, findings, remaining) | Builder | CraftBot |
 | `inspection_vXX.md` | Inspector | Builder, Designer |
 | `closeout_vXX.md`, `closeout_run.md` | Runner (via `tools/closeout.py`) | Builder, CraftBot |
-| `experiment_NN_fable_vXX.py`, `views_fable.py` | Builder | Runner |
-| `experiment_NN_fable_design_rationale.md`, `experiment_NN_fable_callouts.json` | CraftBot | Runner, viewer |
-| `input/experiment_NN_prompts_fable.txt` | CraftBot (verbatim appends) | everyone |
-| `experiment_NN_fable_conversation.jsonl` | Runner, last action of the run | nobody during the run |
+| `experiment_NN_<slug>_vXX.py`, `views_<slug>.py` | Builder | Runner |
+| `experiment_NN_<slug>_design_rationale.md`, `experiment_NN_<slug>_callouts.json` | CraftBot | Runner, viewer |
+| `input/experiment_NN_prompts_<slug>.txt` | CraftBot (verbatim appends) | everyone |
+| `experiment_NN_<slug>_conversation.jsonl` | Runner, last action of the run | nobody during the run |
 
 ## What the user provides
 
@@ -53,7 +92,7 @@ The user places no code and no prompt files. If the brief is missing, CraftBot d
 
 ## Phases
 
-1. **Set-up (CraftBot).** Prompt file, `brief.md` (the brief as understood, posted to the user), Designer spawned, Runner spawned in the background.
+1. **Set-up (CraftBot).** Agent detected and `<Agent>/agent.md` written (the folder created if missing, the agent and folder posted to the user), prompt file, `brief.md` (the brief as understood, posted to the user), Designer spawned, Runner spawned in the background with the run folder name.
 2. **Concept (Designer, Researcher).** `concept.md`, research through one or more Researchers, `requirements.md` and the photo rule set. CraftBot checks the concept against the brief and posts the source-to-rule-to-number table and the deviations before any geometry exists.
 3. **Build to the brief (Builder, Inspectors, Runner).** The version loop: write, render, overlap and contact checks, family triage, an Inspector per version, patch. After every rendered version the Builder reports to CraftBot, CraftBot sends the Runner, the Runner's `closeout_vXX.md` is read before the next version. Stops at 0 pairs, 0 floating, nothing open in the inspection, every requirement of the phase ticked or waived. Default limit 10 versions per phase unless the brief says otherwise; at the limit, what remains open is reported.
 4. **Comparison and structural review (Designer with an Inspector).** Against the reference (rationale 3b): the last model versus the photos, drawings or figures, as a table (in the reference, in the model, change or kept with reason). Independent of the reference (rationale 6b): load path to ground for every element, lateral stability per direction, bearing, continuity, sizes. Both feed `requirements.md`; the Builder runs the phase-2 versions under the same loop.
@@ -65,7 +104,7 @@ The user places no code and no prompt files. If the brief is missing, CraftBot d
 - **Spawning tree** is flat under CraftBot: CraftBot spawns Designer, Builder and Runner; the Designer spawns Researchers and Inspectors; the Builder spawns Inspectors. Researchers and Inspectors are disposable, one per question set or version; their files are the record. The Runner is one standing background agent, continued with messages.
 - **Disagreements.** When the Builder cannot meet a requirement, the Designer rewrites the requirement or the concept. When that changes scope, CraftBot decides and records the decision in `brief.md`. The Builder never narrows scope on its own.
 - **Research depth.** The Researcher works from the manuals first, in the order index descriptions, chapter lists, extracted `.md`, PDF pages. An online search needs the Designer's approval per request; anything external is labelled in `references/captions.md` and in `sources.md`.
-- **Independence.** No agent opens another agent's run folder for the same experiment (`ChatGPT 5.1/` or any other run folder). Common ground is `tools/`, `skills/`, `manuals/`, `input/` and `references/`.
+- **Independence.** No agent opens another agent's run folder for the same experiment (`ChatGPT 5.1/`, `Fable/` or any run folder that is not this run's `<Agent>/`). Common ground is `tools/`, `skills/`, `manuals/`, `input/` and `references/`.
 - **Narrate visibly.** Transcripts drop private reasoning. Decisions, rejected alternatives and key numbers go into the notes files and into CraftBot's messages; the rationale is compiled from them.
 - **Settle questions from the materials** and state an assumption rather than blocking; questions that change scope go up the tree.
 - **Shared code.** The one sanctioned edit to `tools/` during a run is an `OVERRIDES` entry for the experiment in `tools/layers.py`. Promotions of helpers into `tools/` are proposals in `version_notes.md`, done after the run.
@@ -85,20 +124,21 @@ Read `manuals/INDEX.md` in full. It has one entry per manual: title, extracted `
 - Render each version with:
 
 ```
-"<blender>" --background --python tools/render_views.py -- "experiments/<exp>/Fable/experiment_NN_fable_vXX.py" "<abs repo>/experiments/<exp>/Fable/experiment_NN_fable_vXX_blender" --views "experiments/<exp>/Fable/views_fable.py" --lib "experiments/<exp>/input" [--only 01,05]
+"<blender>" --background --python tools/render_views.py -- "experiments/<exp>/<Agent>/experiment_NN_<slug>_vXX.py" "<abs repo>/experiments/<exp>/<Agent>/experiment_NN_<slug>_vXX_blender" --views "experiments/<exp>/<Agent>/views_<slug>.py" --lib "experiments/<exp>/input" [--only 01,05]
 ```
 
-  This writes `experiment_NN_fable_vXX_blender_view_01.png` and following, saves a `.blend` (gitignored), writes `..._blender_pairs.txt` with every penetrating pair, and prints `OVERLAP CHECK: <n> members, <k> penetrating pairs (> 1 mm)`, the pair families (one row per cause, `tools/triage.py`) and `CONTACT CHECK: <n> members, <f> floating` (members touching nothing, `tools/check_contacts.py`).
+  Quote the paths; a run folder name may contain a space (`Opus 5.1`). This writes `experiment_NN_<slug>_vXX_blender_view_01.png` and following, saves a `.blend` (gitignored), writes `..._blender_pairs.txt` with every penetrating pair, and prints `OVERLAP CHECK: <n> members, <k> penetrating pairs (> 1 mm)`, the pair families (one row per cause, `tools/triage.py`) and `CONTACT CHECK: <n> members, <f> floating` (members touching nothing, `tools/check_contacts.py`).
 - Each rendered version is a new file; never overwrite a version that has renders. Add a view for every new feature in the version that adds it.
 - Mandatory views: the four orbits, a frame-only view, a from-below view, an interior view or section per storey; a camera matched to the reference photo when the model is meant to resemble one; a close-up for every joint that needs judgement. Hide lists use bare collection names.
 
 ## Mechanics: close-out (Runner, CraftBot)
 
-- Per version: `python tools/closeout.py version NN vXX` exports the version (`tools/export_all_models.py`), bakes and audits the layers (`tools/layers.py`; anything in `other` needs an `OVERRIDES` entry keyed by the experiment id), rebuilds `viewer/models/index.json`, checks the view set, confirms the renders and screenshots the viewer, writing `Fable/closeout_vXX.md`.
-- Per run, after the rationale and callouts are final: `python tools/closeout.py run NN --session-id <id>` checks the rationale sections, the hand-off files, the prompt file, the callouts (`tools/callouts.py --check`), the API card (`tools/api_card.py --check`), rebuilds the index and copies the transcript as the last step, writing `Fable/closeout_run.md`. The session id is the folder name in the scratchpad path (`.../<repo-slug>/<session-id>/scratchpad`); the copy ends just before that command, so it contains the report. `/export` gives the user a markdown copy.
-- Callouts need the exported models: `python tools/callouts.py --names NN` lists the element name patterns; the schema is in the header of `tools/callouts.py`; at most 15 callouts, labels at most 80 characters, quotes verbatim inside the named section.
+- Both close-out commands take `--agent "<Agent>"`, the run folder name. Without it the script uses the experiment's only run folder and refuses when there are several, so the Runner always passes it.
+- Per version: `python tools/closeout.py version NN vXX --agent "<Agent>"` exports the version (`tools/export_all_models.py`), bakes and audits the layers (`tools/layers.py`; anything in `other` needs an `OVERRIDES` entry keyed by the experiment id), rebuilds `viewer/models/index.json`, checks the view set, confirms the renders and screenshots the viewer, writing `<Agent>/closeout_vXX.md`.
+- Per run, after the rationale and callouts are final: `python tools/closeout.py run NN --session-id <id> --agent "<Agent>"` checks the rationale sections, the hand-off files (`agent.md` included), the prompt file, the callouts (`tools/callouts.py --check`), the API card (`tools/api_card.py --check`), rebuilds the index and copies the transcript as the last step, writing `<Agent>/closeout_run.md`. The session id is the folder name in the scratchpad path (`.../<repo-slug>/<session-id>/scratchpad`); the copy ends just before that command, so it contains the report. `/export` gives the user a markdown copy.
+- Callouts need the exported models: `python tools/callouts.py --names NN` lists the element name patterns per run folder (read the rows of this run); the schema is in the header of `tools/callouts.py`; at most 15 callouts, labels at most 80 characters, quotes verbatim inside the named section.
 - The three `--only` filters match differently (exporter: substring of the script path; layers: substring of the model path; callouts: substring of the experiment id); the experiment folder name works for all three.
-- Viewer check by hand, if needed: `python -m http.server -d viewer 8123`, then a headless Chrome screenshot of `http://127.0.0.1:8123/?model=models/<exp>/fable_vXX.json&anim=none` (`--headless=new`, never `--disable-gpu`). A wrong `model` value opens a random showcase model without an error; a red banner is a JavaScript error.
+- Viewer check by hand, if needed: `python -m http.server -d viewer 8123`, then a headless Chrome screenshot of `http://127.0.0.1:8123/?model=models/<exp>/<slug>_vXX.json&anim=none` (`--headless=new`, never `--disable-gpu`). A wrong `model` value opens a random showcase model without an error; a red banner is a JavaScript error.
 
 ## Final report (CraftBot)
 
@@ -107,17 +147,18 @@ A single message a reader who saw nothing else can follow: the brief as understo
 ## Outputs of a complete run
 
 ```
-experiments/<exp>/input/experiment_NN_prompts_fable.txt
-experiments/<exp>/Fable/brief.md, concept.md, sources.md, requirements.md, design_notes.md, version_notes.md
-experiments/<exp>/Fable/inspection_vXX.md, closeout_vXX.md, closeout_run.md
-experiments/<exp>/Fable/experiment_NN_fable_vXX.py                  one per version
-experiments/<exp>/Fable/experiment_NN_fable_vXX_blender_view_YY.png  gitignored renders
-experiments/<exp>/Fable/views_fable.py
-experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md
-experiments/<exp>/Fable/experiment_NN_fable_callouts.json
-experiments/<exp>/Fable/experiment_NN_fable_conversation.jsonl
-experiments/<exp>/references/manual_*.png, captions.md                 Researcher snippets
-viewer/models/<exp>/fable_vXX.json, fable_rationale.md, fable_callouts.json, index.json updated
+experiments/<exp>/input/experiment_NN_prompts_<slug>.txt
+experiments/<exp>/<Agent>/agent.md                                     agent, slug, model id, harness, date
+experiments/<exp>/<Agent>/brief.md, concept.md, sources.md, requirements.md, design_notes.md, version_notes.md
+experiments/<exp>/<Agent>/inspection_vXX.md, closeout_vXX.md, closeout_run.md
+experiments/<exp>/<Agent>/experiment_NN_<slug>_vXX.py                  one per version
+experiments/<exp>/<Agent>/experiment_NN_<slug>_vXX_blender_view_YY.png  gitignored renders
+experiments/<exp>/<Agent>/views_<slug>.py
+experiments/<exp>/<Agent>/experiment_NN_<slug>_design_rationale.md
+experiments/<exp>/<Agent>/experiment_NN_<slug>_callouts.json
+experiments/<exp>/<Agent>/experiment_NN_<slug>_conversation.jsonl
+experiments/<exp>/references/manual_*.png, captions.md                  Researcher snippets
+viewer/models/<exp>/<slug>_vXX.json, <slug>_rationale.md, <slug>_callouts.json, index.json updated
 tools/layers.py                                                      only if an OVERRIDES entry was needed
 manuals/<name>.pdf                                                   only if downloaded during the run; gitignored
 ```
@@ -140,7 +181,8 @@ manuals/<name>.pdf                                                   only if dow
 | Rationale after the archive | transcript lacks the reasoning the rationale needs | rationale first, transcript last |
 | Exporting only the final version | viewer iteration slider shows one step | `closeout.py version` for every version |
 | A requirement quietly dropped by the Builder | the model narrows the brief without a record | Designer rewrites, CraftBot decides scope, `brief.md` records it |
+| Writing into `Fable/` without checking the model | an Opus or Sonnet run lands in the Fable folder and the viewer lists it as a Fable run | detect the model first, `agent.md` is the first file, folder named after the agent |
 
 ## Provenance
 
-Assembled from the Fable prompt files of experiments 01-14 (`input/experiment_NN_prompts_fable.txt`), their design rationale documents, and the project notes that accumulated across those runs. The manuals step was added on 2026-09-02 when the reference PDFs moved into `manuals/`. The six-agent team, the hand-off files, the contact check, the triage table and the close-out script were added on 2026-09-06 after the experiment 14 context audit (455 k tokens of context, 68 percent of it screenshots, manuals and code that a single agent read and then needed only in compressed form).
+Assembled from the Fable prompt files of experiments 01-14 (`input/experiment_NN_prompts_fable.txt`), their design rationale documents, and the project notes that accumulated across those runs. The manuals step was added on 2026-09-02 when the reference PDFs moved into `manuals/`. The six-agent team, the hand-off files, the contact check, the triage table and the close-out script were added on 2026-09-06 after the experiment 14 context audit (455 k tokens of context, 68 percent of it screenshots, manuals and code that a single agent read and then needed only in compressed form). The run folder named after the detected model, `agent.md` and the `--agent` flag of the close-out script were added on 2026-09-08 so that the same workflow serves any model, not only Fable.

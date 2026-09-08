@@ -6,10 +6,14 @@
 #   python tools/export_all_models.py [--blender PATH] [--only GLOB] [--dry-run]
 #   python tools/export_all_models.py --index-only   # no Blender: just index.json
 #
-# Fable runs also ship their design rationale: experiments/<exp>/Fable/
-# experiment_NN_fable_design_rationale.md is copied next to the models as
-# viewer/models/<exp>/fable_rationale.md and linked from index.json; likewise
-# experiment_NN_fable_callouts.json -> fable_callouts.json (see tools/callouts.py).
+# Every subfolder of experiments/<exp>/ except input/ and references/ is a run
+# folder, named after the model that ran it ("ChatGPT 5.1", "Fable",
+# "Opus 5.1"); its file slug is the lower-case letters and digits of that name
+# ("chatgpt51", "fable", "opus51"). A run that ships a design rationale
+# (<Agent>/experiment_NN_<slug>_design_rationale.md) gets it copied next to the
+# models as viewer/models/<exp>/<slug>_rationale.md and linked from index.json;
+# likewise experiment_NN_<slug>_callouts.json -> <slug>_callouts.json (see
+# tools/callouts.py).
 #
 # Blender path resolution: --blender arg > CRAFTBOT_BLENDER env > known installs.
 
@@ -28,7 +32,7 @@ import model_export_core as core
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(REPO_ROOT, "viewer", "models")
 EXPORTER = os.path.join(REPO_ROOT, "tools", "export_model_json.py")
-AGENT_DIRS = {"ChatGPT 5.1": "chatgpt51", "Fable": "fable"}
+RESERVED_DIRS = {"input", "references"}   # every other subfolder of an experiment is a run folder
 KNOWN_BLENDERS = [
     r"C:\Program Files\Blender Foundation\Blender 4.3\blender.exe",
     r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe",
@@ -42,6 +46,33 @@ def find_blender(cli_path):
     sys.exit("No Blender executable found: pass --blender or set CRAFTBOT_BLENDER")
 
 
+def agent_slug(agent):
+    """Run folder name -> file slug, lower-case letters and digits only
+    ("ChatGPT 5.1" -> "chatgpt51", "Opus 5.1" -> "opus51", "Fable" -> "fable")."""
+    return re.sub(r"[^a-z0-9]", "", agent.lower())
+
+
+def run_folders(exp_dir):
+    """Run folder names of one experiment, sorted: every subfolder except
+    input/, references/ and hidden or private ones."""
+    return sorted(name for name in os.listdir(exp_dir)
+                  if os.path.isdir(os.path.join(exp_dir, name))
+                  and name not in RESERVED_DIRS and not name.startswith((".", "_")))
+
+
+def resolve_run_folder(exp_dir, agent=None):
+    """Path of one run folder of exp_dir: the one named by agent, else the
+    only one there is. Exits when the choice is ambiguous."""
+    runs = run_folders(exp_dir)
+    if agent:
+        if agent not in runs:
+            sys.exit(f"no run folder {agent!r} in {exp_dir}; found {runs}")
+        return os.path.join(exp_dir, agent)
+    if len(runs) == 1:
+        return os.path.join(exp_dir, runs[0])
+    sys.exit(f"{len(runs)} run folders in {exp_dir} {runs}; pass --agent NAME")
+
+
 def find_scripts():
     """Yield (experiment_id, agent, version, script_path, lib_dir) in order."""
     jobs = []
@@ -52,14 +83,12 @@ def find_scripts():
         lib_dir = os.path.join(exp_dir, "input")   # old runs keep craftbot_lib V1.1 here;
         if not os.path.isdir(lib_dir):              # newer runs import tools/ instead
             lib_dir = exp_dir
-        for agent in AGENT_DIRS:
+        for agent in run_folders(exp_dir):
             agent_dir = os.path.join(exp_dir, agent)
-            if not os.path.isdir(agent_dir):
-                continue
             for script in sorted(glob.glob(os.path.join(agent_dir, "experiment_*.py"))):
                 m = core.VERSION_RE.search(os.path.basename(script))
                 if not m:
-                    continue  # render_fable.py and other helpers
+                    continue  # render_*.py and other helpers
                 jobs.append((exp_id, agent, f"v{m.group(1)}", script, lib_dir))
     return jobs
 
@@ -91,7 +120,7 @@ def main():
     blender = find_blender(args.blender)
     failures = []
     for i, (exp_id, agent, v, script, lib_dir) in enumerate(jobs, 1):
-        out_rel = f"{exp_id}/{AGENT_DIRS[agent]}_{v}.json"
+        out_rel = f"{exp_id}/{agent_slug(agent)}_{v}.json"
         out_path = os.path.join(MODELS_DIR, out_rel.replace("/", os.sep))
         print(f"[{i}/{len(jobs)}] {out_rel} ... ", end="", flush=True)
         try:
@@ -120,10 +149,10 @@ def main():
         print(f"\n--- FAILED {rel}\n{safe}")
 
 
-def sync_fable_doc(exp_id, pattern, dst_name):
-    """Copy a Fable-run document (rationale md, callouts json) next to the
-    experiment's models; returns the index-relative path, or None."""
-    found = glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, "Fable", pattern))
+def sync_run_doc(exp_id, agent, pattern, dst_name):
+    """Copy a run document (rationale md, callouts json) from the run folder
+    next to the experiment's models; returns the index-relative path, or None."""
+    found = glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, agent, pattern))
     if not found:
         return None
     dst = os.path.join(MODELS_DIR, exp_id, dst_name)
@@ -133,21 +162,32 @@ def sync_fable_doc(exp_id, pattern, dst_name):
     return f"{exp_id}/{dst_name}"
 
 
-def sync_rationale(exp_id):
-    return sync_fable_doc(exp_id, "experiment_*_design_rationale.md", "fable_rationale.md")
+def sync_rationale(exp_id, agent):
+    return sync_run_doc(exp_id, agent, "experiment_*_design_rationale.md",
+                        f"{agent_slug(agent)}_rationale.md")
 
 
-def sync_callouts(exp_id):
-    return sync_fable_doc(exp_id, "experiment_*_callouts.json", "fable_callouts.json")
+def sync_callouts(exp_id, agent):
+    return sync_run_doc(exp_id, agent, "experiment_*_callouts.json",
+                        f"{agent_slug(agent)}_callouts.json")
+
+
+def agents_by_slug():
+    """{slug: run folder name} over every experiment on disk."""
+    names = {}
+    for exp_dir in glob.glob(os.path.join(REPO_ROOT, "experiments", "*")):
+        if os.path.isdir(exp_dir):
+            for agent in run_folders(exp_dir):
+                names[agent_slug(agent)] = agent
+    return names
 
 
 def rebuild_index():
     """Regenerate index.json from every model JSON currently on disk, so
     partial runs (--only) never shrink the index."""
     import json
-    agents_by_slug = {slug: agent for agent, slug in AGENT_DIRS.items()}
-    rationales = {}
-    callouts = {}
+    names = agents_by_slug()
+    docs = {}   # (exp_id, agent) -> (rationale path, callouts path)
     entries = []
     for path in glob.glob(os.path.join(MODELS_DIR, "*", "*.json")):
         rel = os.path.relpath(path, MODELS_DIR).replace(os.sep, "/")
@@ -157,10 +197,10 @@ def rebuild_index():
         exp_id, slug, v = m.groups()
         with open(path, encoding="utf-8") as f:
             model = json.load(f)
-        agent = agents_by_slug.get(slug, slug)
-        if exp_id not in rationales:
-            rationales[exp_id] = sync_rationale(exp_id)
-            callouts[exp_id] = sync_callouts(exp_id)
+        agent = names.get(slug, slug)
+        if (exp_id, agent) not in docs:
+            docs[(exp_id, agent)] = (sync_rationale(exp_id, agent), sync_callouts(exp_id, agent))
+        rationale, callouts = docs[(exp_id, agent)]
         entries.append({
             "experiment": exp_id,
             "agent": agent,
@@ -168,8 +208,8 @@ def rebuild_index():
             "file": rel,
             "elements": len(model["boxes"]) + len(model["meshes"]),
             "bytes": os.path.getsize(path),
-            "rationale": rationales[exp_id] if agent == "Fable" else None,
-            "callouts": callouts[exp_id] if agent == "Fable" else None,
+            "rationale": rationale,
+            "callouts": callouts,
         })
     os.makedirs(MODELS_DIR, exist_ok=True)
     core.dump_compact(core.build_index(entries),

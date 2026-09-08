@@ -31,7 +31,8 @@ Each experiment folder follows the same layout:
 
 - `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template. Experiments 04, 08, 09, 11 and 13 also used a construction manual PDF; it was removed from the repository for copyright reasons, an `original_pdf_provenance.txt` in the folder names it, and the extracted summary used during the run stays next to it.
 - `ChatGPT 5.1/` holds the outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models.
-- `Fable/` (eleven experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation. From experiment 15 on it also holds the hand-off files of the agent team (`brief.md`, `concept.md`, `sources.md`, `requirements.md`, `design_notes.md`, `version_notes.md`, inspection and close-out reports).
+- `Fable/` (eleven experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation. From experiment 15 on it also holds the hand-off files of the agent team (`agent.md`, `brief.md`, `concept.md`, `sources.md`, `requirements.md`, `design_notes.md`, `version_notes.md`, inspection and close-out reports).
+- Any other run folder (`Opus 5.1/`, `Sonnet 5/`, ...) is a run of the same workflow by another model. Every subfolder except `input/` and `references/` is a run folder, named after the model, with file names carrying its slug (`experiment_NN_opus51_v01.py`); the tools and the viewer discover them from the folder names.
 - `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
 
 ## Experiments
@@ -91,11 +92,11 @@ From experiment 15 on, a run is done by six Claude Code sub-agents defined in [`
 | [CraftBot](.claude/agents/craftbot.md) | orchestrates, owns the brief and the scope, compiles the rationale, reports to the user; the session that receives `/run-experiment` plays this role | the invocation, `input/`, every hand-off file | `brief.md`, the rationale, the callouts, the prompt file |
 | [Designer](.claude/agents/designer.md) | spatial and construction concept, requirements checklist, photo comparison round, structural review | `brief.md`, `input/`, `references/`, `sources.md` | `concept.md`, `requirements.md`, `design_notes.md` |
 | [Researcher](.claude/agents/researcher.md) | searches the manuals for what the concept needs, crops figure snippets, asks the Designer before searching online | `concept.md`, `manuals/` | `sources.md`, snippets in `references/` |
-| [Builder](.claude/agents/builder.md) | implements the concept as versioned scripts, runs the render and check loop, triages the pair families, patches | the hand-off files, `tools/API.md`, inspection and close-out reports | the scripts, `views_fable.py`, `version_notes.md` |
+| [Builder](.claude/agents/builder.md) | implements the concept as versioned scripts, runs the render and check loop, triages the pair families, patches | the hand-off files, `tools/API.md`, inspection and close-out reports | the scripts, `views_<slug>.py`, `version_notes.md` |
 | [Inspector](.claude/agents/inspector.md) | looks at one version's renders against the requirements and the reference, reports absence and misplacement; images only | the PNGs, the view legend, `requirements.md` | `inspection_vXX.md` |
 | [Runner](.claude/agents/runner.md) | closes out every version and the run with [`tools/closeout.py`](tools/closeout.py), archives the transcript last | the close-out reports | `closeout_vXX.md`, `closeout_run.md` |
 
-Rules that hold the team together: the spawning tree is flat under CraftBot (the Designer may spawn Researchers and Inspectors, the Builder may spawn Inspectors); every hand-off is a file in the experiment's `Fable/` folder, so any agent can be restarted from disk; when the Builder cannot meet a requirement the Designer rewrites it, and when that changes scope CraftBot decides and records it in `brief.md`, so the Builder never narrows the brief on its own. The workflow itself, phases, files, rules and mechanics, is [`skills/running-craftbot-experiment/SKILL.md`](skills/running-craftbot-experiment/SKILL.md).
+Rules that hold the team together: the spawning tree is flat under CraftBot (the Designer may spawn Researchers and Inspectors, the Builder may spawn Inspectors); CraftBot first detects which model runs it and names the run folder after it (`Fable/`, `Opus 5.1/`, ...), so the team is not tied to one model; every hand-off is a file in that run folder, so any agent can be restarted from disk; when the Builder cannot meet a requirement the Designer rewrites it, and when that changes scope CraftBot decides and records it in `brief.md`, so the Builder never narrows the brief on its own. The workflow itself, phases, files, rules and mechanics, is [`skills/running-craftbot-experiment/SKILL.md`](skills/running-craftbot-experiment/SKILL.md).
 
 To use the team, run `/run-experiment NN [brief]` in Claude Code from the repo root, or `claude --agent craftbot` for a whole session in the orchestrator role. The agents load from `.claude/agents/` (Claude Code's project agent folder); they read the repo skills by path, so nothing needs copying into `.claude/skills/`.
 
@@ -156,7 +157,7 @@ Features:
 - Eight layer toggles (frame, exterior and interior cladding, interior boards, roof, floors, foundations, fixtures) with an always-visible material takeoff (length, volume, weight).
 - Section planes on three axes, and a Blender-style navigation cube with a 4-view mode in which the three fixed views share one wheel zoom.
 - Hover and click element inspection: a name and layer tag at the cursor, picking that works through section cuts, and the element's true oriented length, width and thickness drawn in the active style.
-- For Fable runs, the design rationale document in a panel under the view cube, with callouts on the model (tags with leader lines, authored per run in `experiment_NN_fable_callouts.json`) that link groups of elements to passages of the document. Click a tag to jump to the passage; hover a heading to see its callouts.
+- For runs that ship one (the Fable runs and the agent-team runs), the design rationale document in a panel under the view cube, with callouts on the model (tags with leader lines, authored per run in `experiment_NN_<slug>_callouts.json`) that link groups of elements to passages of the document. Click a tag to jump to the passage; hover a heading to see its callouts.
 - On phones the GUI starts collapsed with one section open at a time.
 
 Run locally:
@@ -179,7 +180,7 @@ python tools/closeout.py version 14 v09         # all of the above for one versi
 python tools/closeout.py run 14 --session-id ID # run-level checks, then the transcript copy
 ```
 
-The index step also copies each `experiments/<exp>/Fable/experiment_NN_fable_design_rationale.md` to `viewer/models/<exp>/fable_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
+The index step also copies each run's `experiments/<exp>/<Agent>/experiment_NN_<slug>_design_rationale.md` to `viewer/models/<exp>/<slug>_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
 
 ### Recording a video of the viewer
 

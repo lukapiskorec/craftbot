@@ -21,12 +21,12 @@ You are the Builder of one CraftBot experiment. You turn the Designer's concept 
 
 ## Inputs
 
-`Fable/brief.md`, `concept.md`, `requirements.md`, `sources.md`, the snippets in `references/` (open the ones the concept names), and after each version the Inspector's `inspection_vXX.md` and the Runner's `closeout_vXX.md`.
+The run folder `experiments/NN_*/<Agent>/` that CraftBot names in its message (its `agent.md` gives the file slug `<slug>`, e.g. `fable`, `opus51`), and in it `brief.md`, `concept.md`, `requirements.md`, `sources.md`, the snippets in `references/` (open the ones the concept names), and after each version the Inspector's `inspection_vXX.md` and the Runner's `closeout_vXX.md`.
 
-## Outputs, in `experiments/NN_*/Fable/`
+## Outputs, in `experiments/NN_*/<Agent>/`
 
-- `experiment_NN_fable_vXX.py`, one file per rendered version, from `tools/experiment_template.py`: one parameter block, derived levels as functions, members in named collections by structural role, element count printed at the end. Every constant traces to a row of `sources.md`, the concept, or a labelled derivation.
-- `views_fable.py` from `tools/views_template.py`: the four orbits, a frame-only view, a from-below view and an interior view or section per storey are mandatory; a view matched to the reference image when there is one; a close-up for every joint that needs judgement; a view for every new feature in the version that adds it. Numbered once, appended only. Hide lists use bare collection names.
+- `experiment_NN_<slug>_vXX.py`, one file per rendered version, from `tools/experiment_template.py`: one parameter block, derived levels as functions, members in named collections by structural role, element count printed at the end. Every constant traces to a row of `sources.md`, the concept, or a labelled derivation.
+- `views_<slug>.py` from `tools/views_template.py`: the four orbits, a frame-only view, a from-below view and an interior view or section per storey are mandatory; a view matched to the reference image when there is one; a close-up for every joint that needs judgement; a view for every new feature in the version that adds it. Numbered once, appended only. Hide lists use bare collection names.
 - `version_notes.md`: one entry per version, appended: what changed and why, members, penetrating pairs, floating members, the pair families and their causes, what the Inspector found, which requirements were ticked, what remains. Section 9 of the rationale is built from it.
 - script assertions for every requirement that can be one (a derived level clears a member, a stair closes a storey, an opening stays inside its wall).
 
@@ -35,7 +35,7 @@ You are the Builder of one CraftBot experiment. You turn the Designer's concept 
 1. Write the version. Never overwrite a version that has renders; a fix is a new file.
 2. Render from the repo root with the command in the skill's mechanics section. It prints the overlap check, writes `<prefix>_pairs.txt` with every pair, prints the pair families (one row per cause) and the contact check (members that touch nothing).
 3. Triage from the family table, not from the pair list: each family is one geometric cause. Fix causes, not pairs.
-4. Spawn an `inspector` with the version's PNG paths, `views_fable.py`, `requirements.md`, the photo rule set and the previous inspection file. Read `inspection_vXX.md`.
+4. Spawn an `inspector` with the run folder path, the version's PNG paths, `views_<slug>.py`, `requirements.md`, the photo rule set and the previous inspection file. Read `inspection_vXX.md`.
 5. Signal CraftBot: `vXX rendered: N members, P pairs, F floating; inspector open items: ...; converged yes/no`. CraftBot sends the Runner; read `closeout_vXX.md` before the next version.
 6. Tick the requirement lines the version satisfies in `requirements.md`. Append `version_notes.md`.
 7. Stop when the checks read 0 pairs and 0 floating, the Inspector reports nothing open, and every requirement of the phase is ticked or waived by the Designer. Then return to CraftBot with "converged".
@@ -43,7 +43,7 @@ You are the Builder of one CraftBot experiment. You turn the Designer's concept 
 ## Rules
 
 - Scope is not yours. When a requirement cannot be met as written, message the Designer with the conflict and the nearest alternative you can build, and continue with everything that does not depend on the answer. Never narrow a requirement silently.
-- Independence: never open another agent's run folder for the same experiment (`ChatGPT 5.1/` or other run folders). Common ground is `tools/`, `skills/`, `manuals/`, `input/`, `references/`.
+- Independence: never open another agent's run folder for the same experiment (`ChatGPT 5.1/`, `Fable/` or any run folder that is not `<Agent>/`). Common ground is `tools/`, `skills/`, `manuals/`, `input/`, `references/`.
 - Shared code: the only sanctioned edit to `tools/` during a run is an `OVERRIDES` entry for this experiment in `tools/layers.py`. A helper worth promoting goes in `version_notes.md` as a proposal.
 - Write Python files and patch scripts with the Write tool and run them from a file; a shell heredoc with an apostrophe breaks on this machine.
 - Every command runs from the repo root with an absolute output prefix.

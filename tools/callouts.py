@@ -1,6 +1,8 @@
 # Design-rationale callouts: validation of the authored files.
 #
-# A Fable run may ship experiments/<exp>/Fable/experiment_NN_fable_callouts.json:
+# A run may ship experiments/<exp>/<Agent>/experiment_NN_<slug>_callouts.json
+# (<Agent> is the run folder, e.g. Fable or "Opus 5.1"; <slug> its letters and
+# digits in lower case, see tools/export_all_models.py):
 #   {"callouts": [{"id": "heel",                 # unique, [a-z0-9-]
 #                  "label": "Truss heel over the full 112 binder",
 #                  "section": "5.1",             # numbered heading of the rationale
@@ -25,6 +27,9 @@ import json
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from export_all_models import agent_slug, run_folders  # noqa: E402
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(REPO_ROOT, "viewer", "models")
@@ -149,30 +154,38 @@ def check(data, md, models):
     return errors, report
 
 
-def experiment_files(exp_id):
-    """(callouts path, rationale path, {version: model path}) or None."""
-    fable = os.path.join(REPO_ROOT, "experiments", exp_id, "Fable")
-    found = glob.glob(os.path.join(fable, "experiment_*_callouts.json"))
+def run_files(exp_id, agent):
+    """(callouts path, rationale path, {version: model path}) of one run
+    folder, or None when the run has no callouts file."""
+    run_dir = os.path.join(REPO_ROOT, "experiments", exp_id, agent)
+    found = glob.glob(os.path.join(run_dir, "experiment_*_callouts.json"))
     if not found:
         return None
-    docs = glob.glob(os.path.join(fable, "experiment_*_design_rationale.md"))
+    docs = glob.glob(os.path.join(run_dir, "experiment_*_design_rationale.md"))
     models = {}
-    for p in glob.glob(os.path.join(MODELS_DIR, exp_id, "fable_v*.json")):
+    for p in glob.glob(os.path.join(MODELS_DIR, exp_id, f"{agent_slug(agent)}_v*.json")):
         models[re.search(r"(v\d+)\.json$", p).group(1)] = p
     return sorted(found)[0], (sorted(docs)[0] if docs else None), models
 
 
-def check_all(only=""):
-    ok = True
+def matching_runs(only=""):
+    """(exp_dir, exp_id, agent) for every run folder of every experiment whose id contains `only`."""
     for exp_dir in sorted(glob.glob(os.path.join(REPO_ROOT, "experiments", "*"))):
         exp_id = os.path.basename(exp_dir)
-        if only and only not in exp_id:
+        if not os.path.isdir(exp_dir) or (only and only not in exp_id):
             continue
-        files = experiment_files(exp_id)
+        for agent in run_folders(exp_dir):
+            yield exp_dir, exp_id, agent
+
+
+def check_all(only=""):
+    ok = True
+    for _, exp_id, agent in matching_runs(only):
+        files = run_files(exp_id, agent)
         if not files:
             continue
         callouts_path, doc_path, model_paths = files
-        print(exp_id)
+        print(f"{exp_id} {agent}")
         if not doc_path:
             print("  ERROR: no design rationale next to the callouts")
             ok = False
@@ -196,12 +209,9 @@ def check_all(only=""):
 
 def print_names(only):
     """Element name patterns (digits -> #) per collection of the latest
-    Fable version of each matching experiment, with counts."""
-    for exp_dir in sorted(glob.glob(os.path.join(REPO_ROOT, "experiments", "*"))):
-        exp_id = os.path.basename(exp_dir)
-        if only and only not in exp_id:
-            continue
-        versions = sorted(glob.glob(os.path.join(MODELS_DIR, exp_id, "fable_v*.json")))
+    exported version of each run of each matching experiment, with counts."""
+    for _, exp_id, agent in matching_runs(only):
+        versions = sorted(glob.glob(os.path.join(MODELS_DIR, exp_id, f"{agent_slug(agent)}_v*.json")))
         if not versions:
             continue
         with open(versions[-1], encoding="utf-8") as fh:
@@ -212,7 +222,7 @@ def print_names(only):
             groups[colls[row[1]]][re.sub(r"\d+", "#", row[0])] += 1
         for mesh in model["meshes"]:
             groups[colls[mesh["collection"]]][re.sub(r"\d+", "#", mesh["name"])] += 1
-        print(f"{exp_id} ({os.path.basename(versions[-1])})")
+        print(f"{exp_id} {agent} ({os.path.basename(versions[-1])})")
         for coll in sorted(groups):
             names = ", ".join(f"{k} x{v}" for k, v in sorted(groups[coll].items()))
             print(f"  {coll or '(no collection)'}: {names}")

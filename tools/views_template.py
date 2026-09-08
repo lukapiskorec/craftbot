@@ -1,5 +1,6 @@
 # Views file for tools/render_views.py (pass with --views). Copy it next to
-# the experiment script as Fable/views_fable.py and edit.
+# the experiment script as <Agent>/views_<slug>.py (Fable/views_fable.py,
+# "Opus 5.1"/views_opus51.py) and edit.
 #
 # This file is exec'd by the harness with these names in scope:
 #   M       the experiment's namespace (dict): M["RIDGE_Z"], M["z_floor"](3), ...

@@ -1,9 +1,11 @@
 # ------------------------------------------------------------------
 # CRAFT BOT - EXPERIMENT SCRIPT TEMPLATE
 #
-# Copy this file to experiments/<NN>_.../Fable/experiment_NN_fable_v01.py
-# and replace the BUILD section. It shows the layout every Fable run
-# converged on: one parameter block, derived levels as functions, the
+# Copy this file to experiments/<NN>_.../<Agent>/experiment_NN_<slug>_v01.py
+# (<Agent> is the run folder named after the model, <slug> its lower-case
+# letters and digits: Fable/experiment_NN_fable_v01.py, "Opus 5.1"/
+# experiment_NN_opus51_v01.py) and replace the BUILD section. It shows the
+# layout the Fable runs converged on: one parameter block, derived levels as functions, the
 # shared kits from tools/, members in named collections, a print of the
 # element count at the end.
 #

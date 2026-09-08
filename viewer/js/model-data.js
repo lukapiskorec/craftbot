@@ -9,7 +9,7 @@
 export const LAYERS = ["frame", "cladding ext", "cladding int", "interior", "roof",
   "floors", "foundations", "fixtures", "other"];
 // Desaturated warm greys/tans matching the Blender Workbench OBJECT colours
-// used by the headless renders (see experiments/*/Fable/render_fable.py).
+// used by the headless renders (tools/render_views.py, earlier experiments/*/Fable/render_fable.py).
 export const LAYER_COLORS = [0xb08d63, 0x8c8c85, 0x9c9a8e, 0xb9b3a4, 0xc2a173,
   0xd0b98f, 0xa3a39c, 0x7d8a8f, 0xb4b4ac];
 export const TIMBER_DENSITY = 500; // kg/m3

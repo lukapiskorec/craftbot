@@ -1,6 +1,6 @@
 // Design-rationale callouts: tags over the model that point at passages of
-// the DESIGN RATIONALE document. Authored per Fable run in
-// experiments/<exp>/Fable/experiment_NN_fable_callouts.json (validated by
+// the DESIGN RATIONALE document. Authored per run in
+// experiments/<exp>/<Agent>/experiment_NN_<slug>_callouts.json (validated by
 // tools/callouts.py), resolved here against whatever iteration is loaded -
 // a callout whose elements do not exist in this iteration is not shown.
 //

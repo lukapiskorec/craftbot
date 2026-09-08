@@ -4,18 +4,23 @@ The Runner agent calls this instead of the six-step sequence by hand and
 reads the markdown it writes. Every step reports pass or fail; the script
 never stops at the first failure, so one report shows everything.
 
-    python tools/closeout.py version 14 v09 [--blender PATH] [--no-screenshot]
+    python tools/closeout.py version 14 v09 [--agent NAME] [--blender PATH] [--no-screenshot]
         export the version to the viewer, bake and audit layers, rebuild
         index.json, check the view set, screenshot the viewer
-        -> experiments/<exp>/Fable/closeout_v09.md
+        -> experiments/<exp>/<Agent>/closeout_v09.md
 
-    python tools/closeout.py run 14 [--session-id ID]
-        rationale sections present, callouts check, prompt file present,
-        API card current, index rebuilt, then (last) the transcript copy
-        -> experiments/<exp>/Fable/closeout_run.md
+    python tools/closeout.py run 14 [--agent NAME] [--session-id ID]
+        rationale sections present, hand-off files, callouts check, prompt
+        file present, API card current, index rebuilt, then (last) the
+        transcript copy
+        -> experiments/<exp>/<Agent>/closeout_run.md
 
 The experiment id is the two-digit prefix or the folder name under
-experiments/. Blender resolves like the exporter (--blender, then
+experiments/. <Agent> is the run folder, named after the model that ran
+the experiment ("Fable", "Opus 5.1", "ChatGPT 5.1"); --agent names it and
+is needed only when the experiment has more than one run folder. File
+names inside it use the slug (lower-case letters and digits: fable,
+opus51). Blender resolves like the exporter (--blender, then
 CRAFTBOT_BLENDER, then the known installs); Chrome from CRAFTBOT_CHROME or
 the default install path.
 
@@ -35,7 +40,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS = os.path.join(REPO, "tools")
 sys.path.insert(0, TOOLS)
-from export_all_models import find_blender  # noqa: E402
+from export_all_models import find_blender, agent_slug, resolve_run_folder  # noqa: E402
 
 CHROME_DEFAULT = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 SESSIONS_DIR = os.path.join(os.path.expanduser("~"), ".claude", "projects")
@@ -83,7 +88,7 @@ def views_ok(views_path):
     """The view set needs a frame-only view, a from-below view and an interior
     view (a section cut or a view that hides the envelope)."""
     if not os.path.isfile(views_path):
-        return False, "views_fable.py missing"
+        return False, os.path.basename(views_path) + " missing"
     t = open(views_path, encoding="utf-8").read()
     problems = []
     if not re.search(r"elev\s*=\s*-\d", t):
@@ -121,12 +126,14 @@ def closeout_version(args):
     exp_dir = experiment_dir(args.exp)
     exp_id = os.path.basename(exp_dir)
     nn = exp_id[:2]
-    fable = os.path.join(exp_dir, "Fable")
-    rep = Report(f"Close-out of {exp_id} {args.version}")
-    script = os.path.join(fable, f"experiment_{nn}_fable_{args.version}.py")
+    run_dir = resolve_run_folder(exp_dir, args.agent)
+    agent = os.path.basename(run_dir)
+    slug = agent_slug(agent)
+    rep = Report(f"Close-out of {exp_id} {agent} {args.version}")
+    script = os.path.join(run_dir, f"experiment_{nn}_{slug}_{args.version}.py")
     rep.add("script exists", os.path.isfile(script), os.path.relpath(script, REPO))
     blender = find_blender(args.blender)
-    only = f"{exp_id}/Fable/experiment_{nn}_fable_{args.version}"
+    only = f"{exp_id}/{agent}/experiment_{nn}_{slug}_{args.version}"
     code, out = run([sys.executable, os.path.join(TOOLS, "export_all_models.py"), "--blender", blender, "--only", only])
     rep.add("export to viewer", code == 0 and "failed this run: 0" in out, out)
     code, out = run([sys.executable, os.path.join(TOOLS, "layers.py"), "--bake", "--only", exp_id])
@@ -138,24 +145,26 @@ def closeout_version(args):
             f"{n_other} elements in 'other'" + ("; add an OVERRIDES entry in tools/layers.py" if n_other else ""))
     code, out = run([sys.executable, os.path.join(TOOLS, "export_all_models.py"), "--index-only"])
     rep.add("index.json rebuilt", code == 0, out)
-    ok, detail = views_ok(os.path.join(fable, "views_fable.py"))
+    ok, detail = views_ok(os.path.join(run_dir, f"views_{slug}.py"))
     rep.add("view set complete", ok, detail)
-    renders = glob.glob(os.path.join(fable, f"experiment_{nn}_fable_{args.version}_blender_view_*.png"))
+    renders = glob.glob(os.path.join(run_dir, f"experiment_{nn}_{slug}_{args.version}_blender_view_*.png"))
     rep.add("renders present", len(renders) > 0, f"{len(renders)} view PNGs")
     if not args.no_screenshot:
-        png = os.path.join(fable, f"closeout_{args.version}_viewer.png")
-        ok, detail = screenshot(f"models/{exp_id}/fable_{args.version}.json", png)
+        png = os.path.join(run_dir, f"closeout_{args.version}_viewer.png")
+        ok, detail = screenshot(f"models/{exp_id}/{slug}_{args.version}.json", png)
         rep.add("viewer loads the model", ok, detail)
-    return rep.write(os.path.join(fable, f"closeout_{args.version}.md"))
+    return rep.write(os.path.join(run_dir, f"closeout_{args.version}.md"))
 
 
 def closeout_run(args):
     exp_dir = experiment_dir(args.exp)
     exp_id = os.path.basename(exp_dir)
     nn = exp_id[:2]
-    fable = os.path.join(exp_dir, "Fable")
-    rep = Report(f"Close-out of the {exp_id} run")
-    rationale = os.path.join(fable, f"experiment_{nn}_fable_design_rationale.md")
+    run_dir = resolve_run_folder(exp_dir, args.agent)
+    agent = os.path.basename(run_dir)
+    slug = agent_slug(agent)
+    rep = Report(f"Close-out of the {exp_id} {agent} run")
+    rationale = os.path.join(run_dir, f"experiment_{nn}_{slug}_design_rationale.md")
     if os.path.isfile(rationale):
         text = open(rationale, encoding="utf-8").read()
         heads = re.findall(r"^##\s+(\d+[a-z]?)\.", text, re.M)
@@ -163,10 +172,10 @@ def closeout_run(args):
         rep.add("rationale sections", not missing, "missing: " + ", ".join(missing) if missing else "sections 0-10 present")
     else:
         rep.add("rationale sections", False, "rationale missing")
-    for name in ("brief.md", "concept.md", "requirements.md", "sources.md", "design_notes.md", "version_notes.md"):
-        p = os.path.join(fable, name)
+    for name in ("agent.md", "brief.md", "concept.md", "requirements.md", "sources.md", "design_notes.md", "version_notes.md"):
+        p = os.path.join(run_dir, name)
         rep.add(f"hand-off file {name}", os.path.isfile(p), "present" if os.path.isfile(p) else "missing (single-agent runs before experiment 15 have none)")
-    prompt = os.path.join(exp_dir, "input", f"experiment_{nn}_prompts_fable.txt")
+    prompt = os.path.join(exp_dir, "input", f"experiment_{nn}_prompts_{slug}.txt")
     rep.add("prompt file", os.path.isfile(prompt), os.path.relpath(prompt, REPO))
     code, out = run([sys.executable, os.path.join(TOOLS, "callouts.py"), "--check", "--only", exp_id])
     rep.add("callouts check", code == 0, out)
@@ -177,14 +186,14 @@ def closeout_run(args):
     if args.session_id:
         hits = glob.glob(os.path.join(SESSIONS_DIR, "*", args.session_id + ".jsonl"))
         if hits:
-            dst = os.path.join(fable, f"experiment_{nn}_fable_conversation.jsonl")
+            dst = os.path.join(run_dir, f"experiment_{nn}_{slug}_conversation.jsonl")
             shutil.copy(hits[0], dst)
             rep.add("transcript archived (last step)", True, f"{os.path.getsize(dst) // 1024} KB from {hits[0]}")
         else:
             rep.add("transcript archived (last step)", False, f"no {args.session_id}.jsonl under {SESSIONS_DIR}")
     else:
         rep.add("transcript archived (last step)", False, "no --session-id given; archive by hand as the last action")
-    return rep.write(os.path.join(fable, "closeout_run.md"))
+    return rep.write(os.path.join(run_dir, "closeout_run.md"))
 
 
 def main():
@@ -193,10 +202,12 @@ def main():
     v = sub.add_parser("version")
     v.add_argument("exp")
     v.add_argument("version")
+    v.add_argument("--agent", default=None, help="run folder name, e.g. \"Opus 5.1\"; needed when the experiment has several")
     v.add_argument("--blender", default=None)
     v.add_argument("--no-screenshot", action="store_true")
     r = sub.add_parser("run")
     r.add_argument("exp")
+    r.add_argument("--agent", default=None, help="run folder name, e.g. \"Opus 5.1\"; needed when the experiment has several")
     r.add_argument("--session-id", default=None)
     args = ap.parse_args()
     ok = closeout_version(args) if args.cmd == "version" else closeout_run(args)

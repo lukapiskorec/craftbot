@@ -226,9 +226,12 @@ outputs/
 CLAUDE.md
 
 # Experiment run renders - keep the Python generators, not the viewport PNGs.
-# Images under input/ and references/ are inputs, not outputs, and stay tracked.
-experiments/*/ChatGPT 5.1/**/*.png
-experiments/*/Fable/**/*.png
+# Every subfolder of an experiment except input/ and references/ is a run
+# folder (ChatGPT 5.1, Fable, Opus 5.1, ...). Images under input/ and
+# references/ are inputs, not outputs, and stay tracked.
+experiments/*/*/**/*.png
+!experiments/*/input/**/*.png
+!experiments/*/references/**/*.png
 
 # Claude working documents (specs, plans) - kept local only
 docs/

@@ -1,5 +1,5 @@
-// Design-rationale panel: renders a run's markdown document (Fable runs ship
-// one, see tools/export_all_models.py) in a collapsible, scrollable box.
+// Design-rationale panel: renders a run's markdown document (agent-team runs
+// ship one, see tools/export_all_models.py) in a collapsible, scrollable box.
 // Numbered headings carry data-section so callouts (callouts.js) can scroll
 // to a passage; callout quotes are wrapped in <mark> (callout-data.js).
 // Pure DOM - no three.js imports.

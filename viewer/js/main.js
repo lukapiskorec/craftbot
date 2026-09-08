@@ -383,7 +383,7 @@ function loadPicked() {
   loadedExp = pick.exp;
 }
 
-// Rationale document + its callouts for a run (Fable runs only)
+// Rationale document + its callouts for a run (only runs that ship one)
 let docSeq = 0;
 async function loadRunDocs(run) {
   const seq = ++docSeq;
@@ -594,11 +594,11 @@ fetch("models/index.json", FETCH_OPTS)
         }
       }
     }
-    // No ?model: open a random Fable showcase at its final iteration
+    // No ?model: open a random showcase run that ships a rationale, at its final iteration
     const showcase = idx.experiments.filter((exp) =>
-      SHOWCASE.includes(exp.id.slice(0, 2)) && exp.runs.some((run) => run.agent === "Fable"));
+      SHOWCASE.includes(exp.id.slice(0, 2)) && exp.runs.some((run) => run.rationale));
     const e = found?.e ?? showcase[Math.floor(Math.random() * showcase.length)] ?? idx.experiments[0];
-    const r = found?.r ?? e.runs.find((run) => run.agent === "Fable") ?? last(e.runs);
+    const r = found?.r ?? e.runs.find((run) => run.rationale) ?? last(e.runs);
     const x = found?.x ?? last(r.versions);
     pick.exp = e.id; pick.agent = r.agent; pick.v = x.v;
     refreshPickers();

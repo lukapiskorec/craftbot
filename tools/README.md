@@ -43,7 +43,7 @@ same name (name every piece with all its loop indices).
 | `api_card.py` | Generates `API.md`, the compact card of every kit function and class with signature and first docstring sentence, from the source with `ast`. `--check` fails when the card is stale. Agents read the card, not the modules. |
 | `closeout.py` | One command per close-out: `version NN vXX` (export, layers bake and audit, index, view set, renders, viewer screenshot) and `run NN --session-id ID` (rationale sections, hand-off files, prompt file, callouts, API card, index, transcript copy last). Writes `closeout_*.md` with pass or fail per step. |
 | `experiment_template.py` | Starting point for a new experiment script (parameter block, derived levels, kits, named collections). Renders clean through `render_views.py`. |
-| `views_template.py` | Starting point for an experiment's `views_fable.py` (view keys explained, mandatory views, colours). |
+| `views_template.py` | Starting point for an experiment's `views_<slug>.py` (view keys explained, mandatory views, colours). |
 | `export_model_json.py`, `export_all_models.py`, `model_export_core.py`, `layers.py`, `callouts.py` | Web viewer export pipeline (see the root README). |
 | `capture_knoll.mjs` | Records the viewer's knolling sequence to an mp4 (model, stacked, flat, back to the model) by driving headless Chrome over the DevTools protocol. Node, no dependencies; needs ffmpeg on PATH. `--help` lists the style, view, timing and frame-size options; the root README has the table. |
 
@@ -52,8 +52,8 @@ blender --background --python tools/render_views.py -- <experiment.py> <abs_out_
 blender --background model.blend --python tools/check_overlaps.py -- [tolerance_mm]
 blender --background model.blend --python tools/check_contacts.py -- [tolerance_mm] [ignore_prefix,...]
 python tools/api_card.py [--check]
-python tools/closeout.py version 14 v09
-python tools/closeout.py run 14 --session-id <id>
+python tools/closeout.py version 14 v09 [--agent "Opus 5.1"]
+python tools/closeout.py run 14 --session-id <id> [--agent "Opus 5.1"]
 node tools/capture_knoll.mjs [--model <exp>/<agent>_<v>.json] [--style mono] [--help]
 ```
 
@@ -65,6 +65,14 @@ their `VIEWS` lists show a full view set for each building.
 
 `API.md` is the generated card of the kits; regenerate it after changing a
 docstring or a signature (`closeout.py run` checks that it is current).
+
+Run folders: every subfolder of `experiments/<exp>/` except `input/` and
+`references/` is one run, named after the model that produced it (`Fable`,
+`ChatGPT 5.1`, `Opus 5.1`). File names inside use the slug, the folder name
+in lower case with only letters and digits kept (`fable`, `chatgpt51`,
+`opus51`); `agent_slug` and `run_folders` in `export_all_models.py` are the
+one place this is defined. `closeout.py` needs `--agent` only when an
+experiment has more than one run folder.
 
 ## Tests
 
