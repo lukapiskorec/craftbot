@@ -222,9 +222,6 @@ outputs/
 *.blend
 *.blend1
 
-# Claude
-CLAUDE.md
-
 # Experiment run renders - keep the Python generators, not the viewport PNGs.
 # Every subfolder of an experiment except input/ and references/ is a run
 # folder (ChatGPT 5.1, Fable, Opus 5.1, ...). Images under input/ and
