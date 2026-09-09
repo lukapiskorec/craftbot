@@ -68,23 +68,39 @@ The interpenetration check the skills refer to is [`tools/check_overlaps.py`](to
 From experiment 15 on, a run is done by six Claude Code sub-agents defined in [`.claude/agents/`](.claude/agents/), one file each. The split follows a context audit of the experiment 14 run: of its 455 k tokens of context, 38 percent were render screenshots, 22 percent manuals and 8 percent the tools and the script itself, all read by one agent that then needed each of them only as a few lines of decisions. Each agent file is that agent's system prompt: its role, inputs, outputs, procedure and rules, and the list of skills in `skills/` it reads at startup. The domain knowledge stays in the skills, so there is one copy of every rule.
 
 ```
-                                   USER
-                                     |
-                              +-------------+
-                              |  CraftBot   |   brief, scope, phases, rationale, report
-                              +-------------+
-                     spawns /       |        \ spawns
-                +-----------+  +---------+   +---------+
-                | Designer  |  | Builder |   | Runner  |   standing, background
-                +-----------+  +---------+   +---------+
-                  |       |         |             ^
-      spawns      |       |  spawns |             | "version rendered" / "phase converged"
-                  v       v         v             |
-          +------------+ +-----------+            |
-          | Researcher | | Inspector |<-----------+ (Builder, per version)
-          +------------+ +-----------+
-                              ^
-                              | (Designer, comparison round)
+                                                 +--------+
+                                                 |  USER  |
+                                                 +--------+
+                                                    |  ^
+                                                    |  :.. rationale, final report
+                                                    v  :
+                                            +==================+
+                                            |     CRAFTBOT     |
+                                            +==================+
+       +--------------------------------------+  ^  |  ^  ^  +---------------------------------+
+       |                                         :  |  :  :                                    |
+       |        concept, requirements            :  |  :  :    close-out reports               |
+       |   .......................................  |  :  ..................................   |
+       |   :                                        |  :                                   :   |
+       |   :                                        |  :.. scripts, version notes          :   |
+       v   :                                        v  :                                   :   v
+    +------------+                            +------------+                        +------------+
+    |  DESIGNER  |------------------+         |  BUILDER   |.......................>|   RUNNER   |
+    +------------+                  |         +------------+    version rendered    +------------+
+       |   ^    ^                   |              |  ^  ^                                :
+       |   :    :                   |              |  :  :                                :
+       |   :    : comparison round  |              |  :  ..................................
+       |   :    ................... |              |  :         close-out report
+       |   :                      : |              |  :
+       |   :.. sources,           : |              |  :
+       |   :   figure snippets    : |              |  :.. inspection report
+       |   :                      : +-----------+  |  :
+       v   :                      :             v  v  :
+    +------------+                :           +------------+
+    | RESEARCHER |                ............| INSPECTOR  |
+    +------------+                            +------------+
+
+    ------->  spawns              .......>  reports back, with the hand-off it delivers
 ```
 
 | Agent | Does | Reads | Writes |
