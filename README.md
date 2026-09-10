@@ -144,6 +144,17 @@ Point your agent at both folders in its project instructions, one line each, as 
 blender --background --python tools/run_experiment_headless.py -- <experiment.py> <lib_dir> [out_dir]
 ```
 
+Cycles presentation rendering uses the stored material, light, camera and
+quality defaults. Full controls and the line-compositing workflow are documented
+in [`tools/README.md`](tools/README.md#render-any-model-with-cli-controls).
+
+```bash
+blender --background --factory-startup --python-exit-code 1 --python tools/render_views.py -- \
+  experiments/14_Becher_Studies_Amalgamated_Structure/Fable/experiment_14_fable_v09.py \
+  "outputs/$(date +%Y-%m-%d_%H%M%S)_cycles/cycles" \
+  --style cycles --views tools/views_cycles_layer_series.py --no-check
+```
+
 - `<experiment.py>` is the path to the experiment script to execute.
 - `<lib_dir>` is the folder containing `craftbot_lib.py` (the experiment's `input/` folder).
 - `[out_dir]` is an optional output folder for `view_1..4.png` and `model.blend`; it defaults to `outputs/<experiment_name>/` (gitignored).
