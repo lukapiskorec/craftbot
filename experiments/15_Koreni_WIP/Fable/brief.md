@@ -24,3 +24,5 @@ The user stopped the run after v04 (message in `input/experiment_15_prompts_fabl
 - Not started: v05 (which carries R-27, R-46, R-51, R-53, R-54, the strip-window placement fix and the zone-list printout from `version_notes.md` v04), the rationale, the callouts, the run close-out and the transcript archive.
 
 To continue: read `agent.md`, this file, `concept.md`, `requirements.md`, `design_notes.md`, `version_notes.md` and `closeout_v04.md`; have the Designer finish the comparison round from `inspection_v04_comparison.md`; then the Builder runs v05 onward under the phase-2 loop.
+
+Wrapped up on 2026-09-11 at the same state: the design rationale (`experiment_15_fable_design_rationale.md`, section 3b carries the comparison table and the five unruled proposals, section 10 the open items), the callouts (`experiment_15_fable_callouts.json`, 15 callouts against v04), `closeout_run.md` and the transcript archive were written so the run is complete as a paused run. A continuation updates the rationale and re-runs the close-out.
