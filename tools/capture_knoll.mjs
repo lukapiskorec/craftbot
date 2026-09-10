@@ -31,6 +31,9 @@ const CHROME_DEFAULT = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.e
 // viewer/js/styles.js
 const STYLES = ["plaster", "solid", "random", "mono", "wireframe", "blueprint", "dither"];
 
+// viewer/js/knolling.js
+const ARRANGEMENTS = ["model", "flat", "stacked"];
+
 // Named view directions, as the navigation cube snaps them: a face, an edge or
 // a corner of the cube. `axo` is the viewer's own three-quarter view.
 const DIRECTIONS = {
@@ -43,8 +46,9 @@ const DIRECTIONS = {
   axo: [1, -1, 0.8],
 };
 
-// main.js fixes the length of a knolling transition; the shot list follows it.
-const KNOLL_SECONDS = 3;
+// The length main.js gives a knolling transition. --transition stretches it by
+// wrapping anims.startKnoll, and the camera flights alongside it stretch to match.
+const VIEWER_KNOLL_SECONDS = 3;
 
 // ---- options -------------------------------------------------------------
 // name: [default, help]. A boolean default makes a flag (--loop / --no-loop),
@@ -56,8 +60,13 @@ const OPTIONS = {
   "model-view": ["axo", "direction the model is seen from"],
   "stacked-view": ["top-front", "direction the stacked arrangement is seen from"],
   "flat-view": ["top", "direction the flat arrangement is seen from"],
-  hold: [1.0, "seconds held on each arrangement (the opening beat holds 60 % of it)"],
-  loop: [true, "end back on the model, framed as the first beat; --no-loop stops on flat"],
+  sequence: ["model,stacked,flat", `arrangements to visit, in order; the clip opens on the first`],
+  lock: ["", `hold one arrangement's framing for the whole clip (${ARRANGEMENTS.join(", ")}), `
+    + "so only the geometry moves; default: the camera flies to each in turn"],
+  zoom: [1, "magnify the framing: 1.2 draws it 20 % bigger than the fit"],
+  transition: [VIEWER_KNOLL_SECONDS, "seconds one arrangement takes to become the next"],
+  hold: [1.0, "seconds held on each arrangement (with --loop the opening beat holds 60 % of it)"],
+  loop: [true, "end back on the arrangement the clip opened on, framed as the first beat"],
   fps: [30, "frames per second"],
   width: [1344, "frame width in CSS px"],
   height: [1080, "frame height in CSS px"],
@@ -71,7 +80,7 @@ const OPTIONS = {
 function usage() {
   const rows = Object.entries(OPTIONS).map(([name, [def, help]]) => {
     const flag = typeof def === "boolean" ? `--${name}` : `--${name} <v>`;
-    const shown = def === null || def === false ? "" : ` (${def})`;
+    const shown = def === null || def === false || def === "" ? "" : ` (${def})`;
     return `  ${flag.padEnd(20)} ${help}${shown}`;
   });
   return [
@@ -111,11 +120,22 @@ function parseArgs(argv) {
       throw new Error(`unknown view ${opt[key]}: ${Object.keys(DIRECTIONS).join(", ")}`);
     }
   }
-  for (const key of ["mode", "hold", "fps", "width", "height", "scale", "port"]) {
+  for (const key of ["mode", "zoom", "transition", "hold", "fps", "width", "height", "scale", "port"]) {
     if (!Number.isFinite(opt[key])) throw new Error(`--${key} needs a number`);
   }
   if (opt.fps < 1 || opt.hold < 0 || opt.width < 1 || opt.height < 1 || opt.scale < 1) {
     throw new Error("fps, width, height and scale must be positive, hold non-negative");
+  }
+  if (opt.zoom <= 0 || opt.transition <= 0) throw new Error("zoom and transition must be positive");
+  if (opt.lock && !ARRANGEMENTS.includes(opt.lock)) {
+    throw new Error(`unknown arrangement ${opt.lock}: ${ARRANGEMENTS.join(", ")}`);
+  }
+  opt.sequence = opt.sequence.split(",").map((s) => s.trim()).filter(Boolean);
+  if (!opt.sequence.length) throw new Error("--sequence needs at least one arrangement");
+  for (const name of opt.sequence) {
+    if (!ARRANGEMENTS.includes(name)) {
+      throw new Error(`unknown arrangement ${name}: ${ARRANGEMENTS.join(", ")}`);
+    }
   }
   opt.out ??= path.join(REPO, "outputs", `knolling_${slug(opt.model)}_${stamp()}.mp4`);
   opt.frames ??= path.join(tmpdir(), "craftbot-knoll-frames");
@@ -140,28 +160,35 @@ function stamp() {
 // One beat per row: a hold, or an action evaluated in the page (awaited before
 // the clock starts moving again) followed by `seconds` of stepped time. Each
 // transition is one camera flight, landing framed on the arrangement from its
-// own direction in KNOLL_VIEW.
+// own direction in KNOLL_VIEW - unless --lock, which pins one framing and lets
+// the geometry move through it.
 //
-// The closing beat returns to the model on the opening framing so the clip
-// loops. __frameBounds hands that flight the scene bounds the opening frame was
-// built from: knolling's own model layout bounds are the union of oriented-box
-// AABBs, a hair wider than the real geometry, and would show as a jump.
+// With --loop the closing beat returns to the arrangement the clip opened on,
+// on the opening framing. Coming home to the model, __frameBounds hands that
+// flight the scene bounds the opening frame was built from: knolling's own model
+// layout bounds are the union of oriented-box AABBs, a hair wider than the real
+// geometry, and would show as a jump.
 function storyboard(opt) {
-  const beats = [
-    { label: `model (${opt.modelView})`, seconds: opt.hold * 0.6 },
-    { label: "-> stacked", seconds: KNOLL_SECONDS, action: `window.craftbot.arrange("stacked")` },
-    { label: `stacked (${opt.stackedView})`, seconds: opt.hold },
-    { label: "-> flat", seconds: KNOLL_SECONDS, action: `window.craftbot.arrange("flat")` },
-    { label: `flat (${opt.flatView})`, seconds: opt.hold },
-  ];
-  if (!opt.loop) return beats;
-  return beats.concat(
-    { label: "-> model", seconds: KNOLL_SECONDS, action: `(async () => {
+  const seq = opt.sequence;
+  const view = (name) => (opt.lock ? `locked on ${opt.lock}` : opt[`${name}View`]);
+  const hold = (name, seconds) => ({ label: `${name} (${view(name)})`, seconds });
+  const goTo = (name) => ({
+    label: `-> ${name}`, seconds: opt.transition,
+    action: `window.craftbot.arrange(${JSON.stringify(name)})`,
+  });
+
+  const beats = [hold(seq[0], opt.hold * (opt.loop ? 0.6 : 1))];
+  for (const name of seq.slice(1)) beats.push(goTo(name), hold(name, opt.hold));
+
+  const home = seq[0];
+  if (!opt.loop || seq[seq.length - 1] === home) return beats;
+  const back = home !== "model" ? goTo(home) : {
+    label: "-> model", seconds: opt.transition, action: `(async () => {
         window.__frameBounds = window.craftbot.getSceneApi().bounds;
         await window.craftbot.arrange("model");
         window.__frameBounds = null;
-      })()` },
-    { label: `model (${opt.modelView})`, seconds: opt.hold });
+      })()` };
+  return beats.concat(back, hold(home, opt.hold));
 }
 
 // Frozen clock, installed before any page script runs. `elapsed` is the video's
@@ -179,8 +206,10 @@ const CLOCK_SHIM = `
 `;
 
 // Collapse the rationale column (it owns 24rem of the width), aim each
-// arrangement, and frame the model the way the arrangements will be framed -
-// projected extent, not the looser sphere fit loadModel() lands on.
+// arrangement, and frame the opening one the way every later arrangement will be
+// framed - projected extent, not the looser sphere fit loadModel() lands on. An
+// opening arrangement other than the model is already in place by now: the URL
+// carries ?knoll=<name>&kt=1, the viewer's own path for landing in one settled.
 //
 // frameTo is wrapped rather than main.js changed: every flight then uses the
 // recording's insets instead of frameInsets(). The viewer keeps 14rem down the
@@ -192,6 +221,8 @@ function setupExpr(opt) {
     stacked: DIRECTIONS[opt.stackedView],
     flat: DIRECTIONS[opt.flatView],
   };
+  const start = opt.sequence[0];
+  const timeScale = opt.transition / VIEWER_KNOLL_SECONDS; // flights keep pace with the knoll
   return `(async () => {
     const c = window.craftbot;
     document.querySelector("#doc:not(.closed) > h2")?.click();
@@ -201,14 +232,40 @@ function setupExpr(opt) {
       left: document.getElementById("gui").getBoundingClientRect().width,
       right: 7 * rem, // the view cube column, as main.js measures it
     };
+    // Zoom rides on the bounds: framing() fits their projected extent, so a box
+    // shrunk about its own centre by 1/zoom is drawn that many times bigger.
+    const zoomed = (box) => {
+      const out = box.clone();
+      const mid = out.getCenter(new c.THREE.Vector3());
+      out.min.lerp(mid, 1 - 1 / ${opt.zoom});
+      out.max.lerp(mid, 1 - 1 / ${opt.zoom});
+      return out;
+    };
     const frameTo = c.views.frameTo.bind(c.views);
     c.views.frameTo = (bounds, dir, seconds, opts = {}) =>
-      frameTo(window.__frameBounds ?? bounds, dir, seconds, { ...opts, insets });
+      frameTo(zoomed(window.__frameBounds ?? bounds), dir, seconds * ${timeScale},
+        { ...opts, midBounds: opts.midBounds ? zoomed(opts.midBounds) : null, insets });
+    // A longer transition than main.js hands out, the same way: wrap, don't patch.
+    const startKnoll = c.anims.startKnoll.bind(c.anims);
+    c.anims.startKnoll = (sceneApi, from, to, delays, opts) =>
+      startKnoll(sceneApi, from, to, delays, { ...opts, duration: ${opt.transition} });
     await new Promise((r) => requestAnimationFrame(r));
-    c.views.frameTo(c.getSceneApi().bounds, new c.THREE.Vector3(...${JSON.stringify(dirs.model)}), 0);
-    await new Promise((r) => requestAnimationFrame(r));
+    const start = ${JSON.stringify(start)};
     const banner = document.getElementById("banner");
-    return banner.hidden ? "ok" : banner.textContent;
+    if (!banner.hidden) return banner.textContent;
+    if (c.knolling.toName !== start) return \`opened on \${c.knolling.toName}, not \${start}\`;
+    // The opening frame, and with --lock the only frame: an arrangement other
+    // than the model is framed on its own layout, which exists once it is solved.
+    const framed = ${JSON.stringify(opt.lock || start)};
+    const b = framed === "model" ? null : (c.knolling.layouts ?? {})[framed]?.bounds;
+    if (framed !== "model" && !b) return \`no \${framed} layout to lock to; open the clip on it\`;
+    const bounds = b
+      ? new c.THREE.Box3(new c.THREE.Vector3(...b.min), new c.THREE.Vector3(...b.max))
+      : c.getSceneApi().bounds;
+    c.views.frameTo(bounds, new c.THREE.Vector3(...${JSON.stringify(dirs[opt.lock || start])}), 0);
+    await new Promise((r) => requestAnimationFrame(r));
+    if (${JSON.stringify(!!opt.lock)}) c.views.frameTo = () => {}; // every later flight is dropped
+    return "ok";
   })()`;
 }
 
@@ -300,8 +357,10 @@ async function capture(opt, chrome) {
 
   const server = spawn("python", ["-m", "http.server", "-d", path.join(REPO, "viewer"), String(opt.port)],
     { stdio: "ignore" });
+  const start = opt.sequence[0];
   const url = `http://127.0.0.1:${opt.port}/?model=models/${opt.model}`
-    + `&style=${opt.style}&mode=${opt.mode}&anim=none&debug=1&open=ANIMATION,SECTION`;
+    + `&style=${opt.style}&mode=${opt.mode}&anim=none&debug=1&open=ANIMATION,SECTION`
+    + (start === "model" ? "" : `&knoll=${start}&kt=1`);
 
   const browser = spawn(chrome, [
     "--headless=new", "--hide-scrollbars", "--no-first-run", "--no-default-browser-check",
@@ -333,6 +392,10 @@ async function capture(opt, chrome) {
     await waitFor("the model to load", () =>
       evaluate(cdp, `!!(window.craftbot && window.craftbot.getModel() && window.craftbot.getSceneApi())`));
     await evaluate(cdp, `document.fonts.ready`, true);
+    if (start !== "model") { // ?knoll= solves the layouts before it arranges
+      await waitFor(`the ${start} arrangement`, () =>
+        evaluate(cdp, `window.craftbot.knolling.toName === ${JSON.stringify(start)}`));
+    }
     await sleep(1200); // shader compile + the rationale fetch, on the real clock
 
     const setup = await evaluate(cdp, setupExpr(opt), true);

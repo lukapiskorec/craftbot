@@ -261,7 +261,12 @@ async function arrange(name) {
   arrangeButtons.setActive(name);
   knollRow.hidden = false;
   knollSlider.set(0);
-  anims.startKnoll(sceneApi, from, to, delays, { lift, duration: KNOLL_SECONDS, settleOff: name === "model" });
+  // onEnd: the render loop only tracks the slider while the blend is playing,
+  // and the frame that reaches 1 is the frame that clears the flag - without
+  // this the readout stops on the frame before, at 99 %.
+  anims.startKnoll(sceneApi, from, to, delays, {
+    lift, duration: KNOLL_SECONDS, settleOff: name === "model", onEnd: () => knollSlider.set(1),
+  });
   // One camera move over the whole transition, landing framed exactly on
   // the arrangement from its own view (straight down onto the flat sheet,
   // axo for the stacks and the model); half-way it widens to keep both

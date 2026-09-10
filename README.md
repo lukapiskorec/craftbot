@@ -200,7 +200,7 @@ The index step also copies each run's `experiments/<exp>/<Agent>/experiment_NN_<
 
 ### Recording a video of the viewer
 
-[`tools/capture_knoll.mjs`](tools/capture_knoll.mjs) records the knolling sequence to an mp4: the model, every element rearranged into stacked bundles, then flat on its widest face, then back to the model on the opening framing so the clip loops. It drives the real viewer in headless Chrome over the DevTools protocol, so what you get is the page itself, GUI included.
+[`tools/capture_knoll.mjs`](tools/capture_knoll.mjs) records the knolling sequence to an mp4: the model, every element rearranged into stacked bundles, then flat on its widest face, then back to the model on the opening framing so the clip loops. It drives the real viewer in headless Chrome over the DevTools protocol, so what you get is the page itself, GUI included. `--sequence` names the arrangements to visit and in what order, so a clip can open on the stacks and assemble from there instead. The camera flies to each arrangement in turn; `--lock` pins one framing for the whole clip so only the geometry moves, and the arrangements that do not fit it run off the edges of the frame.
 
 **ffmpeg has to be installed and on PATH**, and Chrome at the usual install path or in `CRAFTBOT_CHROME`. Both are checked before a frame is captured. The script starts and stops the static server itself; nothing else needs to be running.
 
@@ -208,6 +208,8 @@ The index step also copies each run's `experiments/<exp>/<Agent>/experiment_NN_<
 node tools/capture_knoll.mjs                    # every default: exp 08 Fable v06, mono, 1344x1080, 30 fps, 12.6 s
 node tools/capture_knoll.mjs --style blueprint --stacked-view top-front-right
 node tools/capture_knoll.mjs --model 06_Prouve_Cabanon_Blender_Python/fable_v07.json --no-loop
+node tools/capture_knoll.mjs --sequence stacked,model --no-loop --stacked-view axo   # stacks assembling into the house
+node tools/capture_knoll.mjs --sequence stacked,model --no-loop --lock model --zoom 1.15 --transition 6   # camera never moves
 node tools/capture_knoll.mjs --help
 ```
 
@@ -219,8 +221,12 @@ node tools/capture_knoll.mjs --help
 | `--model-view NAME` | `axo` | direction the model beats are framed from |
 | `--stacked-view NAME` | `top-front` | direction the stacked arrangement is framed from |
 | `--flat-view NAME` | `top` | direction the flat sheet is framed from |
-| `--hold S` | `1.0` | seconds held on each arrangement; the opening beat holds 60 % of it, so a loop does not stall |
-| `--no-loop` | off | stop on the flat sheet instead of returning to the model |
+| `--sequence LIST` | `model,stacked,flat` | arrangements to visit, in order; the clip opens on the first one, already settled, and each later one is one transition. `model`, `flat`, `stacked` |
+| `--lock NAME` | off | hold that arrangement's framing for the whole clip, so the camera never moves and the other arrangements pass through the frame, cropped as they are |
+| `--zoom N` | `1` | magnify the framing: `1.15` draws it 15 % bigger than the fit |
+| `--transition S` | `3` | seconds one arrangement takes to become the next; the camera flight alongside it stretches to match |
+| `--hold S` | `1.0` | seconds held on each arrangement; with `--loop` the opening beat holds 60 % of it, so the seam does not stall |
+| `--no-loop` | off | stop on the last arrangement instead of returning to the one the clip opened on |
 | `--fps N` | `30` | frames per second |
 | `--width N`, `--height N` | `1344`, `1080` | frame size in CSS px |
 | `--scale N` | `2` | pixel ratio to render at; frames are downsampled to the frame size, which antialiases the outlines |
@@ -228,7 +234,7 @@ node tools/capture_knoll.mjs --help
 | `--frames DIR`, `--keep-frames` | a temp folder, deleted after stitching | the PNG frames |
 | `--port N` | `8123` | port for the static server |
 
-View names are the navigation cube's own regions: `top`, `bottom`, `front`, `back`, `left`, `right`, the edges and corners between them (`top-front`, `top-front-right`, ...) and `axo`, the viewer's three-quarter view. A transition always runs 3 s, the length `main.js` gives it.
+View names are the navigation cube's own regions: `top`, `bottom`, `front`, `back`, `left`, `right`, the edges and corners between them (`top-front`, `top-front-right`, ...) and `axo`, the viewer's three-quarter view. Under `--lock` only the locked arrangement's view name is read, since it is the only framing the clip uses. A transition runs the 3 s `main.js` gives it unless `--transition` stretches it, which the driver does by wrapping `anims.startKnoll` rather than patching the viewer; `--zoom` works the same way, riding on the bounds handed to `views.frameTo`, because the fit is to their projected extent.
 
 The capture is frame-exact rather than a real-time screen grab: `performance.now()` is frozen when the page loads and stepped by exactly 1/fps per frame, and both clocks the viewer animates on read it. Recording the animation as it plays does not work, since headless Chrome will not paint a timed animation faster than it can screenshot it. The driver reaches the viewer's arrangements and camera through a `?debug=1` hook in `main.js` that puts them on `window.craftbot`; nothing is exposed without that parameter.
 
