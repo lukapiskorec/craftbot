@@ -127,6 +127,21 @@ OVERRIDES = {
     "12": [
         (r"^\|dormer_window", FRAME),
     ],
+    "15": [
+        # Three variations in one scene, collections A_Bridge/A_*, B_Cut/B_*,
+        # C_Steps/C_*: the variation names hit the generic rules ("ridge",
+        # "step"), so the child collection decides. Terrain skin -> foundations
+        # (no ground layer exists); foundation and plinth walls -> foundations.
+        (r"_footings\|", FOUND),
+        (r"_terrain\|", FOUND),
+        (r"\|[abc]_(plinth|fndwall)", FOUND),
+        (r"_slabs\|", FLOORS),
+        (r"_roof\|", ROOF),
+        (r"_glazing\|", FIXT),
+        (r"_stairs\|", FIXT),
+        (r"_cores\|", INTERIOR),
+        (r"_(concrete|steel)\|", FRAME),
+    ],
     "14": [
         (r"headhouse_floor\|", FLOORS),    # head house floor boards
         (r"shed_ceiling\|", FRAME),        # ceiling joists, headers, trimmers, mid beam (not roof)

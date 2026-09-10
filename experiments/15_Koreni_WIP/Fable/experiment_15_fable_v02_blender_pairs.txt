@@ -1,0 +1,10 @@
+1294 members, 9 pairs (> 1 mm)
+   150.0 mm  A_FloorTrimmer_000  x  A_BoxPart_001_00
+    20.0 mm  B_ClosedWall_028_00  x  B_Part_002_02
+    19.0 mm  A_LandingGuard_002  x  A_WellGuard_002
+     4.0 mm  B_EdgeBeam_011  x  B_GlzEndMull_004
+     4.0 mm  B_EdgeBeam_011  x  B_GlzEndHead_000
+     4.0 mm  A_EdgeBeam_010  x  A_GlzEndMull_004
+     4.0 mm  A_EdgeBeam_010  x  A_GlzEndHead_000
+     4.0 mm  C_EdgeBeam_010  x  C_GlzEndMull_004
+     4.0 mm  C_EdgeBeam_010  x  C_GlzEndHead_000

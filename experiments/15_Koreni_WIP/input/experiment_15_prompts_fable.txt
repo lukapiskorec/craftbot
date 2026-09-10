@@ -1,0 +1,4 @@
+2026-09-09 /run-experiment 15 A long, modern, open house on a sloped terrain made out of concrete, steel and glass. It's a brand new design so focus less on matching the references and more on developing a strong concept for the house. Develop also the interior spaces and the construction details. Because it's an early stage design, create three different variations of the house. Model the actual terrain as well so the relation of the house to the slope is visible.
+2026-09-10 Let's archive this experiment. Stop here, give me a short report on what was achieved, documents created etc. Can we continue the experiment at a later stage from the documents that we have available?
+
+Commit everything created in experiment 15 folder with a title and comments.
