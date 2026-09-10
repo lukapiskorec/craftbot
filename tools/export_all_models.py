@@ -13,7 +13,10 @@
 # (<Agent>/experiment_NN_<slug>_design_rationale.md) gets it copied next to the
 # models as viewer/models/<exp>/<slug>_rationale.md and linked from index.json;
 # likewise experiment_NN_<slug>_callouts.json -> <slug>_callouts.json (see
-# tools/callouts.py).
+# tools/callouts.py). A multi-variation run has an orchestrator folder
+# ("Fable", no scripts) and one variation folder per team ("Fable A",
+# "Fable B", slugs fablea, fableb); a variation folder without a rationale
+# uses the orchestrator folder's one.
 #
 # Blender path resolution: --blender arg > CRAFTBOT_BLENDER env > known installs.
 
@@ -149,14 +152,34 @@ def main():
         print(f"\n--- FAILED {rel}\n{safe}")
 
 
+def parent_run_folder(agent):
+    """Orchestrator folder of a variation folder ("Fable A" -> "Fable"), or
+    None for a plain run folder ("Fable", "Opus 5.1": "Opus" is no folder)."""
+    if " " not in agent:
+        return None
+    return agent.rsplit(" ", 1)[0]
+
+
+def find_run_doc(exp_id, agent, pattern):
+    """Path of a run document (rationale md, callouts json) in the run folder,
+    else in the orchestrator folder of a multi-variation run; None if absent."""
+    for folder in (agent, parent_run_folder(agent)):
+        if not folder:
+            continue
+        found = sorted(glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, folder, pattern)))
+        if found:
+            return found[0]
+    return None
+
+
 def sync_run_doc(exp_id, agent, pattern, dst_name):
     """Copy a run document (rationale md, callouts json) from the run folder
-    next to the experiment's models; returns the index-relative path, or None."""
-    found = glob.glob(os.path.join(REPO_ROOT, "experiments", exp_id, agent, pattern))
-    if not found:
+    (or the orchestrator folder of a variation team) next to the experiment's
+    models; returns the index-relative path, or None."""
+    src = find_run_doc(exp_id, agent, pattern)
+    if not src:
         return None
     dst = os.path.join(MODELS_DIR, exp_id, dst_name)
-    src = sorted(found)[0]
     if not os.path.isfile(dst) or open(src, "rb").read() != open(dst, "rb").read():
         shutil.copyfile(src, dst)
     return f"{exp_id}/{dst_name}"

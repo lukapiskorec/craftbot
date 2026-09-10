@@ -54,6 +54,7 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 | [procedural-geometry](skills/procedural-geometry/SKILL.md) | writing Blender Python that generates construction geometry |
 | [non-orthogonal-geometry](skills/non-orthogonal-geometry/SKILL.md) | sloped, tilted, twisted or warped surfaces are involved |
 | [verifying-models](skills/verifying-models/SKILL.md) | setting up or running the render-inspect-revise loop |
+| [structural-logic](skills/structural-logic/SKILL.md) | every building, any material: bearing stacks, load paths, lateral stability, sizing without a manual, the structural review |
 | [timber-framing](skills/timber-framing/SKILL.md) | modelling framed timber structures or reviewing them as structures |
 | [roof-framing-and-sheathing](skills/roof-framing-and-sheathing/SKILL.md) | modelling pitched roofs, sheathing or coverings |
 | [modular-grids-and-panelization](skills/modular-grids-and-panelization/SKILL.md) | prefabrication, panels, sheet materials, CLT, multi-storey systems |

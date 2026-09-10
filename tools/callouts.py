@@ -29,7 +29,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from export_all_models import agent_slug, run_folders  # noqa: E402
+from export_all_models import agent_slug, run_folders, find_run_doc  # noqa: E402
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(REPO_ROOT, "viewer", "models")
@@ -161,11 +161,12 @@ def run_files(exp_id, agent):
     found = glob.glob(os.path.join(run_dir, "experiment_*_callouts.json"))
     if not found:
         return None
-    docs = glob.glob(os.path.join(run_dir, "experiment_*_design_rationale.md"))
+    # a variation team's callouts quote the shared rationale of the orchestrator folder
+    doc = find_run_doc(exp_id, agent, "experiment_*_design_rationale.md")
     models = {}
     for p in glob.glob(os.path.join(MODELS_DIR, exp_id, f"{agent_slug(agent)}_v*.json")):
         models[re.search(r"(v\d+)\.json$", p).group(1)] = p
-    return sorted(found)[0], (sorted(docs)[0] if docs else None), models
+    return sorted(found)[0], doc, models
 
 
 def matching_runs(only=""):

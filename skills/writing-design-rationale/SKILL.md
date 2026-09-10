@@ -14,7 +14,7 @@ The rationale is the mechanism by which a run's knowledge survives. Session tran
 Section table proven across multiple runs (numbering from experiment 14 on;
 experiments 13 and earlier lack section 1 and number the rest one lower):
 
-0. About this document: which agent and model wrote it (name and model id from the run folder's `agent.md`), the harness, the date, the experiment
+0. About this document: which agent and model wrote it (name, model id and the mechanical model of the Inspectors, Researchers and Runner, all from the run folder's `agent.md`), the harness, the date, the experiment
 1. Brief as understood: the task in one paragraph as the run read it, written before any source is opened and kept verbatim from the first message of the run; what is built, what is preserved, what is dropped and why. A reader who sees nothing else should be able to judge the model against it.
 2. How to run / outputs: render command, the named view list, the collection tree, member and overlap counts
 3. Reading the inputs: the source-to-rule-to-number mapping table, then deliberate deviations
@@ -25,8 +25,8 @@ experiments 13 and earlier lack section 1 and number the rest one lower):
 6. Core modelling decisions, each with alternatives considered and rejected
 6b. Independent structural improvements (the review that ignores the reference)
 7. Detailed geometry numbers
-8. Verification: what the checks prove, and a separate "Not verified" list
-9. Iterations table: one row per version, the change, and what the renders or checks showed
+8. Verification: what the checks prove, and a separate "Not verified" list; then the cost totals per agent (context at return and tool calls, from the task notifications CraftBot relayed), so the next run has a baseline
+9. Iterations table: one row per version, the change, and what the renders or checks showed; one table per team in a multi-variation run
 10. Scope and known simplifications
 
 ## What must be recorded

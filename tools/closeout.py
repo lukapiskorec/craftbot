@@ -20,7 +20,11 @@ experiments/. <Agent> is the run folder, named after the model that ran
 the experiment ("Fable", "Opus 5.1", "ChatGPT 5.1"); --agent names it and
 is needed only when the experiment has more than one run folder. File
 names inside it use the slug (lower-case letters and digits: fable,
-opus51). Blender resolves like the exporter (--blender, then
+opus51). In a multi-variation run the versions live in variation folders
+("Fable A", "Fable B": `version 15 v03 --agent "Fable A"`) and the run
+close-out runs on the orchestrator folder (`run 15 --agent "Fable"`), which
+checks the shared files there and the team files in every variation
+folder. Blender resolves like the exporter (--blender, then
 CRAFTBOT_BLENDER, then the known installs); Chrome from CRAFTBOT_CHROME or
 the default install path.
 
@@ -40,7 +44,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS = os.path.join(REPO, "tools")
 sys.path.insert(0, TOOLS)
-from export_all_models import find_blender, agent_slug, resolve_run_folder  # noqa: E402
+from export_all_models import find_blender, agent_slug, resolve_run_folder, run_folders  # noqa: E402
 
 CHROME_DEFAULT = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 SESSIONS_DIR = os.path.join(os.path.expanduser("~"), ".claude", "projects")
@@ -54,6 +58,13 @@ def experiment_dir(exp):
     if not hits:
         sys.exit(f"no experiment folder for {exp}")
     return hits[0]
+
+
+def variation_folders(exp_dir, agent):
+    """Variation folders of a multi-variation run: the run folders named
+    "<agent> <V>" beside the orchestrator folder <agent> ("Fable A", "Fable B"
+    for "Fable"); empty for a plain single-variation run."""
+    return [name for name in run_folders(exp_dir) if name.startswith(agent + " ")]
 
 
 def run(cmd, timeout=1200):
@@ -172,9 +183,23 @@ def closeout_run(args):
         rep.add("rationale sections", not missing, "missing: " + ", ".join(missing) if missing else "sections 0-10 present")
     else:
         rep.add("rationale sections", False, "rationale missing")
-    for name in ("agent.md", "brief.md", "concept.md", "requirements.md", "sources.md", "design_notes.md", "version_notes.md"):
+    variations = variation_folders(exp_dir, agent)
+    if variations:
+        shared = ("agent.md", "brief.md", "concept_shared.md", "sources.md")
+        team = ("agent.md", "concept.md", "requirements.md", "design_notes.md", "version_notes.md")
+        rep.add("multi-variation run", True, "variation folders: " + ", ".join(variations))
+    else:
+        shared = ("agent.md", "brief.md", "concept.md", "requirements.md", "sources.md", "design_notes.md", "version_notes.md")
+        team = ()
+    for name in shared:
         p = os.path.join(run_dir, name)
         rep.add(f"hand-off file {name}", os.path.isfile(p), "present" if os.path.isfile(p) else "missing (single-agent runs before experiment 15 have none)")
+    for var in variations:
+        for name in team:
+            p = os.path.join(exp_dir, var, name)
+            rep.add(f"hand-off file {var}/{name}", os.path.isfile(p), "present" if os.path.isfile(p) else "missing")
+        callouts = glob.glob(os.path.join(exp_dir, var, "experiment_*_callouts.json"))
+        rep.add(f"callouts file {var}", bool(callouts), os.path.relpath(callouts[0], REPO) if callouts else "missing: one callouts file per variation folder")
     prompt = os.path.join(exp_dir, "input", f"experiment_{nn}_prompts_{slug}.txt")
     rep.add("prompt file", os.path.isfile(prompt), os.path.relpath(prompt, REPO))
     code, out = run([sys.executable, os.path.join(TOOLS, "callouts.py"), "--check", "--only", exp_id])

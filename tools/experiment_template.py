@@ -28,6 +28,13 @@ for _d in (os.path.join(_HERE, "..", "..", "..", "tools"), os.path.join(_HERE, "
     if os.path.isfile(os.path.join(_d, "craftbot_lib.py")) and _d not in sys.path:
         sys.path.insert(0, _d)
 
+# Multi-variation runs: a variation folder "<Agent> A" imports the shared
+# module common_<slug>.py from the orchestrator folder "<Agent>" beside it.
+# A plain run folder ("Fable", "Opus 5.1") has no such parent and skips this.
+_PARENT = os.path.normpath(os.path.join(_HERE, "..", os.path.basename(_HERE).rsplit(" ", 1)[0]))
+if " " in os.path.basename(_HERE) and os.path.isdir(_PARENT) and _PARENT not in sys.path:
+    sys.path.insert(0, _PARENT)
+
 import craftbot_lib as craftbot
 import geometry2d as g2
 import planes
