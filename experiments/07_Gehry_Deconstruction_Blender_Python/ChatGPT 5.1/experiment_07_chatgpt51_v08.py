@@ -8,11 +8,22 @@ import importlib
 import math
 
 import craftbot_lib as craftbot
+
+# Keep any scene content that existed before importing the experiment-04
+# parameter module. The module builds its reference house as an import side
+# effect, so remove that geometry before constructing this experiment. Doing
+# this up front avoids Blender reusing deleted object pointers for the new
+# same-named platform members (which previously removed Joist_6..Joist_8).
+PREEXISTING_OBJECT_POINTERS = {obj.as_pointer() for obj in bpy.data.objects}
 import experiment_04_chatgpt51_v14_lib as base
 
 # Ensure latest versions while iterating in Blender
 importlib.reload(craftbot)
 importlib.reload(base)
+
+for obj in list(bpy.data.objects):
+    if obj.as_pointer() not in PREEXISTING_OBJECT_POINTERS:
+        bpy.data.objects.remove(obj, do_unlink=True)
 
 # ---------------------------------------------------------------------------
 # GLOBAL SHORTCUTS / CONSTANTS

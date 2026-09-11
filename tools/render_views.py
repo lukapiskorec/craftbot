@@ -71,6 +71,7 @@ parser.add_argument("--edge-width", type=float, help="Bevel width in model units
 parser.add_argument("--edge-darkness", type=float, help="Edge color multiplier, 0=black and 1=base color; default .22")
 parser.add_argument("--edge-light-response", type=float, help="0=constant unlit edge, 1=fully lit edge; default 0.30")
 parser.add_argument("--fill-strength", type=float, help="Neutral indirect environment fill; default .25, 0 reproduces dark undersides")
+parser.add_argument("--overlap-shadow-epsilon", type=float, help="Ignore only shadow hits closer than this many model units; default .001")
 parser.add_argument("--glass-roughness", type=float, help="Default .015")
 parser.add_argument("--glass-transmission", type=float, help="Default 1")
 parser.add_argument("--glass-ior", type=float, help="Default 1.45")

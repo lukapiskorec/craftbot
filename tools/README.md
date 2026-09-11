@@ -36,7 +36,7 @@ same name (name every piece with all its loop indices).
 | Script | Purpose |
 |---|---|
 | `render_views.py` | Run an experiment headless, render Workbench views (default) or Cycles presentation views (`--style cycles`), save the `.blend`, run the overlap and contact checks. Cycles defaults to a foundation-free render, supports paired states, and records settings in JSON. |
-| `cycles_style.py`, `views_cycles_study.py` | Nishita blue-sky Cycles setup, white plaster and desaturated material palettes; the study view file supplies low orthographic cameras, sun variants and Fable v09 material roles. |
+| `cycles_style.py`, `views_cycles_study.py` | Nishita blue-sky Cycles setup, white plaster and desaturated material palettes. Opaque presentation shaders ignore sub-millimetre and back-facing shadow hits to prevent black patches where closed members touch or intersect (`--overlap-shadow-epsilon`, default `.001`); camera rays and ordinary front-facing shadows are unchanged. The study view file supplies low orthographic cameras, sun variants and Fable v09 material roles. |
 | `views_cycles_layer_series.py`, `presentation_facades.py` | Four matched full/open/frame views. Visibility comes from `layers.py`; facade labels support cardinal and signed-axis names with a geometric fallback. |
 | `compose_presentation_batch.py` | Apply the default Grade 3 Levels adjustment and adaptive 1 px line composite to every source pair, then write a manifest and HTML gallery. |
 | `render_gallery.py` | Build a local HTML comparison gallery from a Cycles `<prefix>_settings.json`, with palette/light filters, a foundation toggle and full-resolution links. No Python dependencies. |
@@ -155,10 +155,11 @@ Pass `--foundation show` to both source renders to retain foundations. For the
 seven above-camera views, use `--views tools/views_cycles_layer_series_above.py`:
 roof-on and roof-off each include full, south/east open and south/west open
 states, followed by a frame view. Roof-off hides the viewer's roof layer while
-keeping structural rafters and trusses. A camera-ray-only uniform background,
-sampled from the approved sky as sRGB `(0.57647, 0.66275, 0.75686)`, prevents
-the Nishita lower hemisphere from rendering black without changing lighting or
-reflections.
+keeping structural rafters and trusses. A uniform background for camera,
+glass-transmission and glossy reflection rays, sampled from the approved sky as sRGB
+`(0.57647, 0.66275, 0.75686)`, prevents the Nishita lower hemisphere from
+rendering black directly, through glazing or in glazing reflections without
+changing diffuse lighting.
 
 `--isolate A,B` renders only the named collections and descendants and excludes
 everything else from camera fitting. This separates compound scripts cleanly;

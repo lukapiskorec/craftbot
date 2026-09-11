@@ -30,7 +30,17 @@ steel = bpy.data.objects.new("Steel", timber.data)
 metal.objects.link(steel)
 foot = bpy.data.objects.new("Foot", timber.data.copy())
 plinths.objects.link(foot)
-settings = dict(material_roles={"Metal": "metal", "Plinths": "concrete"}, foundation_collections=["Foundation"])
+source_glass = bpy.data.materials.new("UnlabelledClearMaterial")
+source_glass.use_nodes = True
+source_glass.node_tree.nodes["Principled BSDF"].inputs["Transmission Weight"].default_value = 1
+screen = bpy.data.objects.new("Screen", timber.data.copy())
+screen.data.materials.append(source_glass)
+frame.objects.link(screen)
+window_pane = bpy.data.objects.new("Window_Pane_01", timber.data.copy())
+frame.objects.link(window_pane)
+settings = dict(material_roles={"Metal": "metal", "Plinths": "concrete"},
+                foundation_collections=["Foundation"],
+                camera_background_srgb=(.57647, .66275, .75686))
 views = [dict(name="A", azim=305, elev=-25, hide=["Frame"]),
          dict(name="B", azim=225, elev=-30, hide=[])]
 paired = cycles_style.paired_views(views, {"A"}, settings)
@@ -42,18 +52,45 @@ assert paired[0]["azim"] == paired[1]["azim"]
 assert foot in foundation.all_objects[:]
 assert views[0]["hide"] == ["Frame"], "Pair expansion mutated the source views"
 original_vertices = [tuple(v.co) for v in timber.data.vertices]
+assert cycles_style.material_role(screen, {}) == "glass"
+assert cycles_style.material_role(window_pane, {}) == "glass"
 cycles_style.setup(scene, settings)
-cycles_style.apply_view(scene, [timber, steel, foot], dict(palette="muted"), settings)
+cycles_style.apply_view(scene, [timber, steel, foot, screen, window_pane], dict(palette="muted"), settings)
 assert timber.data == steel.data
 assert timber.material_slots[0].material.name == "Presentation_muted_timber"
 assert steel.material_slots[0].material.name == "Presentation_muted_metal"
 assert foot.material_slots[0].material.name == "Presentation_muted_concrete"
+assert screen.material_slots[0].material.name == "Presentation_muted_glass"
+assert window_pane.material_slots[0].material.name == "Presentation_muted_glass"
+timber_nodes = timber.material_slots[0].material.node_tree.nodes
+assert timber_nodes["ContactShadowRayLength"].operation == "LESS_THAN"
+assert abs(timber_nodes["ContactShadowRayLength"].inputs[1].default_value - .001) < 1e-9
+assert timber_nodes["ContactShadowOverlap"].operation == "MAXIMUM"
+assert any(link.from_socket.name == "Backfacing" and link.to_node == timber_nodes["ContactShadowOverlap"]
+           for link in timber.material_slots[0].material.node_tree.links)
+assert timber_nodes["ContactShadowSelector"].operation == "MULTIPLY"
+assert timber_nodes.get("ContactShadowMix") is not None
+assert screen.material_slots[0].material.node_tree.nodes.get("ContactShadowMix") is None
 assert original_vertices == [tuple(v.co) for v in timber.data.vertices]
 cycles_style.apply_view(scene, [timber, steel, foot], dict(palette="white"), settings)
 assert timber.material_slots[0].material.diffuse_color[:] == steel.material_slots[0].material.diffuse_color[:]
 assert steel.material_slots[0].material.node_tree.nodes["Principled BSDF"].inputs["Metallic"].default_value == 0
 assert scene.render.engine == "CYCLES" and scene.cycles.use_denoising
 assert scene.world.node_tree.nodes["IndirectFill"].inputs["Strength"].default_value == .25
+camera_or_transmission = scene.world.node_tree.nodes["CameraOrTransmissionRay"]
+assert camera_or_transmission.operation == "MAXIMUM"
+first_inputs = {link.from_socket.name for link in scene.world.node_tree.links
+                if link.to_node == camera_or_transmission}
+assert first_inputs == {"Is Camera Ray", "Is Transmission Ray"}
+ray_selector = scene.world.node_tree.nodes["CameraTransmissionOrGlossyRay"]
+assert ray_selector.operation == "MAXIMUM"
+assert any(link.from_socket.name == "Is Glossy Ray" and link.to_node == ray_selector
+           for link in scene.world.node_tree.links)
+assert any(link.from_node == camera_or_transmission and link.to_node == ray_selector
+           for link in scene.world.node_tree.links)
+camera_mix = scene.world.node_tree.nodes["CameraBackgroundMix"]
+assert any(link.from_node == ray_selector and link.to_node == camera_mix
+           for link in scene.world.node_tree.links)
 for palette in cycles_style.PALETTES:
     mat = cycles_style.material(palette, "glass", {})
     shader = mat.node_tree.nodes["Principled BSDF"]
@@ -73,4 +110,4 @@ assert not timber.modifiers["PresentationEdges"].show_render
 assert len(cycles_style.paired_views(views, {"A"}, dict(settings, edges="both"))) == 4
 unlit = cycles_style.edge_material("washed", "timber", dict(edge_darkness=.22, edge_light_response=0))
 assert unlit.node_tree.nodes["EdgeLightResponse"].inputs[0].default_value == 0
-print("PASS: foundation pairs, shared meshes, clear glass in every palette, fill, render-only edge toggles, unchanged vertices")
+print("PASS: foundation pairs, shared meshes, clear glass/background, contact-shadow bypass, fill, render-only edge toggles, unchanged vertices")
