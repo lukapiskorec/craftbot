@@ -74,7 +74,7 @@ PLAN:
 
 Before starting or continuing an experiment, check `skills/` and load the relevant `SKILL.md` files - the frontmatter description of each says when it applies.
 
-To run an experiment end to end (`/run-experiment NN [brief]`, or asked in plain words), follow `skills/running-craftbot-experiment/SKILL.md`.
+To run an experiment end to end, use the host-specific entry point: `/run-experiment NN [brief]` in Claude Code or `$run-experiment NN [brief]` in Codex. Both entry points follow `skills/running-craftbot-experiment/SKILL.md`. A request in plain words to run, start, continue or redo an experiment uses the same host-specific entry point.
 
 ## Tools
 

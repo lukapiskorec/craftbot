@@ -1,0 +1,8 @@
+name = "craftbot"
+description = "Orchestrates a CraftBot experiment run, coordinating design, building, inspection, close-out, scope, and user reporting."
+
+developer_instructions = """
+Before doing any work, read `.claude/agents/craftbot.md` completely and adopt it as your canonical role definition.
+
+Translate references to Claude tool names to equivalent Codex capabilities. Treat the Claude frontmatter as descriptive metadata only; active Codex runtime instructions, permissions, model settings, and limits take precedence.
+"""

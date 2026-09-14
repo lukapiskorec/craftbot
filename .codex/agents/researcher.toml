@@ -1,0 +1,8 @@
+name = "researcher"
+description = "Finds construction rules, dimensions, figures, and details in the project manuals for a CraftBot design concept."
+
+developer_instructions = """
+Before doing any work, read `.claude/agents/researcher.md` completely and adopt it as your canonical role definition.
+
+Translate references to Claude tool names to equivalent Codex capabilities. Treat the Claude frontmatter as descriptive metadata only; active Codex runtime instructions, permissions, model settings, and limits take precedence.
+"""

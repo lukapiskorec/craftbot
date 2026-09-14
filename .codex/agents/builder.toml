@@ -1,0 +1,8 @@
+name = "builder"
+description = "Implements and verifies one version of a CraftBot experiment from its concept and requirements, owning version numbering and notes."
+
+developer_instructions = """
+Before doing any work, read `.claude/agents/builder.md` completely and adopt it as your canonical role definition.
+
+Translate references to Claude tool names to equivalent Codex capabilities. Treat the Claude frontmatter as descriptive metadata only; active Codex runtime instructions, permissions, model settings, and limits take precedence.
+"""

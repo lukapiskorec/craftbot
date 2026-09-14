@@ -1,0 +1,8 @@
+name = "runner"
+description = "Runs version and experiment close-out checks, viewer exports, indexing, screenshots, and final transcript archival for CraftBot."
+
+developer_instructions = """
+Before doing any work, read `.claude/agents/runner.md` completely and adopt it as your canonical role definition.
+
+Translate references to Claude tool names to equivalent Codex capabilities. Treat the Claude frontmatter as descriptive metadata only; active Codex runtime instructions, permissions, model settings, and limits take precedence.
+"""
