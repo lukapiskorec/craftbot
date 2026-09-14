@@ -1,8 +1,8 @@
 # CraftBot
 
-![CraftBot Experiment 08 Blender model and physical model visualization](visuals/craftbot_fig_02.png)
+![CraftBot outputs rendered in Blender](visuals/craftbot_art-ai-fact_website_banner_2026.jpg)
 
-*Blender model generated with the Python code output of Experiment 08 (left), and its physical model visualization (right). The input for generation was a 27-page PDF "The Segal Method", a special issue of The Architect's Journal from 1986.*
+*CraftBot outputs made with the Fable 5 agent and rendered in Blender with parts of the cladding hidden: experiment 02 (left), experiment 06 (middle) and experiment 14 (right).*
 
 CraftBot is an architect AI agent. It reads a design brief, grounds itself in domain knowledge by ingesting documents, images and other references, and outputs Python code that defines a building procedurally. Instead of producing meshes or images, CraftBot writes scripts that construct architectural geometry in Blender. From there it can produce the industry's standard representations: floorplans, sections, elevations, BIM models, bills of quantities. It can run in a fully automated loop of code generation, execution, visual feedback and revision. CraftBot is a research project asking whether large language models can take part in architectural design when they are constrained to work through executable CAD code.
 
@@ -36,6 +36,10 @@ Each experiment folder follows the same layout:
 - `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
 
 ## Experiments
+
+![CraftBot outputs rendered in Blender](visuals/craftbot_4x4_composite_2026_v1_smaller.jpg)
+
+*Eight different experiment outputs shown with a fully clad model alongside their corresponding exposed timber frames.*
 
 The experiments started in November 2025 with ChatGPT 5.1 (runs through January 2026); other agents followed, with Fable runs added in August 2026, and the series is ongoing as of September 2026. Grouped by the type of reference material used:
 
@@ -168,9 +172,9 @@ Example (Windows):
 
 ## Web viewer
 
-![CraftBot viewer screenshots](visuals/craftbot_viewer_triptych_260830.png)
+![CraftBot viewer screenshots](visuals/craftbot_viewer_diptych_260830.jpg)
 
-*CraftBot viewer interface: exp 06 Prouvé Cabanon (left, MONO 1 mode), exp 04 Construction Manual (middle, BLUEPRINT mode) and exp 07 Gehry Deconstruction (right, MONO 2 mode) with callouts linking to a design rationale document*
+*CraftBot viewer interface: exp 06 Prouvé Cabanon (left, MONO 1 mode) and exp 04 Construction Manual (middle, BLUEPRINT mode) with callouts linking to a design rationale document.*
 
 A WebGL viewer for all generated models lives in [`viewer/`](viewer/) and deploys to [GitHub Pages (live link)](https://lukapiskorec.github.io/craftbot).
 
