@@ -14,7 +14,8 @@ Conventions
 
 Provenance: clip / strip / positions from the Fable runs of experiments
 04-09, clip_lin / inset from 07, tile from 08, wall_pieces from 09,
-board-layout scanline helpers from 11 and 13.
+board-layout scanline helpers from 11 and 13, columns / enforce_max /
+lap_length from 16.
 """
 import math
 
@@ -196,6 +197,57 @@ def count_fit(length, module):
     the int(round()) trap that silently drops a partial module."""
     n = int(math.floor(length / module + 1e-9))
     return n, length - n * module
+
+
+def columns(a0, a1, w, rip_min=0.04):
+    """Board columns (ca, cb) of width `w` covering a0..a1: whole boards
+    from a0, and the remainder as one ripped board at the end, unless it
+    is under `rip_min`, in which case the last two boards share it (no
+    sliver on a wall or a deck)."""
+    n, rem = count_fit(a1 - a0, w)
+    edges = [a0 + w * k for k in range(n + 1)]
+    if rem > EPS:
+        if rem < rip_min and n >= 1:
+            edges[-1] = a0 + w * (n - 1) + (w + rem) / 2
+        edges.append(a1)
+    return list(zip(edges[:-1], edges[1:]))
+
+
+def enforce_max(cuts, supports, max_len, clear=0.3):
+    """Cut positions with every piece at most `max_len` long: any longer
+    piece between two existing cuts is spliced at the support position
+    nearest its midpoint (a rail centre, a truss node), at least `clear`
+    from both ends, repeated until every piece fits. Raises when a piece
+    has no support to splice on. Studs and chords beyond stock length."""
+    cuts = sorted(cuts)
+    changed = True
+    while changed:
+        changed = False
+        for m in range(len(cuts) - 1):
+            if cuts[m + 1] - cuts[m] > max_len + EPS:
+                mid = (cuts[m] + cuts[m + 1]) / 2
+                inside = [c for c in supports if cuts[m] + clear < c < cuts[m + 1] - clear]
+                if not inside:
+                    raise ValueError(f"no support to splice on between {cuts[m]} and {cuts[m + 1]}")
+                cuts.insert(m + 1, min(inside, key=lambda c: abs(c - mid)))
+                changed = True
+                break
+    return cuts
+
+
+def lap_length(d1, d2, width, margin=0.0):
+    """Length of the halving-joint zone along one member of two that
+    cross at the angle between directions d1 and d2 (2D or 3D), the
+    other being `width` wide in the crossing plane: width * (1 + cos) /
+    sin, plus `margin`. Feed it to framing.halved_brace as lap_len."""
+    dot = sum(x * y for x, y in zip(d1, d2))
+    l1 = math.sqrt(sum(x * x for x in d1))
+    l2 = math.sqrt(sum(x * x for x in d2))
+    c = abs(dot) / (l1 * l2)
+    s = math.sqrt(max(0.0, 1.0 - c * c))
+    if s < EPS:
+        raise ValueError("members are parallel, no crossing")
+    return width * (1.0 + c) / s + margin
 
 
 def split_range(a0, a1, cuts):

@@ -231,7 +231,8 @@ def halved_brace(name, coll, p0, p1, width, depth, width_dir, n0, n1, cross_pt, 
     a half-width middle segment (the halving joint) of length lap_len
     centred on the point of the axis nearest cross_pt, kept on the
     `lap_side` (+1 / -1 along width_dir) so two crossing braces share
-    the joint zone without overlapping (St Andrew's cross)."""
+    the joint zone without overlapping (St Andrew's cross). lap_len for
+    two members of the same width comes from geometry2d.lap_length."""
     p0, p1 = Vector(p0), Vector(p1)
     axis = (p1 - p0).normalized()
     w = Vector(width_dir).normalized()

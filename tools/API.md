@@ -41,6 +41,9 @@ Pure 2D polygon and interval tools shared by the CraftBot kits.
 - `scan_intervals(loops, b_s)`: Even-odd intervals in `a` where the horizontal line b = b_s lies inside the region bounded by `loops` (outer loop plus holes).
 - `positions(a0, a1, spacing, thick, grid0=None)`: Centre positions of repeated members (studs, joists, rafters) between a0 and a1: first and last flush with the ends, the others on the grid grid0 + k*spacing (grid0 defaults to a0).
 - `count_fit(length, module)`: Number of whole modules in `length` and the remainder, without the int(round()) trap that silently drops a partial module.
+- `columns(a0, a1, w, rip_min=0.04)`: Board columns (ca, cb) of width `w` covering a0..a1: whole boards from a0, and the remainder as one ripped board at the end, unless it is under `rip_min`, in which case the last two boards share it (no sliver on a wall or a deck).
+- `enforce_max(cuts, supports, max_len, clear=0.3)`: Cut positions with every piece at most `max_len` long: any longer piece between two existing cuts is spliced at the support position nearest its midpoint (a rail centre, a truss node), at least `clear` from both ends, repeated until every piece fits.
+- `lap_length(d1, d2, width, margin=0.0)`: Length of the halving-joint zone along one member of two that cross at the angle between directions d1 and d2 (2D or 3D), the other being `width` wide in the crossing plane: width * (1 + cos) / sin, plus `margin`.
 - `split_range(a0, a1, cuts)`: Sub-ranges of (a0, a1) outside the cut intervals [(ca, cb), ...] (a bottom plate interrupted by doors).
 - `strips(a0, a1, cuts)`: Split [a0, a1] at the given cut positions (panel joints).
 - `split_rows(rows, holes)`: Split bands [(b0, b1), ...] at the bottom / top of every hole (a0, a1, b0, b1) so pieces beside a hole can be generated.
@@ -58,6 +61,7 @@ Planes, half-spaces and clipped members in 3D (needs Blender's mathutils).
 - `vertical_hs(p, d, h_out, offset=0.0)`: Vertical half-space containing horizontal direction d through p, shifted by `offset` along the horizontal h_out, keeping the side away from h_out (an eave plane a set distance outside a wall face).
 - `cheek(C, d, toward, t)`: Vertical side face of a member of thickness `t` whose centre line runs through C along horizontal d, on the side of point `toward`.
 - `mitre_clip(corner, d_self, d_other)`: Half-space cutting a member that runs away from `corner` along d_self on the mitre line bisecting d_self and d_other (both pointing away from the corner); fascia and trim corners.
+- `guarded_hs(p, n, far)`: The half-space (p, n) as a one-item clip list when the member's far end `far` lies on its kept side, else an empty list.
 - `plane_nd(half_space)`: (n, d) plane form of a half-space (p, n): n .
 - `vplane(axis, value)`: Vertical plane x = value ('x') or y = value ('y') in (n, d) form.
 - `isect(p1, p2, p3)`: Intersection point of three (n, d) planes.

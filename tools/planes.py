@@ -24,7 +24,7 @@ frame_prism()    any convex polygon in a Frame, extruded across a thickness
 
 Provenance: member() from Fable experiments 01/02, Frame / frame_prism /
 slab_coeffs / subtract / bar from 07, frame_prism cheek cuts, sloped_member,
-Roof, cheek, mitre_clip from 11, isect / vplane from 13.
+Roof, cheek, mitre_clip from 11, isect / vplane from 13, guarded_hs from 16.
 """
 import math
 
@@ -92,6 +92,18 @@ def mitre_clip(corner, d_self, d_other):
     if n.dot(d_self) < 0:
         n = -n
     return hs((corner[0], corner[1], 0.0), n)
+
+
+def guarded_hs(p, n, far):
+    """The half-space (p, n) as a one-item clip list when the member's
+    far end `far` lies on its kept side, else an empty list. For a clip
+    that is right at one kind of corner and wrong at another: a web at
+    a truss node clipped to stay inside the neighbouring chord's face is
+    right at an eave, where that face lies beside the web, and wrong at
+    the apex, where the face extended passes under the web body and cuts
+    it to a stub. Use as `clips += guarded_hs(p, n, far)`."""
+    p, n = Vector(p), Vector(n)
+    return [hs(p, n)] if (Vector(far) - p).dot(n) >= 0 else []
 
 
 def plane_nd(half_space):

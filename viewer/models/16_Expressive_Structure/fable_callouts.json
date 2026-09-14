@@ -1,0 +1,158 @@
+{
+  "callouts": [
+    {
+      "id": "ripple",
+      "label": "Outer chord depth 0.33 to 0.93 m by a sine along the outline, phase per truss",
+      "section": "6",
+      "quote": "only the depth varies, d = 0.63 + 0.30 sin(2 pi s / 8.0 + 2 pi i / 11) along the arc length s of the inner outline",
+      "match": {
+        "names": "RingOut_05_*",
+        "collection": "Ring/RingChords"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "sandwich",
+      "label": "Paired 30 x 120 chords sandwich single webs in two separate planes",
+      "section": "5",
+      "quote": "A 60 mm gap between the chord slats gives the rising webs and the falling webs their own 30 mm plane",
+      "match": {
+        "names": "RingWeb_05_1?R|RingWeb_05_1?F",
+        "collection": "Ring/RingWebs"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "mitred-corner",
+      "label": "Mitred outer vertex at every corner (v02): the chamfer cut the inner chord",
+      "section": "6",
+      "quote": "v02 added an outer vertex on each corner's bisector at the offset-polygon position, a mitred kink with no web to it",
+      "match": {
+        "names": "RingOut_03_14A|RingOut_03_15A|RingOut_03_16A",
+        "collection": "Ring/RingChords"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "apex-webs",
+      "label": "Apex webs were 0.27 m stubs through v02; v03 guards the clip by the far end",
+      "section": "6",
+      "quote": "v03 applies the clip only when the web's far end satisfies it and asserts the reach of every web",
+      "match": {
+        "names": "RingWeb_05_17F|RingWeb_05_18R",
+        "collection": "Ring/RingWebs"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "spacers",
+      "label": "Chord spacers between rings: weak-axis restraint for 28 m compression chords",
+      "section": "6b",
+      "quote": "F 30 x 120 spacers between the facing chord slats of adjacent rings at every third outer vertex and at every inner node of the top runs",
+      "match": {
+        "names": "ChordSpacerO_04_*",
+        "collection": "Ring/RingSpacers"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "roof-x",
+      "label": "Roof-plane X's under the inner top chords hold the ring tops along the row",
+      "section": "6b",
+      "quote": "one zigzag of F diagonals per roof slope, laid flat under the inner top chords in the 0.07 m gap",
+      "match": {
+        "names": "RoofBraceE_*",
+        "collection": "Ring/RoofBracing"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "y-bracing",
+      "label": "X-bracing flat on the leg faces at 61 degrees after the 45-degree rule",
+      "section": "5",
+      "quote": "The Researcher's 45-degree rule forced the panels to half the row's length so the X's stand at 61 degrees",
+      "match": {
+        "names": "BraceE_*",
+        "collection": "Bracing"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "ties",
+      "label": "Horizontal ties at the X ends; the upper one 10 mm under the deck eave",
+      "section": "7",
+      "quote": "ties 5.95 to 6.07 and 11.575 to 11.695",
+      "match": {
+        "names": "TieE_hi*|TieW_hi*",
+        "collection": "Bracing"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "two-systems",
+      "label": "Box roof on its own seven slat trusses; the rings stand 0.08 m outside",
+      "section": "5",
+      "quote": "So the box carries itself with its own seven shallow slat trusses, and the ring trusses stand 0.08 m outside it and brace it",
+      "match": {
+        "names": "RoofTC_*",
+        "collection": "BoxRoof/RoofTrusses"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "band",
+      "label": "Open light band from 9.63 m to the deck: studs continue as bare mullions",
+      "section": "6",
+      "quote": "Both red-building photos show an opaque deck and light only from the side",
+      "match": {
+        "names": "StudE*A_2|StudE*B_2",
+        "collection": "Walls/Studs"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "boards",
+      "label": "Vertical 24 x 120 boards, joints on alternate rails per column (photo 03)",
+      "section": "7",
+      "quote": "joints at 1.95 and 5.85 (B columns) or 3.25 and 7.15 (A columns)",
+      "match": {
+        "names": "BoardEOut_*",
+        "collection": "Walls/BoardsOut"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "door",
+      "label": "1.00 x 2.10 door: kings on the module, doubled jacks, header of four slats",
+      "section": "6",
+      "quote": "The module gives 1.12 clear between single jacks on the +/-0.65 kings; doubled jacks bring it to 1.00",
+      "match": {
+        "names": "Header_*|JackE_*|JackW_*",
+        "collection": "Walls/DoorFrame"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "leaf",
+      "label": "Ledged-and-braced leaf, braces hinge-bottom to latch-top (external source)",
+      "section": "3",
+      "quote": "leaf of B boards, three F ledges, two F braces at 34 degrees",
+      "match": {
+        "names": "DoorBrace_*|DoorLedge_*",
+        "collection": "Door"
+      },
+      "anchor": "centroid"
+    },
+    {
+      "id": "porch",
+      "label": "Two truss bays past each end wall square the outer plan and form the porch",
+      "section": "5",
+      "quote": "two trusses at each end stand past the end walls, which is the entrance porch",
+      "match": {
+        "names": "RingIn_00_*|RingIn_01_*",
+        "collection": "Ring/RingChords"
+      },
+      "anchor": "centroid"
+    }
+  ]
+}
