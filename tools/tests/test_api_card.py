@@ -19,6 +19,13 @@ class ApiCardTest(unittest.TestCase):
         # the point of the card: about 3 k tokens, not the 17 k of the modules
         self.assertLess(len(api_card.build()), 20000)
 
+    def test_bearing_api_and_codex_closeout_are_documented(self):
+        text = api_card.build()
+        self.assertIn("check_bearing(foot, seat, tol=1e-06)", text)
+        self.assertIn("check_pairs(pairs, objects=None, tol=1e-06)", text)
+        self.assertIn("--transcript-source", text)
+        self.assertIn("--no-archive", text)
+
 
 if __name__ == "__main__":
     unittest.main()

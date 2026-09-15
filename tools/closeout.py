@@ -1,4 +1,4 @@
-"""Close-out of an experiment version or run, as one command.
+"""Close-out of an experiment version or run, with validated Claude/Codex transcript archival after all required checks pass; run accepts --transcript-source with --session-id, or --no-archive for preflight.
 
 The Runner agent calls this instead of the six-step sequence by hand and
 reads the markdown it writes. Every step reports pass or fail; the script
@@ -9,11 +9,24 @@ never stops at the first failure, so one report shows everything.
         index.json, check the view set, screenshot the viewer
         -> experiments/<exp>/<Agent>/closeout_v09.md
 
-    python tools/closeout.py run 14 [--agent NAME] [--session-id ID]
+    python tools/closeout.py run 14 [--agent NAME] --session-id ID [--transcript-source PATH]
         rationale sections present, hand-off files, callouts check, prompt
         file present, API card current, index rebuilt, then (last) the
         transcript copy
         -> experiments/<exp>/<Agent>/closeout_run.md
+
+    python tools/closeout.py run 14 [--agent NAME] --no-archive
+        run checks and rebuild the index, without reading/copying a transcript
+        -> experiments/<exp>/<Agent>/closeout_preflight.md
+
+An explicit transcript source can be a Codex rollout or Claude JSONL. Its root
+session identity must match --session-id. Without a source, the legacy Claude
+lookup is retained but must resolve uniquely. A validated temporary snapshot
+replaces the archive atomically, only after every required check passes. Child
+sessions and malformed or unidentified transcripts are rejected. Only the chosen
+root transcript is copied; subagent logs are not collected. The report is written
+after the archive operation. No host-specific runtime launcher is required:
+use any working Python, including Blender's bundled interpreter.
 
 The experiment id is the two-digit prefix or the folder name under
 experiments/. <Agent> is the run folder, named after the model that ran
@@ -33,12 +46,14 @@ Provenance: the close-out steps of the running-craftbot-experiment skill
 """
 import argparse
 import glob
+import json
 import os
 import re
 import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,6 +86,67 @@ def run(cmd, timeout=1200):
     proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
                           timeout=timeout, cwd=REPO)
     return proc.returncode, (proc.stdout + proc.stderr)
+
+
+def _validate_transcript(path, session_id):
+    identified = False
+    with open(path, encoding="utf-8-sig") as handle:
+        for number, line in enumerate(handle, 1):
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except ValueError as exc:
+                raise ValueError(f"invalid transcript JSON at line {number}") from exc
+            if not isinstance(record, dict):
+                raise ValueError(f"transcript line {number} is not an object")
+            if record.get("type") == "session_meta":
+                meta = record.get("payload")
+                if not isinstance(meta, dict) or meta.get("id") != session_id:
+                    raise ValueError("Codex transcript session ID does not match --session-id")
+                source = meta.get("source")
+                if isinstance(source, dict) and "subagent" in source:
+                    raise ValueError("a Codex child session cannot be archived as the root")
+                identified = True
+            if "sessionId" in record:
+                if record["sessionId"] != session_id:
+                    raise ValueError("Claude transcript session ID does not match --session-id")
+                if record.get("isSidechain"):
+                    raise ValueError("a Claude sidechain cannot be archived as the root")
+                identified = True
+    if not identified:
+        raise ValueError("transcript has no recognized root session identity")
+
+
+def archive_transcript(session_id, destination, source=None):
+    """Atomically archive a validated snapshot of one root Claude/Codex JSONL session; an omitted source uses unique legacy Claude lookup.
+
+    Existing archives remain unchanged on lookup, copy or validation failures.
+    The caller must complete all required run checks before calling this.
+    """
+    if not session_id or not re.fullmatch(r"[A-Za-z0-9_-]+", session_id):
+        raise ValueError("a valid --session-id is required to archive a transcript")
+    if source is None:
+        hits = glob.glob(os.path.join(SESSIONS_DIR, "*", session_id + ".jsonl"))
+        if len(hits) != 1:
+            raise ValueError(f"expected one transcript for {session_id}; found {len(hits)} under {SESSIONS_DIR}")
+        source = hits[0]
+    source = os.path.abspath(source)
+    destination = os.path.abspath(destination)
+    if os.path.normcase(os.path.realpath(source)) == os.path.normcase(os.path.realpath(destination)):
+        raise ValueError("transcript source and archive destination must differ")
+    with tempfile.NamedTemporaryFile(prefix=".transcript-", suffix=".jsonl",
+                                     dir=os.path.dirname(destination), delete=False) as handle:
+        snapshot = handle.name
+    try:
+        shutil.copyfile(source, snapshot)
+        _validate_transcript(snapshot, session_id)
+        size = os.path.getsize(snapshot)
+        os.replace(snapshot, destination)
+    finally:
+        if os.path.exists(snapshot):
+            os.unlink(snapshot)
+    return f"{size // 1024} KB from {source} (root session {session_id})"
 
 
 class Report:
@@ -177,7 +253,8 @@ def closeout_run(args):
     rep = Report(f"Close-out of the {exp_id} {agent} run")
     rationale = os.path.join(run_dir, f"experiment_{nn}_{slug}_design_rationale.md")
     if os.path.isfile(rationale):
-        text = open(rationale, encoding="utf-8").read()
+        with open(rationale, encoding="utf-8") as handle:
+            text = handle.read()
         heads = re.findall(r"^##\s+(\d+[a-z]?)\.", text, re.M)
         missing = [s for s in RATIONALE_SECTIONS if s not in heads]
         rep.add("rationale sections", not missing, "missing: " + ", ".join(missing) if missing else "sections 0-10 present")
@@ -208,17 +285,20 @@ def closeout_run(args):
     rep.add("API card current", code == 0, out)
     code, out = run([sys.executable, os.path.join(TOOLS, "export_all_models.py"), "--index-only"])
     rep.add("index.json rebuilt", code == 0, out)
-    if args.session_id:
-        hits = glob.glob(os.path.join(SESSIONS_DIR, "*", args.session_id + ".jsonl"))
-        if hits:
-            dst = os.path.join(run_dir, f"experiment_{nn}_{slug}_conversation.jsonl")
-            shutil.copy(hits[0], dst)
-            rep.add("transcript archived (last step)", True, f"{os.path.getsize(dst) // 1024} KB from {hits[0]}")
-        else:
-            rep.add("transcript archived (last step)", False, f"no {args.session_id}.jsonl under {SESSIONS_DIR}")
+    no_archive = getattr(args, "no_archive", False)
+    if no_archive:
+        rep.add("transcript archive deferred", True, "preflight only; existing archive and final report unchanged")
+    elif not all(ok for _, ok, _ in rep.rows):
+        rep.add("transcript archived (last step)", False, "blocked by failed run checks; existing archive unchanged")
     else:
-        rep.add("transcript archived (last step)", False, "no --session-id given; archive by hand as the last action")
-    return rep.write(os.path.join(run_dir, "closeout_run.md"))
+        dst = os.path.join(run_dir, f"experiment_{nn}_{slug}_conversation.jsonl")
+        try:
+            detail = archive_transcript(args.session_id, dst, getattr(args, "transcript_source", None))
+            rep.add("transcript archived (last step)", True, detail)
+        except (OSError, ValueError) as exc:
+            rep.add("transcript archived (last step)", False, str(exc))
+    report_name = "closeout_preflight.md" if no_archive else "closeout_run.md"
+    return rep.write(os.path.join(run_dir, report_name))
 
 
 def main():
@@ -234,7 +314,14 @@ def main():
     r.add_argument("exp")
     r.add_argument("--agent", default=None, help="run folder name, e.g. \"Opus 5.1\"; needed when the experiment has several")
     r.add_argument("--session-id", default=None)
+    r.add_argument("--transcript-source", default=None, help="explicit root Claude/Codex JSONL; requires --session-id")
+    r.add_argument("--no-archive", action="store_true", help="run checks/index rebuild only; write closeout_preflight.md")
     args = ap.parse_args()
+    if args.cmd == "run":
+        if args.transcript_source and not args.session_id:
+            ap.error("--transcript-source requires --session-id")
+        if args.no_archive and (args.session_id or args.transcript_source):
+            ap.error("--no-archive cannot be combined with transcript arguments")
     ok = closeout_version(args) if args.cmd == "version" else closeout_run(args)
     sys.exit(0 if ok else 1)
 

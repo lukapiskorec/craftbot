@@ -1,0 +1,68 @@
+{
+  "callouts": [
+    {
+      "id": "quiet-room",
+      "label": "Flat red slats define the 3 x 3 x 6 m room",
+      "section": "6.1",
+      "quote": "Flat red vertical slats preserve its simple interior.",
+      "match": {"names": "SideBoard_*|EndBoard_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "paired-chords",
+      "label": "Paired 36 mm chords around a separate web layer",
+      "section": "6.2",
+      "quote": "Paired chords straddle a single web layer, and each panel has real triangulation.",
+      "match": {"names": "ColumnOuter_*|ColumnInner_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "wave-roof",
+      "label": "Faceted truss depth varies across and along the roof",
+      "section": "6.3",
+      "quote": "Each rib changes depth across the room and elevation along the series.",
+      "match": {"names": "RoofUpper_*|RoofDiagonal_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "straight-roof-slats",
+      "label": "Short straight slats cover the planar roof facets",
+      "section": "6.3",
+      "quote": "Straight short boards can cover the facets; an arbitrary doubly curved skin would require twisted stock.",
+      "match": {"names": "RoofBoard_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "level-ceiling",
+      "label": "Level ceiling; face fixings require connection design",
+      "section": "5",
+      "quote": "The ceiling is face-fixed beneath lower chords, requiring fasteners; it is not described as bearing on a support above it.",
+      "match": {"names": "CeilingBoard_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "one-entrance",
+      "label": "One 0.90 x 2.10 m entrance with supported header",
+      "section": "5",
+      "quote": "Header and jamb assemblies carry boards above the single entrance.",
+      "match": {"names": "EntranceHeader_*|EntranceJamb_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "lateral-bracing",
+      "label": "Explicit bracing connects the transverse frames",
+      "section": "5",
+      "quote": "Longitudinal ties and diagonals connect frames; separate roof and floor-plane diagonals collect shear.",
+      "match": {"names": "LongBrace_*|LongTie_*|RoofPlanBrace_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "integrated-soles",
+      "label": "Sole runners fit within the crossed timber mat",
+      "section": "5",
+      "quote": "A focused Designer review resolved the conflict by integrating continuous sole runners into the existing upper layer at z = -0.060 to -0.024 m.",
+      "match": {"names": "SoleRunner_*"},
+      "anchor": "nearest"
+    }
+  ]
+}

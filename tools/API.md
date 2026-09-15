@@ -150,6 +150,13 @@ Standalone interpenetration check for generated models.
 Contact check: every member must touch something.
 
 
+### `check_bearing.py`
+
+Full-face bearing checks for explicit horizontal convex member/support faces.
+
+- `check_bearing(foot, seat, tol=1e-06)`: Check full containment and coplanarity of ordered horizontal convex XYZ faces, returning a metric report in metres and square metres.
+- `check_pairs(pairs, objects=None, tol=1e-06)`: Check explicit Blender member/support face pairs, returning named reports with failures for missing or unsupported geometry.
+
 ### `triage.py`
 
 Overlap triage: group penetrating pairs into name families (pure Python).
@@ -157,7 +164,7 @@ Overlap triage: group penetrating pairs into name families (pure Python).
 
 ### `closeout.py`
 
-Close-out of an experiment version or run, as one command.
+Close-out of an experiment version or run, with validated Claude/Codex transcript archival after all required checks pass; run accepts --transcript-source with --session-id, or --no-archive for preflight.
 
 
 ### `export_all_models.py`

@@ -153,6 +153,9 @@ OVERRIDES = {
         (r"doors\|", FIXT),
         (r"ladder\|", FIXT),
     ],
+    "16": [
+        (r"ground/(lower|upper)sleepers\|", FRAME),
+    ],
 }
 
 _compiled = {}

@@ -17,7 +17,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODULES = ["craftbot_lib", "geometry2d", "planes", "ruled", "framing", "sheathing"]
-HARNESS = ["render_views", "check_overlaps", "check_contacts", "triage", "closeout",
+HARNESS = ["render_views", "check_overlaps", "check_contacts", "check_bearing", "triage", "closeout",
            "export_all_models", "layers", "callouts", "api_card"]
 OUT = os.path.join(HERE, "API.md")
 
@@ -85,7 +85,7 @@ def build():
     out += ["## Harness scripts (run from the repo root)", ""]
     for m in HARNESS:
         if os.path.isfile(os.path.join(HERE, m + ".py")):
-            out += module_card(m, False)
+            out += module_card(m, m == "check_bearing")
     return "\n".join(out).rstrip() + "\n"
 
 

@@ -43,9 +43,10 @@ same name (name every piece with all its loop indices).
 | `run_experiment_headless.py` | The original minimal runner (four views, no outlines, no check). Kept for the README examples. |
 | `check_overlaps.py` | Separating-axis interpenetration check over every pair of mesh objects; run on a saved `.blend` or import `find_overlaps`. Cannot see missing geometry, so always look at the renders too. |
 | `check_contacts.py` | Contact check: every mesh object must have another within 2 mm (touching counts). Lists floating members, which the overlap check cannot see: treads on nothing, boards nailed to nothing, studs short of their plate. |
+| `check_bearing.py` | Full-foot bearing on explicitly paired horizontal convex faces: checks coplanarity, polygon containment, supported area and edge overhang. Pure-Python core plus Blender mesh-face adapter; complements contact and overlap checks. |
 | `triage.py` | Groups penetrating pairs into name families (pure Python): one row per geometric cause with a count, depth and example, so a version with hundreds of pairs reads as three or four fixes. |
 | `api_card.py` | Generates `API.md`, the compact card of every kit function and class with signature and first docstring sentence, from the source with `ast`. `--check` fails when the card is stale. Agents read the card, not the modules. |
-| `closeout.py` | One command per close-out: `version NN vXX` (export, layers bake and audit, index, view set, renders, viewer screenshot) and `run NN --session-id ID` (rationale sections, hand-off files, prompt file, callouts, API card, index, transcript copy last). Writes `closeout_*.md` with pass or fail per step. |
+| `closeout.py` | One command per close-out: `version NN vXX` (export, layers bake and audit, index, view set, renders, viewer screenshot) and `run NN --session-id ID` (rationale sections, hand-off files, prompt file, callouts, API card, index, transcript copy last). Accepts explicit Claude/Codex `--transcript-source`; archives only after all checks pass. `--no-archive` writes a separate preflight report. |
 | `experiment_template.py` | Starting point for a new experiment script (parameter block, derived levels, kits, named collections). Renders clean through `render_views.py`. |
 | `views_template.py` | Starting point for an experiment's `views_<slug>.py` (view keys explained, mandatory views, colours). |
 | `export_model_json.py`, `export_all_models.py`, `model_export_core.py`, `layers.py`, `callouts.py` | Web viewer export pipeline (see the root README). |
@@ -55,6 +56,7 @@ same name (name every piece with all its loop indices).
 blender --background --python tools/render_views.py -- <experiment.py> <abs_out_prefix> [--views views.py] [--lib <dir>] [--only 01,02] [--tol 1.0]
 blender --background model.blend --python tools/check_overlaps.py -- [tolerance_mm]
 blender --background model.blend --python tools/check_contacts.py -- [tolerance_mm] [ignore_prefix,...]
+blender --background model.blend --python-exit-code 1 --python tools/check_bearing.py -- bearings.json [--tol-mm 0.001]
 python tools/api_card.py [--check]
 python tools/closeout.py version 14 v09 [--agent "Opus 5.1"]
 python tools/closeout.py run 14 --session-id <id> [--agent "Opus 5.1"]
@@ -66,6 +68,82 @@ A views file is plain Python with a `VIEWS` list (and optional `COLORS`,
 namespace so a section cut can be placed at `M["z_floor"](3) + 1.3`. The
 per-experiment `Fable/render_fable.py` files are the pre-tools renderer;
 their `VIEWS` lists show a full view set for each building.
+
+### Full-foot bearing
+
+Contact means proximity to another object, not adequate bearing. This checker
+requires a specific member foot and support seat; it reuses `geometry2d` clipping
+to compare the actual face polygons, not bounding boxes. It does not select
+supports automatically or run implicitly during rendering.
+
+```json
+{"bearings": [{"member": "Post", "member_face": 0, "support": "Sole", "support_face": 1}]}
+```
+
+Face indices are mesh polygon indices: inspect the model to choose them; the
+example indices are not a top/bottom convention. Member faces must point down,
+support faces up. Apply modifiers first. Every chosen face must be horizontal,
+planar, convex and nondegenerate; rotated horizontal seats are supported.
+Each member face is the **entire required footprint**. For a beam end, subdivide
+the underside into the required bearing face or supply that polygon directly.
+Check foot-to-sole and sole-to-base separately; a passing pair does not certify
+the whole support stack, structural capacity or anchorage.
+
+```python
+from check_bearing import check_bearing, check_pairs
+report = check_bearing(foot_xyz, seat_xyz, tol=1e-6)  # no Blender dependency
+reports = check_pairs(pairs)  # Blender; explicit names and face indices as above
+```
+
+Coordinates and returned distances are metres; areas are square metres.
+Reports contain `ok`, signed `gap` (negative means penetration), `required_area`,
+`supported_area`, `coverage` (0–1) and `max_edge_overhang`. Overhang is the largest
+outward distance across a seat edge's supporting line, not corner distance.
+Supported area is zero if the faces are not coplanar within tolerance. The default
+0.001 mm tolerance is numerical precision, not an allowance for short seats.
+Invalid polygons raise `ValueError` in the core; the Blender adapter reports them
+as failed pairs with `error`. The CLI prints a summary and each failed pair;
+use `--python-exit-code 1` to make failures fail a batch. No model is modified.
+
+### Claude/Codex run close-out
+
+```text
+python tools/closeout.py run NN --agent "MODEL" --session-id ROOT_ID --transcript-source "path/to/root.jsonl"
+python tools/closeout.py run NN --agent "MODEL" --no-archive
+```
+
+An explicit source supports a Codex rollout or Claude JSONL without assuming its
+host storage location. Supply the **root** session ID: all recognized identity
+records must match, and child/sidechain sources, malformed JSON and unidentified
+logs are rejected. Without `--transcript-source`, the existing Claude lookup
+under `~/.claude/projects/*/<id>.jsonl` remains available, but must match exactly
+one file. Subagent logs are not collected.
+
+Only after every required run check passes is a temporary transcript snapshot
+validated and atomically moved over the archive. Lookup, copy or validation
+failure preserves any existing archive. `closeout_run.md` is written after that
+operation. Archive at the end of the run: the snapshot cannot include later
+conversation turns. `--no-archive` needs no transcript arguments and writes
+`closeout_preflight.md`, leaving the archive and final report untouched; it still
+runs checks and rebuilds the viewer index, so it is not a read-only dry run.
+
+Use any working Python interpreter; no new dependencies or runtime launcher are
+required. On Windows, if `python` resolves to an unusable Store alias, invoke
+Blender's bundled Python directly (adjust the installed version):
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.1/5.1/python/bin/python.exe' tools/closeout.py run NN --agent 'MODEL' --no-archive
+```
+
+Version close-out retains the existing exporter runtime resolution: `--blender`,
+then `CRAFTBOT_BLENDER`, then known installations.
+
+Focused tests (plus the ordinary `unittest discover -s tools/tests` suite):
+
+```text
+python -m unittest tools.tests.test_check_bearing tools.tests.test_closeout
+blender --background --factory-startup --python-exit-code 1 --python tools/tests/bearing_smoke.py
+```
 
 ### Cycles presentation study
 
