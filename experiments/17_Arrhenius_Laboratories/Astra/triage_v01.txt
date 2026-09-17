@@ -1,0 +1,66 @@
+OVERLAP FAMILIES: 1747 (count  depth  family a  x  family b   e.g. a x b)
+   8750    650.0 mm  Beam  x  EdgeBeam   e.g. Beam_5_9_1_4 x EdgeBeam_5_3_16
+   2682    285.0 mm  EdgeBeam  x  Window_West   e.g. EdgeBeam_5_3_1 x Window_West_37_4_OperableMullion
+   2682    285.0 mm  EdgeBeam  x  Window_East   e.g. EdgeBeam_5_2_21 x Window_East_37_4_OperableMullion
+   2400    285.0 mm  EdgeBeam  x  Window_CourtWest   e.g. EdgeBeam_5_3_5 x Window_CourtWest_9_4_OperableMullion
+   2400    285.0 mm  EdgeBeam  x  Window_CourtEast   e.g. EdgeBeam_5_3_11 x Window_CourtEast_9_4_OperableMullion
+   1685    285.0 mm  EdgeBeam  x  Window_North   e.g. EdgeBeam_5_3_9 x Window_North_9_4_OperableMullion
+   1653    250.0 mm  FloorSlab  x  FloorSlab   e.g. FloorSlab_5_1_133 x FloorSlab_5_3_016
+   1500    600.0 mm  Column  x  EdgeBeam   e.g. Column_78 x EdgeBeam_5_1_13
+   1440    100.0 mm  EdgeBeam  x  CorridorWall   e.g. EdgeBeam_5_3_4 x CorridorWall_4_9.2_9_02
+   1155    650.0 mm  EdgeBeam  x  OfficeWest   e.g. EdgeBeam_5_3_3 x OfficeWest_4_30_0_00
+    990    500.0 mm  EdgeBeam  x  CorridorWall   e.g. EdgeBeam_5_3_4 x CorridorWall_4_6.1_0_32
+    860    650.0 mm  StairEdgeBeam_N  x  EdgeBeam   e.g. StairEdgeBeam_N_5_2_7 x EdgeBeam_5_3_17
+    845    285.0 mm  StairEdgeBeam_N  x  Window_North   e.g. StairEdgeBeam_N_5_1_9 x Window_North_17_4_OperableMullion
+    790    650.0 mm  EdgeBeam  x  OfficeEast   e.g. EdgeBeam_5_3_17 x OfficeEast_4_30_0_00
+    780    650.0 mm  EdgeBeam  x  LabEast   e.g. EdgeBeam_5_3_12 x LabEast_4_9_0_00
+    719     20.0 mm  EdgeBeam  x  Window_East   e.g. EdgeBeam_5_3_17 x Window_East_37_4_OperableMullion
+    716    200.0 mm  EdgeBeam  x  Window_West   e.g. EdgeBeam_5_0_3 x Window_West_37_4_OperableMullion
+    716     80.0 mm  EdgeBeam  x  Window_East   e.g. EdgeBeam_5_3_19 x Window_East_37_4_OperableMullion
+    680    650.0 mm  StairEdgeBeam_E  x  EdgeBeam   e.g. StairEdgeBeam_E_5_3_2 x EdgeBeam_5_3_15
+    660    650.0 mm  StairEdgeBeam_W  x  EdgeBeam   e.g. StairEdgeBeam_W_5_3_3 x EdgeBeam_5_3_9
+    652    230.0 mm  FloorSlab  x  SouthFasciaSeam   e.g. FloorSlab_5_2_010 x SouthFasciaSeam_99
+    641    650.0 mm  EdgeBeam  x  EdgeBeam   e.g. EdgeBeam_5_2_9 x EdgeBeam_5_3_9
+    640    200.0 mm  EdgeBeam  x  Window_CourtEast   e.g. EdgeBeam_5_2_12 x Window_CourtEast_9_4_OperableMullion
+    640     80.0 mm  EdgeBeam  x  Window_CourtWest   e.g. EdgeBeam_5_1_6 x Window_CourtWest_9_4_OperableMullion
+    640     20.0 mm  EdgeBeam  x  Window_CourtWest   e.g. EdgeBeam_5_1_5 x Window_CourtWest_9_4_OperableMullion
+    638    650.0 mm  StairEdgeBeam_S  x  EdgeBeam   e.g. StairEdgeBeam_S_5_3_1 x EdgeBeam_5_3_12
+    638    600.0 mm  Beam  x  EdgeBeam   e.g. Beam_5_9_1_1 x EdgeBeam_5_1_8
+    610    285.0 mm  EdgeBeam  x  Window_CourtSouth   e.g. EdgeBeam_5_3_9 x Window_CourtSouth_5_4_OperableMullion
+    610    285.0 mm  EdgeBeam  x  Window_CourtNorth   e.g. EdgeBeam_5_3_9 x Window_CourtNorth_5_4_OperableMullion
+    552    350.0 mm  EdgeBeam  x  Window_East   e.g. EdgeBeam_5_2_21 x Window_East_37_4_Head
+    552    350.0 mm  EdgeBeam  x  Window_West   e.g. EdgeBeam_5_3_1 x Window_West_37_4_Head
+    552    300.0 mm  EdgeBeam  x  Panel_West   e.g. EdgeBeam_3_3_1 x Panel_West_37_2
+    552    300.0 mm  EdgeBeam  x  Panel_East   e.g. EdgeBeam_3_2_21 x Panel_East_37_2
+    535    300.0 mm  EdgeBeam  x  Panel_North   e.g. EdgeBeam_3_3_9 x Panel_North_9_2
+    510    350.0 mm  EdgeBeam  x  Window_North   e.g. EdgeBeam_5_3_9 x Window_North_9_4_Head
+    490    450.0 mm  Beam  x  EdgeBeam   e.g. Beam_5_9_1_4 x EdgeBeam_5_3_18
+    490     50.0 mm  Beam  x  EdgeBeam   e.g. Beam_5_9_1_4 x EdgeBeam_5_3_20
+    482    600.0 mm  Column  x  FloorSlab   e.g. Column_62 x FloorSlab_2_0_016
+    480    600.0 mm  EdgeBeam  x  CorridorWall   e.g. EdgeBeam_5_0_7 x CorridorWall_4_9.2_9_02
+    480    350.0 mm  EdgeBeam  x  Window_CourtWest   e.g. EdgeBeam_5_3_5 x Window_CourtWest_9_4_Head
+  ... 1707 more families
+
+STAIR/FACADE FAMILIES
+OVERLAP FAMILIES: 153 (count  depth  family a  x  family b   e.g. a x b)
+      8     12.3 mm  Window_East  x  StairWaist_E   e.g. Window_East_20_3_Jamb0 x StairWaist_E_3_20
+      4    129.0 mm  Window_North  x  StairWaist_N   e.g. Window_North_10_2_Glass0 x StairWaist_N_2_11
+      4    129.0 mm  Window_North  x  StairTread_N   e.g. Window_North_10_2_Glass0 x StairTread_N_2_11
+      4     77.3 mm  Window_East  x  StairWaist_E   e.g. Window_East_20_3_Head x StairWaist_E_3_20
+      4     19.6 mm  Window_North  x  StairWaist_N   e.g. Window_North_10_2_Glass1 x StairWaist_N_2_8
+      4     19.6 mm  Window_North  x  StairTread_N   e.g. Window_North_10_2_Glass1 x StairTread_N_2_8
+      2    470.0 mm  Panel_West  x  StairTread_W   e.g. Panel_West_20_2 x StairTread_W_2_21
+      2    440.0 mm  Panel_West  x  StairWaist_W   e.g. Panel_West_20_2 x StairWaist_W_3_0
+      2    440.0 mm  Panel_West  x  StairTread_W   e.g. Panel_West_20_2 x StairTread_W_3_0
+      2    440.0 mm  Panel_East  x  StairTread_E   e.g. Panel_East_20_3 x StairTread_E_3_21
+      2    430.0 mm  Panel_West  x  StairWaist_W   e.g. Panel_West_20_2 x StairWaist_W_2_21
+      2    430.0 mm  Panel_East  x  StairWaist_E   e.g. Panel_East_20_1 x StairWaist_E_1_21
+      2    386.4 mm  Panel_West  x  StairTread_W   e.g. Panel_West_20_2 x StairTread_W_2_20
+      2    360.6 mm  Panel_West  x  StairWaist_W   e.g. Panel_West_19_2 x StairWaist_W_3_2
+      2    360.6 mm  Panel_West  x  StairTread_W   e.g. Panel_West_19_2 x StairTread_W_3_2
+      2    360.6 mm  Panel_East  x  StairWaist_E   e.g. Panel_East_20_Base x StairWaist_E_0_2
+      2    266.4 mm  Panel_West  x  StairWaist_W   e.g. Panel_West_20_2 x StairWaist_W_2_20
+      2    248.9 mm  Panel_East  x  StairWaist_E   e.g. Panel_East_19_3 x StairWaist_E_3_20
+      2    248.9 mm  Panel_East  x  StairTread_E   e.g. Panel_East_19_3 x StairTread_E_3_20
+      2    248.9 mm  Panel_West  x  StairWaist_W   e.g. Panel_West_19_2 x StairWaist_W_3_1
+  ... 133 more families

@@ -1,0 +1,7 @@
+GEOMETRY v06: 29976 meshes; SHA256(names/world vertices at1micrometre)=523cd725f671151f70fb591add45a53875bbd80cb619a85760088230495d1416; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v06.blend
+Forbidden invented beam / ground / earth / granular-base families: 0.
+1250 actual chamfered wings: X projection350mm; Y depth1m; original supportZ.
+Opaque side-panel area within approved below-incline opening: 0m2 (10mm2 area tolerance).
+Fixtures mapping: {'Facade/TimberFrames': 5414, 'Insert/SkylightFrames': 178, 'Facade/SteelFrames': 215, 'Structure/StairRims': 1152}; named examples pass; true frame preserved.
+Measured v05 comparison: 23710 unchanged, 2703 changed shared names, 3754 deleted, 3563 added. Primary shafts/beams/slabs/stair walking geometry stable.
+Fixture geometry unchanged 6145; separately inventoried refitted 814.

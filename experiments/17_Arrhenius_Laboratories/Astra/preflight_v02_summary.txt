@@ -1,0 +1,6 @@
+PREFLIGHT: 31125 members, 3 pairs, 0 floating
+OVERLAP FAMILIES: 3 (count  depth  family a  x  family b   e.g. a x b)
+      1    200.0 mm  SouthInclineRail  x  EdgeBeam   e.g. SouthInclineRail_2_1 x EdgeBeam_1_1_0_0
+      1    200.0 mm  EdgeBeam  x  SouthInclineRail   e.g. EdgeBeam_1_2_19_0 x SouthInclineRail_2_4
+      1     24.9 mm  CourtStairTopLanding  x  InsertInclineRail   e.g. CourtStairTopLanding x InsertInclineRail_1
+FLOATING

@@ -1,0 +1,13 @@
+﻿# v07 ground visual review - accepted
+
+One independent Designer fallback reviewer, not v07 geometry author; fresh Luna Inspector failed at the runtime thread limit. No v07 geometry code read. Source interpretation is retained only under delta_v07's exact29,976-object baseline proof, and actual new-version images are examined independently.
+
+Ground routesW0/E0/N0/S0 preserve continuous approaches around all four core/stair groups without wall crossings. Plans33/34 retain east rooms, courtyard gallery and unobstructed wing-to-insert link. Plan35 preserves the entrance/foyer and correctly labels the150mm step to unmodeled ground. Support41 shows tread seats on the continuous waist with bottom footing and wall-supported landing. Support42 retains terrace concrete and omits earth, with the30mm north cantilever. Supports51/52 retain actual wall/corbel fitting and separate landing seats. WB31 shows insert entrances and court stair intact. Ground bracket56/57 and capped56 show the continuous stepped web clear of tested routes.
+
+All32 actual-mesh capped drawings have been directly reviewed across the storey subsets. New bracket caption55 was corrected from 'inferred capacity' to 'capacity unverified' and reopened successfully; no geometry changed. All55 Workbench views01–37/41–58, four selected Cycles and32 capped drawings have now been directly reviewed across the sequential subsets. No actual geometry defect has been found in this completed subset. Final image identities, all51 batch copies, five saved masters and30,156/0pairs/0families/0floating diagnostics are accepted in inspection_v07_identity.md. This storey subset passes with no unresolved finding. Numeric route/support evidence is separately documented in structural_review_v07.md; images do not establish engineered capacity.
+
+
+WB20 preserves the complete ground ring and four core bases. WB25 shows the local incline beside the stacked stair; WB37 retains the entrance opening/approach. WB41 exposes tread/waist/footing/landing support and WB42 the retained terrace concrete without earth. No attachment crosses the visible entrance or court route.
+
+WB51 shows the retained wall fitting to the true corbel profile, with no full-height shadow subtraction. WB52 is occluded by an unrelated foreground slab and is not used to claim a visible landing connection. The isolated saved-geometry view53 exposes the full landing/support plate, lower retaining-wall ledge and upper corbel shoulder with the shaft behind. The stepped fit visibly retains the cap over the wing and the lower root without a through-hole. Capped52 and the accepted actual-face/R39 evidence establish the separate finite seats; perspective darkness is not used to estimate their areas.
+

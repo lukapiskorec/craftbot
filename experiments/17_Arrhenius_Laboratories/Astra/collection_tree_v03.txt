@@ -1,0 +1,38 @@
+Collection
+Foundation
+Site
+Structure
+  Columns
+  Corbels
+  Beams
+  Cores
+  StairRims
+Floors
+Roof
+  RoofSlabs
+  Parapets
+  Plant
+  PlantLouvres
+  Drains
+Facade
+  PrecastPanels
+  TimberFrames
+  Glass
+  SouthMetal
+  SteelFrames
+Entrance
+Interior
+  Partitions
+Stairs
+  Treads
+  Waists
+  Rails
+  Landings
+Insert
+  InsertFloors
+  InsertStructure
+  InsertWalls
+  SkylightFrames
+  InsertGlass
+  Retaining
+SiteStairs

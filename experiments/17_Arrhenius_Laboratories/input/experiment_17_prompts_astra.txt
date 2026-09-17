@@ -1,0 +1,21 @@
+$run-experiment 17 Build a faithful model of the Arrhenius Laboratories building shown on input images in the experiment folder. Additionally, use this website as a resource for textual description of the building: https://hicarquitectura.com/2026/09/carl-nyren-arhenius-laboratories/
+
+continue
+
+continue
+
+continue
+
+continue
+
+continue
+
+continue
+
+I found some discrepancies in the building geometry and structure that I want you to investigate and fix:
+- columns with corbel seat and wing elements seem to be rotated 90 degrees from they should - check input images Arrhenius Laboratories 02 and Arrhenius Laboratories 06 to see the rotation best
+- elements like EdgeBeam don't exist as such, in their place there is only the facade parapet under the window - Beam elements do exist and hold the floor slabs, this is best visible in Arrhenius Laboratories 01 image
+- Arrhenius Laboratories 07 image shows the structure under construction, with column corbel seats supporting the beams which in turn support floor slabs
+- you should remove extra facade elements under the inclined facade surface (Panel_East_1_0_Fit0_ShoulderFit0, Panel_West_1_0_Fit0_ShoulderFit0 etc.) - it is very clear that space is clear/empty on images like Arrhenius Laboratories 02
+- remove all ground planes in this model, they are distracting
+- layer assignment is off - window frame elements like SouthInclineRafter_31_0 and Window_East_5_3_Sill should be in fixtures, not in frame - also StairRim elements should be in fixtures, not in frame

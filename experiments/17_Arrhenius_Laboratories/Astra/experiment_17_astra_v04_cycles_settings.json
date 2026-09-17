@@ -1,0 +1,290 @@
+{
+  "experiment": "C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\preflight_v04.blend",
+  "blender": "4.3.2",
+  "settings": {
+    "samples": 32,
+    "noise_threshold": 0.015,
+    "exposure": 0,
+    "world_strength": 0.2,
+    "sun_size": 3,
+    "sun_intensity": 0.4,
+    "fill_strength": 0.25,
+    "edges": "none",
+    "edge_width": 0.01,
+    "edge_darkness": 0.22,
+    "edge_light_response": 0.3,
+    "overlap_shadow_epsilon": 0.001,
+    "foundation": "hide",
+    "glass_roughness": 0.015,
+    "glass_transmission": 1.0,
+    "glass_ior": 1.45,
+    "material_roles": {
+      "Foundation": "concrete",
+      "Columns": "concrete",
+      "Corbels": "concrete",
+      "Beams": "concrete",
+      "Cores": "concrete",
+      "Floors": "concrete",
+      "RoofSlabs": "concrete",
+      "Parapets": "concrete",
+      "PrecastPanels": "concrete",
+      "Treads": "concrete",
+      "Waists": "concrete",
+      "Landings": "concrete",
+      "InsertFloors": "concrete",
+      "InsertStructure": "concrete",
+      "InsertWalls": "concrete",
+      "Retaining": "concrete",
+      "SiteStairs": "concrete",
+      "SteelFrames": "metal",
+      "SouthMetal": "metal",
+      "StairRims": "metal",
+      "Rails": "metal",
+      "SkylightFrames": "metal",
+      "Plant": "metal",
+      "PlantLouvres": "metal",
+      "Drains": "metal",
+      "TimberFrames": "timber",
+      "Entrance": "timber",
+      "Glass": "glass",
+      "InsertGlass": "glass",
+      "Partitions": "cladding",
+      "Site": "cladding"
+    },
+    "foundation_collections": [
+      "Foundation"
+    ]
+  },
+  "renders": [
+    {
+      "name": "12_muted_none_no_foundation",
+      "file": "C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\experiment_17_astra_v04_cycles_view_12_muted_none_no_foundation.png",
+      "palette": "muted",
+      "foundation": "no_foundation",
+      "hide": [
+        "Foundation"
+      ],
+      "study": "12",
+      "edges": "none",
+      "edge_width": 0.01,
+      "edge_darkness": 0.22,
+      "edge_light_response": 0.3,
+      "camera": {
+        "type": "ORTHO",
+        "azimuth": 280,
+        "elevation": 7,
+        "location": [
+          89.64208221435547,
+          -329.2608947753906,
+          54.2934684753418
+        ],
+        "ortho_scale": 106.4000015258789
+      },
+      "sun_rotation": -160,
+      "sun_elevation": 45,
+      "resolution": [
+        1200,
+        900
+      ],
+      "samples": 32,
+      "device": "GPU",
+      "denoiser": "OPTIX",
+      "swatches_srgb": {
+        "timber": [
+          0.57,
+          0.51,
+          0.44
+        ],
+        "cladding": [
+          0.73,
+          0.68,
+          0.6
+        ],
+        "concrete": [
+          0.89,
+          0.885,
+          0.87
+        ],
+        "metal": [
+          0.32,
+          0.335,
+          0.35
+        ],
+        "glass": [
+          1,
+          1,
+          1
+        ]
+      },
+      "color_management": {
+        "transform": "AgX",
+        "look": "AgX - Medium High Contrast",
+        "exposure": 0.0
+      },
+      "mesh_count": 29876,
+      "hidden_mesh_count": 436,
+      "material_counts": {
+        "Presentation_muted_concrete": 14915,
+        "Presentation_muted_cladding": 2677,
+        "Presentation_muted_metal": 4254,
+        "Presentation_muted_timber": 5137,
+        "Presentation_muted_glass": 2893
+      },
+      "seconds": 49.28
+    },
+    {
+      "name": "15_muted_none_no_foundation",
+      "file": "C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\experiment_17_astra_v04_cycles_view_15_muted_none_no_foundation.png",
+      "palette": "muted",
+      "foundation": "no_foundation",
+      "hide": [
+        "Foundation"
+      ],
+      "study": "15",
+      "edges": "none",
+      "edge_width": 0.01,
+      "edge_darkness": 0.22,
+      "edge_light_response": 0.3,
+      "camera": {
+        "type": "ORTHO",
+        "azimuth": 270,
+        "elevation": 22,
+        "location": [
+          27.0,
+          -269.98541259765625,
+          143.15093994140625
+        ],
+        "ortho_scale": 81.19999694824219
+      },
+      "sun_rotation": -160,
+      "sun_elevation": 45,
+      "resolution": [
+        1200,
+        900
+      ],
+      "samples": 32,
+      "device": "GPU",
+      "denoiser": "OPTIX",
+      "swatches_srgb": {
+        "timber": [
+          0.57,
+          0.51,
+          0.44
+        ],
+        "cladding": [
+          0.73,
+          0.68,
+          0.6
+        ],
+        "concrete": [
+          0.89,
+          0.885,
+          0.87
+        ],
+        "metal": [
+          0.32,
+          0.335,
+          0.35
+        ],
+        "glass": [
+          1,
+          1,
+          1
+        ]
+      },
+      "color_management": {
+        "transform": "AgX",
+        "look": "AgX - Medium High Contrast",
+        "exposure": 0.0
+      },
+      "mesh_count": 29876,
+      "hidden_mesh_count": 436,
+      "material_counts": {
+        "Presentation_muted_concrete": 14915,
+        "Presentation_muted_cladding": 2677,
+        "Presentation_muted_metal": 4254,
+        "Presentation_muted_timber": 5137,
+        "Presentation_muted_glass": 2893
+      },
+      "seconds": 51.83
+    },
+    {
+      "name": "28_muted_none_no_foundation",
+      "file": "C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\experiment_17_astra_v04_cycles_view_28_muted_none_no_foundation.png",
+      "palette": "muted",
+      "foundation": "no_foundation",
+      "hide": [
+        "Site",
+        "Interior",
+        "Foundation"
+      ],
+      "study": "28",
+      "edges": "none",
+      "edge_width": 0.01,
+      "edge_darkness": 0.22,
+      "edge_light_response": 0.3,
+      "camera": {
+        "type": "ORTHO",
+        "azimuth": 180,
+        "elevation": 0,
+        "location": [
+          -359.80047607421875,
+          61.0,
+          8.0
+        ],
+        "ortho_scale": 30.799999237060547
+      },
+      "sun_rotation": -160,
+      "sun_elevation": 45,
+      "resolution": [
+        1200,
+        900
+      ],
+      "samples": 32,
+      "device": "GPU",
+      "denoiser": "OPTIX",
+      "swatches_srgb": {
+        "timber": [
+          0.57,
+          0.51,
+          0.44
+        ],
+        "cladding": [
+          0.73,
+          0.68,
+          0.6
+        ],
+        "concrete": [
+          0.89,
+          0.885,
+          0.87
+        ],
+        "metal": [
+          0.32,
+          0.335,
+          0.35
+        ],
+        "glass": [
+          1,
+          1,
+          1
+        ]
+      },
+      "color_management": {
+        "transform": "AgX",
+        "look": "AgX - Medium High Contrast",
+        "exposure": 0.0
+      },
+      "mesh_count": 29876,
+      "hidden_mesh_count": 3113,
+      "material_counts": {
+        "Presentation_muted_concrete": 14915,
+        "Presentation_muted_cladding": 2677,
+        "Presentation_muted_metal": 4254,
+        "Presentation_muted_timber": 5137,
+        "Presentation_muted_glass": 2893
+      },
+      "seconds": 46.79
+    }
+  ]
+}

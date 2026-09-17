@@ -1,0 +1,46 @@
+GEOMETRY v05: 30167 meshes; SHA256(names/world vertices at1micrometre)=6cd07366762f8213cb58508c746d180142bf48f2534813f8f0bb0b64dc922f4c; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v05.blend
+Retention regression compares exact world-vertex signatures of every original member against immutable v04.
+29,870 of 29,876 original members are bit-identical. Only six buried metal weather-return pieces were trimmed; all primary frame, slabs, cores, foundations, internal stairs, insert joints, facade brackets and walking surfaces are unchanged.
+The following geometric evidence therefore carries forward by exact member identity. These are retained v04 measurements verified unchanged, not newly rerun or counted as separate v05 tests.
+supports_v04.txt: 250 full-footprint seats; 866 ordinary +8 reduced +2 alternate beam cases; 22 local connection faces; 8 core-base unions; rim/foundation paths
+  report SHA256 ff1b176a314308a579a32d975cc0e1f0882568ca683c914aca8706d34398dfca
+insert_joint_followup_v04.txt: 45 internal integral slab interfaces:36 level1 +9 roof; full13.8749976158m2 concrete face coverage and0.40m support band beyond; kept separate from67 horizontal-seat cases
+  report SHA256 a048997975b5d744922720ffdac938ec7f3439e1eb39932cc66e125e093ab76e
+Current v05 checks: completion_v05.txt reruns4534 ordinary slab ends plus261 intended200mm seats and all new support interfaces; structural_followup_v05.txt rechecks actual core/diaphragm interfaces and insert/foundation context.
+south_v05.txt separately repeats57 bracket contacts and primary14,056-member signature comparison against v04; rim_contacts_v05.txt repeats16 rim/header groups. Route/headroom/public envelopes use current complete v05 geometry.
+Eight0.065m2 reduced corbel seats retain18.75% area reduction; no capacity-equivalence claim.
+Insert is continuous cast-integral reinforced concrete at its45 internal slab lines and0.16m2 beam-column faces; reinforcement development, shear/moment capacity, anchors, soil, diaphragm forces and section sizing remain inferred.
+ADDED OBJECT FAMILIES:
+CourtLandingLedge: 1
+CourtLandingSupport: 3
+CourtStairFooting: 2
+CourtSubsoil: 1
+CourtWaist: 20
+PerimeterLedger_N: 83
+PerimeterLedger_S: 45
+SouthClosure_East_Fit5_LedgerFit1: 1
+SouthClosure_East_Fit7_LedgerFit1: 1
+SouthClosure_East_Fit9_LedgerFit1: 1
+SouthClosure_West_Fit10_LedgerFit1: 1
+SouthClosure_West_Fit14_LedgerFit1: 1
+SouthClosure_West_Fit7_LedgerFit1: 1
+TerraceBase: 6
+TerraceFill: 6
+TerraceFooting_E: 4
+TerraceFooting_N: 4
+TerraceFooting_W: 5
+TerraceSubsoil_E: 9
+TerraceSubsoil_Interior: 50
+TerraceSubsoil_N: 14
+TerraceSubsoil_S: 17
+TerraceSubsoil_W: 12
+TerraceWall_E: 1
+TerraceWall_N: 1
+TerraceWall_W: 1
+BURIED CLOSURE EXCEPTIONS (all other original objects unchanged):
+SouthClosure_East_Fit5: removed 0.001200104m3 at [[53.41999816894531, 53.45000076293945, 0.30000001192092896, 0.5, 10.350000000000001, 10.55]]; 2 remaining fitted pieces
+SouthClosure_East_Fit7: removed 0.001200101m3 at [[53.41999816894531, 53.45000076293945, 0.30000001192092896, 0.5, 13.950000000000001, 14.149999618530273]]; 2 remaining fitted pieces
+SouthClosure_East_Fit9: removed 0.001200104m3 at [[53.41999816894531, 53.45000076293945, 0.30000001192092896, 0.5, 17.55, 17.75]]; 2 remaining fitted pieces
+SouthClosure_West_Fit10: removed 0.001199996m3 at [[0.550000011920929, 0.5799999833106995, 0.30000001192092896, 0.5, 13.950000000000001, 14.149999618530273]]; 2 remaining fitted pieces
+SouthClosure_West_Fit14: removed 0.001199999m3 at [[0.550000011920929, 0.5799999833106995, 0.30000001192092896, 0.5, 17.55, 17.75]]; 2 remaining fitted pieces
+SouthClosure_West_Fit7: removed 0.001199999m3 at [[0.550000011920929, 0.5799999833106995, 0.30000001192092896, 0.5, 10.350000000000001, 10.55]]; 2 remaining fitted pieces

@@ -156,6 +156,21 @@ OVERRIDES = {
     "16": [
         (r"ground/(lower|upper)sleepers\|", FRAME),
     ],
+    "17": [
+        # Arrhenius window assemblies and stair rims are viewer fixtures;
+        # their modeled structural support duties remain separately checked.
+        (r"^(?:facade/(?:timberframes|steelframes)|insert/skylightframes)\|", FIXT),
+        (r"\|stairrim_", FIXT),
+        (r"^floors\|entranceapproachslab$", FLOORS),
+        (r"insert/insertfloors\|inserteastshelf", FRAME),
+        (r"insert/insertfloors\|insertlinkdeck", FRAME),
+        (r"roof/drains\|roofdrain", ROOF),
+        (r"roof/parapets\|parapet", ROOF),
+        (r"roof/plant\|plant(plinth|clad|seam)", ROOF),
+        # The viewer's foundations layer also holds modelled site surfaces.
+        (r"(?:^|/)site\|(siteground|courtyardgarden|courtpatheast|northterrace)", FOUND),
+        (r"^site/terrace(base|fill)\|terrace(base|fill)_", FOUND),
+    ],
 }
 
 _compiled = {}

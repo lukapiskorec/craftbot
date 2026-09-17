@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">South slab end: added 200mm seat on integral beam-edge ledger</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=12.00m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="155.333,610.667 326.000,610.667 326.000,333.333 155.333,333.333" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Beam_3_0_0_1_0</title></polygon>
+<polygon points="368.667,333.333 2800.667,333.333 2800.667,226.667 368.667,226.667" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_3_0_Row0_8_0</title></polygon>
+<polygon points="326.000,418.667 454.000,418.667 454.000,333.333 326.000,333.333" fill="#82afc0" stroke="#303030" stroke-width="1"><title>PerimeterLedger_S_3_11</title></polygon>
+<polygon points="454.000,751.467 560.667,751.467 560.667,738.667 454.000,738.667" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>SouthClosure_Sill_Fit1_ShoulderFit1</title></polygon>
+<polygon points="27.333,751.467 454.000,751.467 454.000,738.667 27.333,738.667" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>SouthClosure_Sill_Fit1_ShoulderFit2</title></polygon>
+<polygon points="-49.467,568.000 155.333,568.000 155.333,525.333 -49.467,525.333" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>SouthSupportBracket_4_0</title></polygon>
+<polygon points="560.667,1229.333 654.533,1229.333 654.533,738.667 560.667,738.667" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>SouthVentBacking</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Existing slab begins y0.30; retained beam ends y0.20.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">Ledger y0.20..0.50; root lies in retained beam concrete.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Section through level 3; same support fitted at levels 3-5.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>

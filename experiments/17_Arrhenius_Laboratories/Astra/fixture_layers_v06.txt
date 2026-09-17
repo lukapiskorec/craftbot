@@ -1,0 +1,10 @@
+C:\Users\lukap\Documents\GitHub\craftbot\viewer\models\17_Arrhenius_Laboratories\astra_v06.json
+SHA256 3418977bac8e7bb2913c6d7eef4ee381396477601414db8d4cffdc6956d23a80
+29976 exported elements; source experiments/17_Arrhenius_Laboratories/Astra/experiment_17_astra_v06.py
+Facade/TimberFrames: count5414; expected fixtures; actual {'fixtures': 5414}; PASS
+Facade/SteelFrames including brackets: count215; expected fixtures; actual {'fixtures': 215}; PASS
+Insert/SkylightFrames: count178; expected fixtures; actual {'fixtures': 178}; PASS
+StairRim: count1152; expected fixtures; actual {'fixtures': 1152}; PASS
+Concrete RooflightSeatBeam: count4; expected frame; actual {'frame': 4}; PASS
+Unclassified other: 0; PASS
+Taxonomy result: 6 passed,0 failed.

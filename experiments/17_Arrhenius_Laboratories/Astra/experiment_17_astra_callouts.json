@@ -1,0 +1,57 @@
+{
+  "callouts": [
+    {
+      "id": "external-concrete-frame",
+      "label": "External concrete columns and bearing shoulders",
+      "section": "6.3",
+      "quote": "Exterior concrete shafts stand proud of the enclosure and widen into chamfered bearing shoulders.",
+      "match": {"names": "Column_*|CorbelSeat_*|CorbelWing_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "inclined-entrance",
+      "label": "Inclined glass above the recessed entrance porch",
+      "section": "6.2",
+      "quote": "The south front combines a tall metal fascia, recessed ribbon, fine horizontal strip and broad inclined glazing over the porch.",
+      "match": {"names": "SouthInclineGlass_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "metal-fascia",
+      "label": "Deep metal fascia distinguishes the south elevation",
+      "section": "6.2",
+      "match": {"names": "SouthFascia*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "courtyard-insert",
+      "label": "Two-storey courtyard insert with rooflights",
+      "section": "6.4",
+      "quote": "The low courtyard insert has two levels, rooflights and side glazing.",
+      "match": {"names": "SkylightGlass_*|InsertInclineGlass_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "curved-stairs",
+      "label": "Four curved stairs with open wells",
+      "section": "6.4",
+      "match": {"names": "StairTread_W_*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "precast-window-rhythm",
+      "label": "Precast spandrels and timber-framed windows",
+      "section": "3",
+      "match": {"names": "Panel_East_*|Window_East_*", "collection": "Facade/*"},
+      "anchor": "nearest"
+    },
+    {
+      "id": "roof-plant",
+      "label": "Plant housings above the flat roof",
+      "section": "6.5",
+      "quote": "The roof remains a flat ring with limited plant housings.",
+      "match": {"names": "PlantClad_*"},
+      "anchor": "nearest"
+    }
+  ]
+}

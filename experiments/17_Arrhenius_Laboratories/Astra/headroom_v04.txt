@@ -1,0 +1,3 @@
+GEOMETRY v04: 29876 meshes; SHA256(names/world vertices at1micrometre)=8a02c4b9865c497bbd2d1af58a76140a978e0863a98ebd97a32ff63a26951657; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v04.blend
+CONTINUOUS HEADROOM: 368 convex walking regions; minimum 2.700m; 0 violations below2.10m
+Governing: (2.6999998092651367, 'StairLanding_E_1_Gallery', 'Beam_3_10_1_1_12')

@@ -1,0 +1,31 @@
+GEOMETRY v06: 29976 meshes; SHA256(names/world vertices at1micrometre)=523cd725f671151f70fb591add45a53875bbd80cb619a85760088230495d1416; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v06.blend
+Paving: width1.200m/headroom2.100m; floor z0.000; gap0.000000000m2; obstacles[]; PASSTrue
+Porch: width1.200m/headroom2.100m; floor z0.000; gap0.000000000m2; obstacles[]; PASSTrue
+CourtPath: width1.200m/headroom2.100m; floor z0.000; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread1: width1.200m/headroom2.100m; floor z0.150; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread2: width1.200m/headroom2.100m; floor z0.300; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread3: width1.200m/headroom2.100m; floor z0.450; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread4: width1.200m/headroom2.100m; floor z0.600; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread5: width1.200m/headroom2.100m; floor z0.750; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread6: width1.200m/headroom2.100m; floor z0.900; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread7: width1.200m/headroom2.100m; floor z1.050; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread8: width1.200m/headroom2.100m; floor z1.200; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread9: width1.200m/headroom2.100m; floor z1.350; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread10: width1.200m/headroom2.100m; floor z1.500; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread11: width1.200m/headroom2.100m; floor z1.650; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread12: width1.200m/headroom2.100m; floor z1.800; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread13: width1.200m/headroom2.100m; floor z1.950; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread14: width1.200m/headroom2.100m; floor z2.100; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread15: width1.200m/headroom2.100m; floor z2.250; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread16: width1.200m/headroom2.100m; floor z2.400; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread17: width1.200m/headroom2.100m; floor z2.550; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread18: width1.200m/headroom2.100m; floor z2.700; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTread19: width1.200m/headroom2.100m; floor z2.850; gap0.000000000m2; obstacles[]; PASSTrue
+CourtTop: width1.200m/headroom2.100m; floor z3.000; gap0.000000000m2; obstacles[]; PASSTrue
+RetainingTop: width1.200m/headroom2.100m; floor z3.000; gap0.000000000m2; obstacles[]; PASSTrue
+Terrace: width1.200m/headroom2.100m; floor z3.000; gap0.000000000m2; obstacles[]; PASSTrue
+DoorAperture: width2.400m/headroom2.400m; floor z0.000; gap0.000000000m2; obstacles[]; PASSTrue
+Removed Lawn/CourtGarden are excluded by concept9; their surfaces are unmodeled. Historical grade transitions were150/100mm; nineteen tread tops plus landing make20 x0.150m rises to3.000m. Consecutive strip boundaries coincide; these are stepped pedestrian routes, not accessible ramps.
+Failures: []
+Approach retained concrete seat and explicit unmodeled earth-bearing remainder atz-0.250: actual face areas{'GradeBeam_0_0_2_0': 1.2000000178813934}; PASSTrue; unmodeled base/ground footprint2.400000m2; no mesh-proved soil claim.
+Terrain / occupied-volume intersections: []; primary wing/link and insert interior boxes conservatively tested.

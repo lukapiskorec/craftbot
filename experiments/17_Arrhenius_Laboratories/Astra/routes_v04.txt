@@ -1,0 +1,23 @@
+GEOMETRY v04: 29876 meshes; SHA256(names/world vertices at1micrometre)=8a02c4b9865c497bbd2d1af58a76140a978e0863a98ebd97a32ff63a26951657; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v04.blend
+ACTUAL-MESH ROUTES; 50mm samples; 1.30m sampled disc for required1.20m; full2.10m obstacle envelope
+W level0 z0.00: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 10766
+W level1 z3.60: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9256
+W level2 z7.20: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9412
+W level3 z10.80: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9256
+W level4 z14.40: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9288
+E level0 z0.00: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 11030
+E level1 z3.60: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9514
+E level2 z7.20: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9674
+E level3 z10.80: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9514
+E level4 z14.40: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 9534
+N level0 z0.00: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 31547
+N level1 z3.60: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 31069
+N level2 z7.20: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 31187
+N level3 z10.80: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 31069
+N level4 z14.40: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 31083
+S level0 z0.00: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 20561
+S level1 z3.60: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 18641
+S level2 z7.20: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 18883
+S level3 z10.80: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 18641
+S level4 z14.40: landing-disc centres 1; 1.20m route/2.10m height to main corridor: True; visited 18680
+Sampled geometric evidence, not regulatory compliance.

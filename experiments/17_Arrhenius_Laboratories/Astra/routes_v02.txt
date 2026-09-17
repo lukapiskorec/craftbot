@@ -1,0 +1,4 @@
+FROZEN v02 MESH ROUTE DIAGNOSTIC; 50mm samples; 1.20m disc; actual floor faces and obstacle section50mm above floor
+West level1 z3.60: 1119 landing sample centres; 271 support/clearance-disc centres; route reaches x9.0 corridor: False; reached cells 277
+West level4 z14.40: 1103 landing sample centres; 210 support/clearance-disc centres; route reaches x9.0 corridor: False; reached cells 210
+Higher obstacles omitted (optimistic). Raster sampling does not prove continuous clearances or regulatory compliance.

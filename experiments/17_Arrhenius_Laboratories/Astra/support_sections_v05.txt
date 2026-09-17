@@ -1,0 +1,2 @@
+GEOMETRY v05: 30167 meshes; SHA256(names/world vertices at1micrometre)=6cd07366762f8213cb58508c746d180142bf48f2534813f8f0bb0b64dc922f4c; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v05.blend
+Actual capped section SVGs41-44; native rasterizer produces PNGs.

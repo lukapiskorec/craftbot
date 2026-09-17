@@ -1,0 +1,19 @@
+C:\Users\lukap\Documents\GitHub\craftbot\viewer\models\17_Arrhenius_Laboratories\astra_v07.json
+SHA256 2a074a8867df408bdd16b5c3a24f0d7d5177bbb9f7a2a1e126a8ce07c2cf26b3
+30156 exported elements; source experiments/17_Arrhenius_Laboratories/Astra/experiment_17_astra_v07.py
+Facade/TimberFrames: count 5414/5414; expected fixtures; actual {'fixtures': 5414}; PASS
+Facade/SteelFrames including brackets: count 395/395; expected fixtures; actual {'fixtures': 395}; PASS
+Insert/SkylightFrames: count 178/178; expected fixtures; actual {'fixtures': 178}; PASS
+StairRim: count 1152/1152; expected fixtures; actual {'fixtures': 1152}; PASS
+Concrete RooflightSeatBeam: count 4/4; expected frame; actual {'frame': 4}; PASS
+New CourtFacadeBracket: count 180/180; expected fixtures; actual {'fixtures': 180}; PASS
+EntranceApproachSlab: count 1/1; expected floors; actual {'floors': 1}; PASS
+Named SouthInclineRafter_31_0: count 1/1; expected fixtures; actual {'fixtures': 1}; PASS
+Named Window_East_5_3_Sill: count 1/1; expected fixtures; actual {'fixtures': 1}; PASS
+All 180 exact bracket names and Facade/SteelFrames collection: PASS
+Named bracket example: ('CourtFacadeBracket_1_0_0_Root', 'Facade/SteelFrames', 'fixtures')
+Named bracket example: ('CourtFacadeBracket_1_0_0_Web', 'Facade/SteelFrames', 'fixtures')
+Named bracket example: ('CourtFacadeBracket_1_0_0_Receiver', 'Facade/SteelFrames', 'fixtures')
+Named bracket example: ('CourtFacadeBracket_1_1_0_Root', 'Facade/SteelFrames', 'fixtures')
+Unclassified other: 0; PASS
+Taxonomy result: 11 passed,0 failed.

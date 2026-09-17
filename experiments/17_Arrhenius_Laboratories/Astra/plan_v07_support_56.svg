@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">Ground CourtSouth attachment: continuous stepped web</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=21.20m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="551.882,458.824 559.412,458.824 559.412,345.882 551.882,345.882" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_0_0_Receiver</title></polygon>
+<polygon points="371.177,571.765 378.706,571.765 378.706,458.824 371.177,458.824" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_0_0_Root</title></polygon>
+<polygon points="378.706,571.765 551.882,571.765 551.882,345.882 378.706,345.882" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_0_0_Web</title></polygon>
+<polygon points="-4372.353,647.059 145.294,647.059 145.294,458.824 -4372.353,458.824" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_0_2_Row1_3_0</title></polygon>
+<polygon points="145.294,647.059 371.177,647.059 371.177,458.824 145.294,458.824" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_0_2_Row2_2_0</title></polygon>
+<polygon points="-5.294,910.588 295.882,910.588 295.882,647.059 -5.294,647.059" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>GradeBeam_2_0_2_0</title></polygon>
+<polygon points="559.412,458.824 725.058,458.824 725.058,120.000 559.412,120.000" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Panel_CourtSouth_1_Base</title></polygon>
+<polygon points="559.412,120.000 634.706,120.000 634.706,71.059 559.412,71.059" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Window_CourtSouth_1_0_Sill</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Root plate -0.15..0.00m; receiver 0.00..0.15m; web -0.15..0.15m.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">Vertical anchor interfaces 0.015m2; weld interfaces 0.0015m2.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Real ground slab bears 200mm on GradeBeam; earth remains unmodeled.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>

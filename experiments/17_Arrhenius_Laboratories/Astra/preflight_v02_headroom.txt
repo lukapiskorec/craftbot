@@ -1,0 +1,1 @@
+HEADROOM: 3648 samples; minimum 2.700m; 0 under2.10m

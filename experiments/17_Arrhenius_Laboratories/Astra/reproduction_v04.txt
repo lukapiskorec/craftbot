@@ -1,0 +1,2 @@
+GEOMETRY v04: 29876 meshes; SHA256(names/world vertices at1micrometre)=8a02c4b9865c497bbd2d1af58a76140a978e0863a98ebd97a32ff63a26951657; loaded 
+Full generator matches completed snapshot: True

@@ -1,0 +1,61 @@
+GEOMETRY v05: 30167 meshes; SHA256(names/world vertices at1micrometre)=6cd07366762f8213cb58508c746d180142bf48f2534813f8f0bb0b64dc922f4c; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v05.blend
+Retained frame/floor/stair/insert signatures: 14056 current / 14056 v04; changed []
+SouthSupportBracket_0_0: rail face (0.010000034570680327, ['SouthSupportPost_0', 'SouthSupportRail_0_Fit0']); concrete face (0.010000034570680327, ['Beam_3_0_0_0_0']); PASSTrue
+SouthSupportBracket_0_1: rail face (0.009999939203282793, ['SouthSupportPost_0', 'SouthSupportRail_1_Fit0']); concrete face (0.009999939203282793, ['Beam_4_0_0_0_0']); PASSTrue
+SouthSupportBracket_0_2: rail face (0.009999843835885258, ['SouthSupportPost_0', 'SouthSupportRail_2_Fit0']); concrete face (0.009999843835885258, ['Beam_5_0_0_0_0']); PASSTrue
+SouthSupportBracket_10_0: rail face (0.009999885558499955, ['SouthSupportPost_10', 'SouthSupportRail_0_Fit10', 'SouthSupportRail_0_Fit9']); concrete face (0.009999885558499955, ['Beam_3_0_0_3_0']); PASSTrue
+SouthSupportBracket_10_1: rail face (0.009999790192523506, ['SouthSupportPost_10', 'SouthSupportRail_1_Fit10', 'SouthSupportRail_1_Fit9']); concrete face (0.009999790192523506, ['Beam_4_0_0_3_0']); PASSTrue
+SouthSupportBracket_10_2: rail face (0.009999694826547056, ['SouthSupportPost_10', 'SouthSupportRail_2_Fit10', 'SouthSupportRail_2_Fit9']); concrete face (0.009999694826547056, ['Beam_5_0_0_3_0']); PASSTrue
+SouthSupportBracket_11_0: rail face (0.009999885558499955, ['SouthSupportPost_11', 'SouthSupportRail_0_Fit10', 'SouthSupportRail_0_Fit11']); concrete face (0.009999885558499955, ['Beam_3_0_0_3_0']); PASSTrue
+SouthSupportBracket_11_1: rail face (0.009999790192523506, ['SouthSupportPost_11', 'SouthSupportRail_1_Fit10', 'SouthSupportRail_1_Fit11']); concrete face (0.009999790192523506, ['Beam_4_0_0_3_0']); PASSTrue
+SouthSupportBracket_11_2: rail face (0.009999694826547056, ['SouthSupportPost_11', 'SouthSupportRail_2_Fit10', 'SouthSupportRail_2_Fit11']); concrete face (0.009999694826547056, ['Beam_5_0_0_3_0']); PASSTrue
+SouthSupportBracket_12_0: rail face (0.009999885558499955, ['SouthSupportPost_12', 'SouthSupportRail_0_Fit11', 'SouthSupportRail_0_Fit12']); concrete face (0.009999885558499955, ['Column_60']); PASSTrue
+SouthSupportBracket_12_1: rail face (0.009999790192523506, ['SouthSupportPost_12', 'SouthSupportRail_1_Fit11', 'SouthSupportRail_1_Fit12']); concrete face (0.009999790192523506, ['Column_60']); PASSTrue
+SouthSupportBracket_12_2: rail face (0.009999694826547056, ['SouthSupportPost_12', 'SouthSupportRail_2_Fit11', 'SouthSupportRail_2_Fit12']); concrete face (0.009999694826547056, ['Column_60']); PASSTrue
+SouthSupportBracket_13_0: rail face (0.009999885558499955, ['SouthSupportPost_13', 'SouthSupportRail_0_Fit12', 'SouthSupportRail_0_Fit13']); concrete face (0.009999885558499955, ['Beam_3_0_0_4_0']); PASSTrue
+SouthSupportBracket_13_1: rail face (0.009999790192523506, ['SouthSupportPost_13', 'SouthSupportRail_1_Fit12', 'SouthSupportRail_1_Fit13']); concrete face (0.009999790192523506, ['Beam_4_0_0_4_0']); PASSTrue
+SouthSupportBracket_13_2: rail face (0.009999694826547056, ['SouthSupportPost_13', 'SouthSupportRail_2_Fit12', 'SouthSupportRail_2_Fit13']); concrete face (0.009999694826547056, ['Beam_5_0_0_4_0']); PASSTrue
+SouthSupportBracket_14_0: rail face (0.009999885558499955, ['SouthSupportPost_14', 'SouthSupportRail_0_Fit13', 'SouthSupportRail_0_Fit14']); concrete face (0.009999885558499955, ['Beam_3_0_0_4_0']); PASSTrue
+SouthSupportBracket_14_1: rail face (0.009999790192523506, ['SouthSupportPost_14', 'SouthSupportRail_1_Fit13', 'SouthSupportRail_1_Fit14']); concrete face (0.009999790192523506, ['Beam_4_0_0_4_0']); PASSTrue
+SouthSupportBracket_14_2: rail face (0.009999694826547056, ['SouthSupportPost_14', 'SouthSupportRail_2_Fit13', 'SouthSupportRail_2_Fit14']); concrete face (0.009999694826547056, ['Beam_5_0_0_4_0']); PASSTrue
+SouthSupportBracket_15_0: rail face (0.009999885558499955, ['SouthSupportPost_15', 'SouthSupportRail_0_Fit14', 'SouthSupportRail_0_Fit15']); concrete face (0.009999885558499955, ['Column_80']); PASSTrue
+SouthSupportBracket_15_1: rail face (0.009999790192523506, ['SouthSupportPost_15', 'SouthSupportRail_1_Fit14', 'SouthSupportRail_1_Fit15']); concrete face (0.009999790192523506, ['Column_80']); PASSTrue
+SouthSupportBracket_15_2: rail face (0.009999694826547056, ['SouthSupportPost_15', 'SouthSupportRail_2_Fit14', 'SouthSupportRail_2_Fit15']); concrete face (0.009999694826547056, ['Column_80']); PASSTrue
+SouthSupportBracket_16_0: rail face (0.009999885558499955, ['SouthSupportPost_16', 'SouthSupportRail_0_Fit15', 'SouthSupportRail_0_Fit16']); concrete face (0.009999885558499955, ['Beam_3_0_0_5_0']); PASSTrue
+SouthSupportBracket_16_1: rail face (0.009999790192523506, ['SouthSupportPost_16', 'SouthSupportRail_1_Fit15', 'SouthSupportRail_1_Fit16']); concrete face (0.009999790192523506, ['Beam_4_0_0_5_0']); PASSTrue
+SouthSupportBracket_16_2: rail face (0.009999694826547056, ['SouthSupportPost_16', 'SouthSupportRail_2_Fit15', 'SouthSupportRail_2_Fit16']); concrete face (0.009999694826547056, ['Beam_5_0_0_5_0']); PASSTrue
+SouthSupportBracket_17_0: rail face (0.009999885558499955, ['SouthSupportPost_17', 'SouthSupportRail_0_Fit16', 'SouthSupportRail_0_Fit17']); concrete face (0.009999885558499955, ['Beam_3_0_0_5_0']); PASSTrue
+SouthSupportBracket_17_1: rail face (0.009999790192523506, ['SouthSupportPost_17', 'SouthSupportRail_1_Fit16', 'SouthSupportRail_1_Fit17']); concrete face (0.009999790192523506, ['Beam_4_0_0_5_0']); PASSTrue
+SouthSupportBracket_17_2: rail face (0.009999694826547056, ['SouthSupportPost_17', 'SouthSupportRail_2_Fit16', 'SouthSupportRail_2_Fit17']); concrete face (0.009999694826547056, ['Beam_5_0_0_5_0']); PASSTrue
+SouthSupportBracket_18_0: rail face (0.010000267029681709, ['SouthSupportPost_18', 'SouthSupportRail_0_Fit17']); concrete face (0.010000267029681709, ['Beam_3_0_0_5_0']); PASSTrue
+SouthSupportBracket_18_1: rail face (0.01000017166006728, ['SouthSupportPost_18', 'SouthSupportRail_1_Fit17']); concrete face (0.01000017166006728, ['Beam_4_0_0_5_0']); PASSTrue
+SouthSupportBracket_18_2: rail face (0.010000076290452853, ['SouthSupportPost_18', 'SouthSupportRail_2_Fit17']); concrete face (0.010000076290452853, ['Beam_5_0_0_5_0']); PASSTrue
+SouthSupportBracket_1_0: rail face (0.010000028610193112, ['SouthSupportPost_1', 'SouthSupportRail_0_Fit0', 'SouthSupportRail_0_Fit1']); concrete face (0.010000028610193112, ['Beam_3_0_0_0_0']); PASSTrue
+SouthSupportBracket_1_1: rail face (0.009999933242852421, ['SouthSupportPost_1', 'SouthSupportRail_1_Fit0', 'SouthSupportRail_1_Fit1']); concrete face (0.009999933242852421, ['Beam_4_0_0_0_0']); PASSTrue
+SouthSupportBracket_1_2: rail face (0.00999983787551173, ['SouthSupportPost_1', 'SouthSupportRail_2_Fit0', 'SouthSupportRail_2_Fit1']); concrete face (0.00999983787551173, ['Beam_5_0_0_0_0']); PASSTrue
+SouthSupportBracket_2_0: rail face (0.010000076294090832, ['SouthSupportPost_2', 'SouthSupportRail_0_Fit1', 'SouthSupportRail_0_Fit2']); concrete face (0.010000076294090832, ['Beam_3_0_0_0_0']); PASSTrue
+SouthSupportBracket_2_1: rail face (0.009999980926295393, ['SouthSupportPost_2', 'SouthSupportRail_1_Fit1', 'SouthSupportRail_1_Fit2']); concrete face (0.009999980926295393, ['Beam_4_0_0_0_0']); PASSTrue
+SouthSupportBracket_2_2: rail face (0.009999885558499955, ['SouthSupportPost_2', 'SouthSupportRail_2_Fit1', 'SouthSupportRail_2_Fit2']); concrete face (0.009999885558499955, ['Beam_5_0_0_0_0']); PASSTrue
+SouthSupportBracket_3_0: rail face (0.010000076294090832, ['SouthSupportPost_3', 'SouthSupportRail_0_Fit2', 'SouthSupportRail_0_Fit3']); concrete face (0.010000076294090832, ['Column_20']); PASSTrue
+SouthSupportBracket_3_1: rail face (0.009999980926295393, ['SouthSupportPost_3', 'SouthSupportRail_1_Fit2', 'SouthSupportRail_1_Fit3']); concrete face (0.009999980926295393, ['Column_20']); PASSTrue
+SouthSupportBracket_3_2: rail face (0.009999885558499955, ['SouthSupportPost_3', 'SouthSupportRail_2_Fit2', 'SouthSupportRail_2_Fit3']); concrete face (0.009999885558499955, ['Column_20']); PASSTrue
+SouthSupportBracket_4_0: rail face (0.010000076294090832, ['SouthSupportPost_4', 'SouthSupportRail_0_Fit3', 'SouthSupportRail_0_Fit4']); concrete face (0.010000076294090832, ['Beam_3_0_0_1_0']); PASSTrue
+SouthSupportBracket_4_1: rail face (0.009999980926295393, ['SouthSupportPost_4', 'SouthSupportRail_1_Fit3', 'SouthSupportRail_1_Fit4']); concrete face (0.009999980926295393, ['Beam_4_0_0_1_0']); PASSTrue
+SouthSupportBracket_4_2: rail face (0.009999885558499955, ['SouthSupportPost_4', 'SouthSupportRail_2_Fit3', 'SouthSupportRail_2_Fit4']); concrete face (0.009999885558499955, ['Beam_5_0_0_1_0']); PASSTrue
+SouthSupportBracket_5_0: rail face (0.010000076294090832, ['SouthSupportPost_5', 'SouthSupportRail_0_Fit4', 'SouthSupportRail_0_Fit5']); concrete face (0.010000076294090832, ['Beam_3_0_0_1_0']); PASSTrue
+SouthSupportBracket_5_1: rail face (0.009999980926295393, ['SouthSupportPost_5', 'SouthSupportRail_1_Fit4', 'SouthSupportRail_1_Fit5']); concrete face (0.009999980926295393, ['Beam_4_0_0_1_0']); PASSTrue
+SouthSupportBracket_5_2: rail face (0.009999885558499955, ['SouthSupportPost_5', 'SouthSupportRail_2_Fit4', 'SouthSupportRail_2_Fit5']); concrete face (0.009999885558499955, ['Beam_5_0_0_1_0']); PASSTrue
+SouthSupportBracket_6_0: rail face (0.009999885558499955, ['SouthSupportPost_6', 'SouthSupportRail_0_Fit5', 'SouthSupportRail_0_Fit6']); concrete face (0.009999885558499955, ['Column_40']); PASSTrue
+SouthSupportBracket_6_1: rail face (0.009999790192523506, ['SouthSupportPost_6', 'SouthSupportRail_1_Fit5', 'SouthSupportRail_1_Fit6']); concrete face (0.009999790192523506, ['Column_40']); PASSTrue
+SouthSupportBracket_6_2: rail face (0.009999694826547056, ['SouthSupportPost_6', 'SouthSupportRail_2_Fit5', 'SouthSupportRail_2_Fit6']); concrete face (0.009999694826547056, ['Column_40']); PASSTrue
+SouthSupportBracket_7_0: rail face (0.009999885558499955, ['SouthSupportPost_7', 'SouthSupportRail_0_Fit6', 'SouthSupportRail_0_Fit7']); concrete face (0.009999885558499955, ['Beam_3_0_0_2_0']); PASSTrue
+SouthSupportBracket_7_1: rail face (0.009999790192523506, ['SouthSupportPost_7', 'SouthSupportRail_1_Fit6', 'SouthSupportRail_1_Fit7']); concrete face (0.009999790192523506, ['Beam_4_0_0_2_0']); PASSTrue
+SouthSupportBracket_7_2: rail face (0.009999694826547056, ['SouthSupportPost_7', 'SouthSupportRail_2_Fit6', 'SouthSupportRail_2_Fit7']); concrete face (0.009999694826547056, ['Beam_5_0_0_2_0']); PASSTrue
+SouthSupportBracket_8_0: rail face (0.009999885558499955, ['SouthSupportPost_8', 'SouthSupportRail_0_Fit7', 'SouthSupportRail_0_Fit8']); concrete face (0.009999885558499955, ['Beam_3_0_0_2_0']); PASSTrue
+SouthSupportBracket_8_1: rail face (0.009999790192523506, ['SouthSupportPost_8', 'SouthSupportRail_1_Fit7', 'SouthSupportRail_1_Fit8']); concrete face (0.009999790192523506, ['Beam_4_0_0_2_0']); PASSTrue
+SouthSupportBracket_8_2: rail face (0.009999694826547056, ['SouthSupportPost_8', 'SouthSupportRail_2_Fit7', 'SouthSupportRail_2_Fit8']); concrete face (0.009999694826547056, ['Beam_5_0_0_2_0']); PASSTrue
+SouthSupportBracket_9_0: rail face (0.009999885558499955, ['SouthSupportPost_9', 'SouthSupportRail_0_Fit8', 'SouthSupportRail_0_Fit9']); concrete face (0.009999885558499955, ['Column_120']); PASSTrue
+SouthSupportBracket_9_1: rail face (0.009999790192523506, ['SouthSupportPost_9', 'SouthSupportRail_1_Fit8', 'SouthSupportRail_1_Fit9']); concrete face (0.009999790192523506, ['Column_120']); PASSTrue
+SouthSupportBracket_9_2: rail face (0.009999694826547056, ['SouthSupportPost_9', 'SouthSupportRail_2_Fit8', 'SouthSupportRail_2_Fit9']); concrete face (0.009999694826547056, ['Column_120']); PASSTrue
+Actual rail/corbel clearance 0.03000003m; minimum0.030m (float32 tolerance20micrometres).
+Bracket failures []; retained member changes []

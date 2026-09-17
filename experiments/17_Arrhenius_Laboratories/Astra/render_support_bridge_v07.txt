@@ -1,0 +1,25 @@
+GEOMETRY v07: 30156 meshes; SHA256(names/world vertices at1micrometre)=1efe2518e65ac7d515c5fb795a9778603de1f95f6e026191dc32975ebde93ad0; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\experiment_17_astra_v07_blender.blend
+Measured render bridge: 93 transform changes; 29 world-coordinate changes; maximum 3.814697265625e-06m.
+All local meshes unchanged. Every primary support world vertex is unchanged; changed families limited by assertions to court treads and inclined glazing rails.
+Actual rendered tread underside unions below use existing20-micrometre float32 seam allowance.
+CourtStair_01: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_01A', 'CourtWaist_01B']; PASS
+CourtStair_02: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_02']; PASS
+CourtStair_03: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_03']; PASS
+CourtStair_04: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_04']; PASS
+CourtStair_05: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_05']; PASS
+CourtStair_06: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_06']; PASS
+CourtStair_07: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_07']; PASS
+CourtStair_08: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_08']; PASS
+CourtStair_09: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_09']; PASS
+CourtStair_10: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_10']; PASS
+CourtStair_11: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_11']; PASS
+CourtStair_12: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_12']; PASS
+CourtStair_13: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_13']; PASS
+CourtStair_14: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_14']; PASS
+CourtStair_15: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_15']; PASS
+CourtStair_16: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_16']; PASS
+CourtStair_17: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_17']; PASS
+CourtStair_18: required0.735006561270m2; uncovered0.000018691993m2; tolerance0.000110000000m2; seats['CourtWaist_18']; PASS
+CourtStair_19: required0.735006561270m2; uncovered0.000000000000m2; tolerance0.000110000000m2; seats['CourtWaist_19']; PASS
+19/19 actual final rendered tread underside unions PASS. Existing public/route margins use20-micrometre geometric seam allowances; affected tread drift is below0.24micrometre, other changed rails below3.82micrometres. No physical route or support change.
+Standard gate is recorded separately in render_v07.log and the saved pair/contact reports; this bridge does not rerun it.

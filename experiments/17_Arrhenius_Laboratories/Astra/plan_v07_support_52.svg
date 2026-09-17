@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">Court landing: upper plate bears on actual rotated corbel</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=35.40m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="252.857,539.266 710.000,539.266 710.000,394.286 252.857,394.286" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CorbelWing_76_1_-1</title></polygon>
+<polygon points="390.001,577.143 481.429,577.143 481.429,539.265 390.001,539.265" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingLedge_0_Slice0_0</title></polygon>
+<polygon points="207.144,485.714 252.857,485.714 252.857,325.714 207.144,325.714" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice0_2</title></polygon>
+<polygon points="252.857,394.286 348.372,394.286 348.372,325.714 252.857,325.714" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice1_2</title></polygon>
+<polygon points="348.372,394.286 481.429,394.286 481.429,325.714 348.372,325.714" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice2_0</title></polygon>
+<polygon points="69.999,394.286 207.144,394.286 207.144,325.714 69.999,325.714" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStair_19</title></polygon>
+<polygon points="64.286,325.714 75.716,325.714 75.716,-78.350 64.286,-72.636" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairBaluster_1_18</title></polygon>
+<polygon points="201.427,257.143 212.856,257.143 212.856,-146.921 201.427,-141.207" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairBaluster_1_19</title></polygon>
+<polygon points="338.571,257.143 350.001,257.143 350.001,-215.493 338.571,-209.778" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairBaluster_1_20</title></polygon>
+<polygon points="-2402.660,1140.394 -2394.485,1156.749 348.372,-214.680 340.197,-231.035" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairHandrail_1</title></polygon>
+<polygon points="207.144,325.714 481.429,325.714 481.429,257.143 207.144,257.143" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairTopLanding</title></polygon>
+<polygon points="69.999,554.286 207.144,485.714 207.144,394.286 69.999,394.286" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtWaist_19</title></polygon>
+<polygon points="618.573,371.429 5615.144,371.429 5615.144,257.143 618.573,257.143" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>NorthTerrace_Fit4</title></polygon>
+<polygon points="481.429,394.286 618.573,394.286 618.573,257.143 481.429,257.143" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>RetainingWall_Fit2_ShoulderFit0</title></polygon>
+<polygon points="481.429,1628.571 618.573,1628.571 618.573,539.265 481.429,539.265" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>RetainingWall_Fit2_ShoulderFit1</title></polygon>
+<polygon points="618.573,394.286 710.000,394.286 710.000,371.429 618.573,371.429" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice0_0</title></polygon>
+<polygon points="618.573,1628.571 710.000,1628.571 710.000,539.265 618.573,539.265" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice0_1</title></polygon>
+<polygon points="710.000,1628.571 2995.714,1628.571 2995.714,371.429 710.000,371.429" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice1_0</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Landing walking top remains 3.00m; full underside support at 2.85m.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">Upper cap underside at 2.70m: 0.05m2 corbel seat.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Separate lower plate bears on 0.44m2 ledge at 2.50m.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>

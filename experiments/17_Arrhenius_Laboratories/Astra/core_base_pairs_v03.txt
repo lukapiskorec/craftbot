@@ -1,0 +1,3 @@
+BASE DELTA: 18 new convex members versus all30003 meshes; 0 penetrating pairs; 0 floating
+[]
+[]

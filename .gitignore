@@ -236,3 +236,26 @@ docs/
 # Timber construction manuals: copyrighted PDFs stay local, only the extracted .md summaries and INDEX.md are committed.
 # See manuals/INDEX.md for where each PDF can be downloaded.
 manuals/*.pdf
+
+# Experiment run working data: checker dumps, route geometry and superseded
+# plan drawings. All of it regenerates from the version scripts, which stay
+# tracked along with the .md coordination docs and the .jsonl transcript.
+experiments/*/*/**/*.npz
+experiments/*/*/**/slab_end_faces_v*.json
+experiments/*/*/**/panel_roots_v*.json
+experiments/*/*/**/panel_baseline_v*.json
+experiments/*/*/**/fixture_layers_v*.json
+experiments/*/*/**/render_identity_difference_v*.json
+experiments/*/*/**/render_evidence_v*.json
+experiments/*/*/**/changes_v*.json
+experiments/*/*/**/brackets_v*.json
+experiments/*/*/**/*_blender_pairs.txt
+experiments/*/*/**/structural_followup_v*.txt
+experiments/*/*/**/structural_priority_v*.txt
+experiments/*/*/**/route_envelopes_v*.txt
+experiments/*/*/**/completion_v*.txt
+experiments/*/*/**/layers_v*_audit.txt
+
+# Experiment 17: keep only the final plan drawing set.
+experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.svg
+experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.html

@@ -1,0 +1,322 @@
+GEOMETRY v04: 29876 meshes; SHA256(names/world vertices at1micrometre)=8a02c4b9865c497bbd2d1af58a76140a978e0863a98ebd97a32ff63a26951657; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v04.blend
+FULL FOOTPRINT SEATS: 250 tested; 0 failures; actual mesh horizontal faces; 0.01mm numerical tolerance.
+Column_0 -> Pedestal_0: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_1 -> Pedestal_1: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_10 -> Pedestal_10: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_100 -> Pedestal_100: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_101 -> Pedestal_101: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_102 -> Pedestal_102: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_103 -> Pedestal_103: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_104 -> Pedestal_104: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_105 -> Pedestal_105: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_106 -> Pedestal_106: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_107 -> Pedestal_107: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_108 -> Pedestal_108: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_109 -> Pedestal_109: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_11 -> Pedestal_11: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_110 -> Pedestal_110: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_111 -> Pedestal_111: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_112 -> Pedestal_112: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_113 -> Pedestal_113: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_114 -> Pedestal_114: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_115 -> Pedestal_115: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_116 -> Pedestal_116: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_117 -> Pedestal_117: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_118 -> Pedestal_118: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_119 -> Pedestal_119: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_12 -> Pedestal_12: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_120 -> Pedestal_120: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_121 -> Pedestal_121: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_122 -> Pedestal_122: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_123 -> Pedestal_123: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_124 -> Pedestal_124: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_13 -> Pedestal_13: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_14 -> Pedestal_14: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_15 -> Pedestal_15: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_16 -> Pedestal_16: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_17 -> Pedestal_17: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_18 -> Pedestal_18: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_19 -> Pedestal_19: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_2 -> Pedestal_2: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_20 -> Pedestal_20: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_21 -> Pedestal_21: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_22 -> Pedestal_22: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_23 -> Pedestal_23: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_24 -> Pedestal_24: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_25 -> Pedestal_25: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_26 -> Pedestal_26: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_27 -> Pedestal_27: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_28 -> Pedestal_28: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_29 -> Pedestal_29: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_3 -> Pedestal_3: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_30 -> Pedestal_30: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_31 -> Pedestal_31: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_32 -> Pedestal_32: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_33 -> Pedestal_33: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_34 -> Pedestal_34: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_35 -> Pedestal_35: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_36 -> Pedestal_36: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_37 -> Pedestal_37: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_38 -> Pedestal_38: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_39 -> Pedestal_39: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_4 -> Pedestal_4: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_40 -> Pedestal_40: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_41 -> Pedestal_41: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_42 -> Pedestal_42: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_43 -> Pedestal_43: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_44 -> Pedestal_44: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_45 -> Pedestal_45: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_46 -> Pedestal_46: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_47 -> Pedestal_47: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_48 -> Pedestal_48: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_49 -> Pedestal_49: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_5 -> Pedestal_5: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_50 -> Pedestal_50: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_51 -> Pedestal_51: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_52 -> Pedestal_52: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_53 -> Pedestal_53: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_54 -> Pedestal_54: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_55 -> Pedestal_55: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_56 -> Pedestal_56: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_57 -> Pedestal_57: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_58 -> Pedestal_58: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_59 -> Pedestal_59: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_6 -> Pedestal_6: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_60 -> Pedestal_60: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_61 -> Pedestal_61: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_62 -> Pedestal_62: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_63 -> Pedestal_63: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_64 -> Pedestal_64: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_65 -> Pedestal_65: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_66 -> Pedestal_66: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_67 -> Pedestal_67: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_68 -> Pedestal_68: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_69 -> Pedestal_69: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_7 -> Pedestal_7: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_70 -> Pedestal_70: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_71 -> Pedestal_71: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_72 -> Pedestal_72: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_73 -> Pedestal_73: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_74 -> Pedestal_74: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_75 -> Pedestal_75: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_76 -> Pedestal_76: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_77 -> Pedestal_77: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_78 -> Pedestal_78: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_79 -> Pedestal_79: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_8 -> Pedestal_8: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_80 -> Pedestal_80: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_82 -> Pedestal_82: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_83 -> Pedestal_83: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_84 -> Pedestal_84: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_85 -> Pedestal_85: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_86 -> Pedestal_86: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_87 -> Pedestal_87: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_88 -> Pedestal_88: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_89 -> Pedestal_89: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_9 -> Pedestal_9: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_90 -> Pedestal_90: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_91 -> Pedestal_91: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_92 -> Pedestal_92: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_93 -> Pedestal_93: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_94 -> Pedestal_94: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_95 -> Pedestal_95: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_96 -> Pedestal_96: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_97 -> Pedestal_97: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_98 -> Pedestal_98: area0.3600m2; coverage1.000000; gap0.00000000m
+Column_99 -> Pedestal_99: area0.3600m2; coverage1.000000; gap0.00000000m
+CoreFoundation_E -> CoreFooting_E: area15.4375m2; coverage1.000000; gap0.00000000m
+CoreFoundation_N -> CoreFooting_N: area15.4375m2; coverage1.000000; gap0.00000000m
+CoreFoundation_S -> CoreFooting_S: area15.4375m2; coverage1.000000; gap0.00000000m
+CoreFoundation_W -> CoreFooting_W: area15.4375m2; coverage1.000000; gap0.00000000m
+Pedestal_0 -> FootingPad_0: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_1 -> FootingPad_1: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_10 -> FootingPad_10: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_100 -> FootingPad_100: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_101 -> FootingPad_101: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_102 -> FootingPad_102: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_103 -> FootingPad_103: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_104 -> FootingPad_104: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_105 -> FootingPad_105: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_106 -> FootingPad_106: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_107 -> FootingPad_107: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_108 -> FootingPad_108: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_109 -> FootingPad_109: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_11 -> FootingPad_11: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_110 -> FootingPad_110: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_111 -> FootingPad_111: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_112 -> FootingPad_112: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_113 -> FootingPad_113: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_114 -> FootingPad_114: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_115 -> FootingPad_115: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_116 -> FootingPad_116: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_117 -> FootingPad_117: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_118 -> FootingPad_118: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_119 -> FootingPad_119: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_12 -> FootingPad_12: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_120 -> FootingPad_120: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_121 -> FootingPad_121: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_122 -> FootingPad_122: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_123 -> FootingPad_123: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_13 -> FootingPad_13: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_14 -> FootingPad_14: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_15 -> FootingPad_15: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_16 -> FootingPad_16: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_17 -> FootingPad_17: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_18 -> FootingPad_18: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_19 -> FootingPad_19: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_2 -> FootingPad_2: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_20 -> FootingPad_20: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_21 -> FootingPad_21: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_22 -> FootingPad_22: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_23 -> FootingPad_23: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_24 -> FootingPad_24: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_25 -> FootingPad_25: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_26 -> FootingPad_26: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_27 -> FootingPad_27: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_28 -> FootingPad_28: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_29 -> FootingPad_29: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_3 -> FootingPad_3: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_30 -> FootingPad_30: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_31 -> FootingPad_31: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_32 -> FootingPad_32: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_33 -> FootingPad_33: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_34 -> FootingPad_34: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_35 -> FootingPad_35: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_36 -> FootingPad_36: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_37 -> FootingPad_37: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_38 -> FootingPad_38: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_39 -> FootingPad_39: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_4 -> FootingPad_4: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_40 -> FootingPad_40: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_41 -> FootingPad_41: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_42 -> FootingPad_42: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_43 -> FootingPad_43: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_44 -> FootingPad_44: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_45 -> FootingPad_45: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_46 -> FootingPad_46: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_47 -> FootingPad_47: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_48 -> FootingPad_48: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_49 -> FootingPad_49: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_5 -> FootingPad_5: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_50 -> FootingPad_50: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_51 -> FootingPad_51: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_52 -> FootingPad_52: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_53 -> FootingPad_53: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_54 -> FootingPad_54: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_55 -> FootingPad_55: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_56 -> FootingPad_56: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_57 -> FootingPad_57: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_58 -> FootingPad_58: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_59 -> FootingPad_59: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_6 -> FootingPad_6: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_60 -> FootingPad_60: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_61 -> FootingPad_61: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_62 -> FootingPad_62: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_63 -> FootingPad_63: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_64 -> FootingPad_64: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_65 -> FootingPad_65: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_66 -> FootingPad_66: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_67 -> FootingPad_67: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_68 -> FootingPad_68: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_69 -> FootingPad_69: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_7 -> FootingPad_7: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_70 -> FootingPad_70: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_71 -> FootingPad_71: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_72 -> FootingPad_72: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_73 -> FootingPad_73: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_74 -> FootingPad_74: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_75 -> FootingPad_75: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_76 -> FootingPad_76: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_77 -> FootingPad_77: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_78 -> FootingPad_78: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_79 -> FootingPad_79: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_8 -> FootingPad_8: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_80 -> FootingPad_80: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_83 -> FootingPad_83: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_84 -> FootingPad_84: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_85 -> FootingPad_85: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_86 -> FootingPad_86: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_87 -> FootingPad_87: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_88 -> FootingPad_88: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_89 -> FootingPad_89: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_9 -> FootingPad_9: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_90 -> FootingPad_90: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_91 -> FootingPad_91: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_92 -> FootingPad_92: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_93 -> FootingPad_93: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_94 -> FootingPad_94: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_95 -> FootingPad_95: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_96 -> FootingPad_96: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_97 -> FootingPad_97: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_98 -> FootingPad_98: area0.3600m2; coverage1.000000; gap0.00000000m
+Pedestal_99 -> FootingPad_99: area0.3600m2; coverage1.000000; gap0.00000000m
+
+RIM TO FOUNDATION CONTACT PATHS: actual SAT gaps<=2mm; contacts do not establish bearing area or joint capacity.
+EntranceApproachGradeBeam: GradeBeam_0_0_2_0 -> FootingPad_120
+StairRim_E_0: StairRim_E_0_67 -> Beam_1_10_1_1_18 -> Beam_1_10_1_1_17 -> Beam_1_10_1_1_0 -> Column_110 -> GradeBeam_10_1_1_0 -> FootingPad_110
+StairRim_E_1: StairRim_E_1_67 -> Beam_2_10_1_1_18 -> Beam_2_10_1_1_17 -> Beam_2_10_1_1_0 -> Column_110 -> GradeBeam_10_1_1_0 -> FootingPad_110
+StairRim_E_2: StairRim_E_2_67 -> Beam_3_10_1_1_18 -> Beam_3_10_1_1_17 -> Beam_3_10_1_1_0 -> Column_110 -> GradeBeam_10_1_1_0 -> FootingPad_110
+StairRim_E_3: StairRim_E_3_67 -> Beam_4_10_1_1_18 -> Beam_4_10_1_1_17 -> Beam_4_10_1_1_0 -> Column_110 -> GradeBeam_10_1_1_0 -> FootingPad_110
+StairRim_N_0: StairRim_N_0_59 -> Beam_1_18_0_3_25 -> Beam_1_18_0_3_24 -> Beam_1_18_0_3_23 -> Beam_1_18_0_3_0 -> Column_78 -> GradeBeam_18_0_3_0 -> FootingPad_123
+StairRim_N_1: StairRim_N_1_59 -> Beam_2_18_0_3_25 -> Beam_2_18_0_3_24 -> Beam_2_18_0_3_23 -> Beam_2_18_0_3_0 -> Column_78 -> GradeBeam_18_0_3_0 -> FootingPad_123
+StairRim_N_2: StairRim_N_2_59 -> Beam_3_18_0_3_25 -> Beam_3_18_0_3_24 -> Beam_3_18_0_3_23 -> Beam_3_18_0_3_0 -> Column_78 -> GradeBeam_18_0_3_0 -> FootingPad_123
+StairRim_N_3: StairRim_N_3_59 -> Beam_4_18_0_3_25 -> Beam_4_18_0_3_24 -> Beam_4_18_0_3_23 -> Beam_4_18_0_3_0 -> Column_78 -> GradeBeam_18_0_3_0 -> FootingPad_123
+StairRim_S_0: StairRim_S_0_20 -> Beam_1_2_0_4_25 -> Beam_1_2_0_4_0 -> Column_62 -> GradeBeam_2_0_3_0 -> FootingPad_122
+StairRim_S_1: StairRim_S_1_20 -> Beam_2_2_0_4_25 -> Beam_2_2_0_4_0 -> Column_62 -> GradeBeam_2_0_3_0 -> FootingPad_122
+StairRim_S_2: StairRim_S_2_20 -> Beam_3_2_0_4_25 -> Beam_3_2_0_4_0 -> Column_62 -> GradeBeam_2_0_3_0 -> FootingPad_122
+StairRim_S_3: StairRim_S_3_20 -> Beam_4_2_0_4_25 -> Beam_4_2_0_4_0 -> Column_62 -> GradeBeam_2_0_3_0 -> FootingPad_122
+StairRim_W_0: StairRim_W_0_67 -> Beam_1_10_0_0_13 -> Beam_1_10_0_0_12 -> Beam_1_10_0_0_0 -> Column_30 -> GradeBeam_10_0_0_0 -> FootingPad_10
+StairRim_W_1: StairRim_W_1_67 -> Beam_2_10_0_0_13 -> Beam_2_10_0_0_12 -> Beam_2_10_0_0_0 -> Column_30 -> GradeBeam_10_0_0_0 -> FootingPad_10
+StairRim_W_2: StairRim_W_2_67 -> Beam_3_10_0_0_13 -> Beam_3_10_0_0_12 -> Beam_3_10_0_0_0 -> Column_30 -> GradeBeam_10_0_0_0 -> FootingPad_10
+StairRim_W_3: StairRim_W_3_67 -> Beam_4_10_0_0_13 -> Beam_4_10_0_0_12 -> Beam_4_10_0_0_0 -> Column_30 -> GradeBeam_10_0_0_0 -> FootingPad_10
+
+NOMINAL0.20x0.40m CORBEL END SEATS: 876 expected geometric cases; 10 exceptions. Both corbel-top and actual beam-underside union must cover0.080m2. Exceptions require local structural review; do not infer unsupported loads from missing beams alone.
+('Column_81', 1, -1, 0.08000000000004093, 0.0, False)
+('Column_81', 1, 1, 0.07999999999998408, 0.0, False)
+('Column_81', 2, -1, 0.07999999999998408, 0.06499996185306145, False)
+('Column_81', 2, 1, 0.07999999999998408, 0.0649999618530046, False)
+('Column_81', 3, -1, 0.07999999999998408, 0.06499996185306145, False)
+('Column_81', 3, 1, 0.07999999999998408, 0.0649999618530046, False)
+('Column_81', 4, -1, 0.07999999999998408, 0.06499996185306145, False)
+('Column_81', 4, 1, 0.07999999999998408, 0.0649999618530046, False)
+('Column_81', 5, -1, 0.07999999999998408, 0.06499996185306145, False)
+('Column_81', 5, 1, 0.07999999999998408, 0.0649999618530046, False)
+Designer classification: 866 ordinary0.20x0.40m seats; 8 reduced0.20x0.325m seats (18.75% width/area reduction; capacity unverified); 2 first-raised cases use core-ledges checked below. No blanket876-case capacity/pass claim.
+
+LOCAL CORE/LINK CONNECTION FACES: required horizontal seat areas and actual below/above mesh coverage; ledger attachment requires inferred anchors, not gravity-only bearing.
+('Core beam alternate seat W', 0.07999999999998408, 0.0799999809264591, 0.07999967575091205, True)
+('Core beam alternate seat E', 0.07999999999998408, 0.07999998092651595, 0.07999998092651595, True)
+('Link deck level0 W0.15m seat via InsertLinkLedger_W_0', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level0 W0.20m attachment', 0.3999999999998636, 0.3999992370604559, 0.3999984741210483, True)
+('Link deck level0 E0.15m seat via InsertLinkLedger_E_0', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level0 E0.20m attachment', 0.3999999999998636, 0.3999992370604559, 0.3999984741210483, True)
+('Link deck level1 W0.15m seat via EdgeBeam_1_1_', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level1 W0.15m attachment', 0.2999999999999545, 0.2999992370605469, 0.2999999999999545, True)
+('Link deck level1 E0.15m seat via InsertLinkLedger_E_1', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level1 E0.20m attachment', 0.3999999999998636, 0.3999992370604559, 0.3999984741210483, True)
+('Link deck level2 W0.15m seat via EdgeBeam_2_1_', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level2 W0.15m attachment', 0.2999999999999545, 0.2999992370605469, 0.2999999999999545, True)
+('Link deck level2 E0.15m seat via InsertLinkLedger_E_2', 0.3000000000001819, 0.3000000000001819, 0.3000000000001819, True)
+('Link ledger level2 E0.20m attachment', 0.3999999999998636, 0.3999992370604559, 0.3999984741210483, True)
+('Link lintel level0 Wing jamb0', 0.04399999999986903, 0.04399999999986903, 0.04399999999986903, True)
+('Link lintel level0 Wing jamb1', 0.04400000000032378, 0.04400000000032378, 0.04400000000032378, True)
+('Link lintel level0 Insert jamb0', 0.03999999999973625, 0.03999999999973625, 0.03999999999973625, True)
+('Link lintel level0 Insert jamb1', 0.03999999999996362, 0.03999999999996362, 0.03999999999996362, True)
+('Link lintel level1 Wing jamb0', 0.04399999999986903, 0.04399999999986903, 0.04399999999986903, True)
+('Link lintel level1 Wing jamb1', 0.04400000000032378, 0.04400000000032378, 0.04400000000032378, True)
+('Link lintel level1 Insert jamb0', 0.03999999999973625, 0.03999999999973625, 0.03999999999973625, True)
+('Link lintel level1 Insert jamb1', 0.03999999999996362, 0.03999999999996362, 0.03999999999996362, True)
+Local connection face failures: 0 / 22
+
+CORE VERTICAL BASE CONTINUITY: actual horizontal faces, both0.25m strip interfaces.
+('W', 'base-to-foundation', 4, 3.7500125169763123, 3.7500125169763123, True)
+('W', 'wall-to-base', 5, 3.4500079274184827, 3.4500079274184827, True)
+('E', 'base-to-foundation', 4, 3.7500123977661133, 3.7500123977661133, True)
+('E', 'wall-to-base', 5, 3.450007629391621, 3.450007629391621, True)
+('N', 'base-to-foundation', 4, 3.75, 3.75, True)
+('N', 'wall-to-base', 5, 3.4499998092651367, 3.4499998092651367, True)
+('S', 'base-to-foundation', 6, 3.6450001525881817, 3.6450001525881817, True)
+('S', 'wall-to-base', 13, 3.4499998092651367, 3.4499998092651367, True)
+Core base union failures: 0 / 8
+
+LIMITATIONS: lateral/moment transfer is inferred where faces meet on a side; the contact graph is undirected and does not establish gravity capacity. Slab end bearings, corbel seat lengths, retaining restraint and diaphragm design require separate evidence/review. Sections are plausible visual estimates, not calculated.

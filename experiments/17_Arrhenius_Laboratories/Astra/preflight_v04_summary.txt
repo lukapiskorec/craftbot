@@ -1,0 +1,4 @@
+PREFLIGHT: 29875 members, 1 pairs, 0 floating
+OVERLAP FAMILIES: 1 (count  depth  family a  x  family b   e.g. a x b)
+      1    150.0 mm  GradeBeam  x  EntranceApproachBase   e.g. GradeBeam_0_0_2_0 x EntranceApproachBase
+FLOATING

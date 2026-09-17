@@ -1,0 +1,4 @@
+GEOMETRY v06: 29961 meshes; SHA256(names/world vertices at1micrometre)=448544c4a053d93cf4d5fb853cf10661e274adea4dd2549fd5ca661521e54e45; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v06.blend
+PREFLIGHT: 29961 members, 0 pairs, 0 floating
+OVERLAP FAMILIES: 0 (count  depth  family a  x  family b   e.g. a x b)
+FLOATING

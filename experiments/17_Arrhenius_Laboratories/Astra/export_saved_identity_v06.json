@@ -1,0 +1,16 @@
+[
+  {
+    "identity": "GEOMETRY v06: 29976 meshes; SHA256(names/world vertices at1micrometre)=523cd725f671151f70fb591add45a53875bbd80cb619a85760088230495d1416; loaded C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\preflight_v06.blend",
+    "exported_elements": 29976,
+    "saved_elements": 29976,
+    "missing": [],
+    "quantized_coordinate_changes": []
+  },
+  {
+    "identity": "GEOMETRY v06: 29976 meshes; SHA256(names/world vertices at1micrometre)=25c4743bc414e69436a7b18e84e6fc5535ae58651dd41d9913a78b3ee06e6f1a; loaded C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\experiment_17_astra_v06_blender.blend",
+    "exported_elements": 29976,
+    "saved_elements": 29976,
+    "missing": [],
+    "quantized_coordinate_changes": []
+  }
+]

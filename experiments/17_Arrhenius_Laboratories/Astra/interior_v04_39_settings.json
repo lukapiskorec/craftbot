@@ -1,0 +1,20 @@
+{
+  "geometry": "GEOMETRY v04: 29876 meshes; SHA256(names/world vertices at1micrometre)=8a02c4b9865c497bbd2d1af58a76140a978e0863a98ebd97a32ff63a26951657; loaded C:\\Users\\lukap\\Documents\\GitHub\\craftbot\\experiments\\17_Arrhenius_Laboratories\\Astra\\preflight_v04.blend",
+  "camera": [
+    3.6500000953674316,
+    59.70000076293945,
+    5.199999809265137
+  ],
+  "target": [
+    4.199999809265137,
+    65.0,
+    5.300000190734863
+  ],
+  "lens_mm": 35.0,
+  "eye_height_above_level1_m": 1.6,
+  "exposure_EV": 2.0,
+  "world_strength": 0.35,
+  "fill_strength": 0.75,
+  "samples": 48,
+  "notes": "Presentation daylight/fill only; genuine glass transmission; all building meshes retained. No invented lighting fixture."
+}

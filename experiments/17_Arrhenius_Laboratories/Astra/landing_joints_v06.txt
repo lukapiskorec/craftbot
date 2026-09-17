@@ -1,0 +1,58 @@
+GEOMETRY v06: 29976 meshes; SHA256(names/world vertices at1micrometre)=523cd725f671151f70fb591add45a53875bbd80cb619a85760088230495d1416; loaded C:\Users\lukap\Documents\GitHub\craftbot\experiments\17_Arrhenius_Laboratories\Astra\preflight_v06.blend
+Actual opposed planar face patches; dimensions are in the two axes normal to reported axis. Graph edges require >0.001m2, not an epsilon touch. Tiny chamfer fragments are monolithic decomposition, not independent seat units.
+('Column_76', 'CorbelWing_76_1_-1', 0, 35.70000076293945, 0.3600037479409366, (0.600006103515625, 0.6000001430511475))
+('CorbelWing_76_1_-1', 'CourtLandingLedge_0_Slice0_1', 0, 35.349998474121094, 0.013999677659739973, (0.1999969482421875, 0.06999945640563965))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice0_1', 1, 95.5, 0.005999757289828267, (0.029998779296875, 0.20000004768371582))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice0_2', 1, 95.5, 0.01400070524232433, (0.07000350952148438, 0.20000004768371582))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice1_1', 2, 2.700000047683716, 0.006267902906984091, (0.029998779296875, 0.2089385986328125))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice1_2', 2, 2.700000047683716, 0.014626435178797692, (0.07000350952148438, 0.2089385986328125))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice1_5', 0, 35.349998474121094, 0.04178772968953126, (0.2089385986328125, 0.20000004768371582))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice2_0', 2, 2.700000047683716, 0.029106806323397905, (0.10000228881835938, 0.2910614013671875))
+('CorbelWing_76_1_-1', 'CourtLandingSupport_0_Slice2_2', 0, 35.349998474121094, 0.05821229415232665, (0.2910614013671875, 0.20000004768371582))
+('CorbelWing_76_1_-1', 'RetainingWall_Fit2_ShoulderFit0', 2, 2.700000047683716, 0.030000991828273982, (0.10000228881835938, 0.3000030517578125))
+('CorbelWing_76_1_-1', 'RetainingWall_Fit2_ShoulderFit2', 0, 35.349998474121094, 0.08100067519990262, (0.3000030517578125, 0.26999950408935547))
+('CourtLandingLedge_0_Slice0_0', 'CourtLandingSupport_0_Slice2_1', 2, 2.5, 0.4251445747213438, (2.1257553100585938, 0.1999969482421875))
+('CourtLandingLedge_0_Slice0_0', 'RetainingWall_Fit2_ShoulderFit1', 1, 96.0, 0.4456870094126799, (2.299999237060547, 0.20000004768371582))
+('CourtLandingLedge_0_Slice0_1', 'CourtLandingSupport_0_Slice2_2', 2, 2.5, 0.01484810106921941, (0.07424163818359375, 0.1999969482421875))
+('CourtLandingLedge_0_Slice0_1', 'RetainingWall_Fit2_ShoulderFit2', 1, 96.0, 0.0025984371577578713, (0.07424163818359375, 0.06999945640563965))
+('CourtLandingSupport_0_Slice0_0', 'CourtLandingSupport_0_Slice0_1', 0, 33.27999496459961, 0.03499945640578517, (0.09999847412109375, 0.34999990463256836))
+('CourtLandingSupport_0_Slice0_0', 'CourtLandingSupport_0_Slice1_0', 1, 95.5, 0.019498997212394897, (0.12999343872070312, 0.14999985694885254))
+('CourtLandingSupport_0_Slice0_0', 'CourtLandingSupport_0_Slice1_3', 1, 95.5, 0.025998693942710815, (0.12999343872070312, 0.20000004768371582))
+('CourtLandingSupport_0_Slice0_0', 'CourtWaist_19', 1, 95.4000015258789, 0.025998693942710815, (0.12999343872070312, 0.20000004768371582))
+('CourtLandingSupport_0_Slice0_1', 'CourtLandingSupport_0_Slice0_2', 0, 35.37999725341797, 0.03499945640578517, (0.09999847412109375, 0.34999990463256836))
+('CourtLandingSupport_0_Slice0_1', 'CourtLandingSupport_0_Slice1_1', 1, 95.5, 0.3150000429150168, (2.1000022888183594, 0.14999985694885254))
+('CourtLandingSupport_0_Slice0_1', 'CourtLandingSupport_0_Slice1_4', 1, 95.5, 0.3779400772905319, (1.9957618713378906, 0.20000004768371582))
+('CourtLandingSupport_0_Slice0_1', 'CourtLandingSupport_0_Slice1_5', 1, 95.5, 0.03606072331922405, (0.2863655090332031, 0.20000004768371582))
+('CourtLandingSupport_0_Slice0_1', 'CourtWaist_19', 1, 95.4000015258789, 0.42000055789958424, (2.1000022888183594, 0.20000004768371582))
+('CourtLandingSupport_0_Slice0_2', 'CourtLandingSupport_0_Slice1_2', 1, 95.5, 0.010500516414140293, (0.07000350952148438, 0.14999985694885254))
+('CourtLandingSupport_0_Slice0_2', 'CourtWaist_19', 1, 95.4000015258789, 0.01400070524232433, (0.07000350952148438, 0.20000004768371582))
+('CourtLandingSupport_0_Slice1_0', 'CourtLandingSupport_0_Slice1_1', 0, 33.27999496459961, 0.03134075990601559, (0.2089385986328125, 0.14999985694885254))
+('CourtLandingSupport_0_Slice1_0', 'CourtLandingSupport_0_Slice1_3', 2, 2.700000047683716, 0.027160646917764097, (0.12999343872070312, 0.2089385986328125))
+('CourtLandingSupport_0_Slice1_0', 'CourtLandingSupport_0_Slice2_0', 1, 95.70893859863281, 0.019498997212394897, (0.12999343872070312, 0.14999985694885254))
+('CourtLandingSupport_0_Slice1_1', 'CourtLandingSupport_0_Slice1_2', 0, 35.37999725341797, 0.03134075990601559, (0.2089385986328125, 0.14999985694885254))
+('CourtLandingSupport_0_Slice1_1', 'CourtLandingSupport_0_Slice1_4', 2, 2.700000047683716, 0.3726708242902532, (1.7836380004882812, 0.2089385986328125))
+('CourtLandingSupport_0_Slice1_1', 'CourtLandingSupport_0_Slice1_5', 2, 2.700000047683716, 0.05983280815416947, (0.2863655090332031, 0.2089385986328125))
+('CourtLandingSupport_0_Slice1_1', 'CourtLandingSupport_0_Slice2_0', 1, 95.70893859863281, 0.3150000429150168, (2.1000022888183594, 0.14999985694885254))
+('CourtLandingSupport_0_Slice1_2', 'CourtLandingSupport_0_Slice2_0', 1, 95.70893859863281, 0.010500516414140293, (0.07000350952148438, 0.14999985694885254))
+('CourtLandingSupport_0_Slice1_3', 'CourtLandingSupport_0_Slice1_4', 0, 33.27999496459961, 0.04178772968953126, (0.2089385986328125, 0.20000004768371582))
+('CourtLandingSupport_0_Slice1_3', 'CourtLandingSupport_0_Slice2_1', 1, 95.70893859863281, 0.025998693942710815, (0.12999343872070312, 0.20000004768371582))
+('CourtLandingSupport_0_Slice1_4', 'CourtLandingSupport_0_Slice2_1', 1, 95.70893859863281, 0.3779400772905319, (1.9957618713378906, 0.20000004768371582))
+('CourtLandingSupport_0_Slice1_5', 'CourtLandingSupport_0_Slice2_2', 1, 95.70893859863281, 0.03606072331922405, (0.2863655090332031, 0.20000004768371582))
+('CourtLandingSupport_0_Slice2_0', 'CourtLandingSupport_0_Slice2_1', 2, 2.700000047683716, 0.5569842483964749, (1.9136314392089844, 0.2910614013671875))
+('CourtLandingSupport_0_Slice2_0', 'CourtLandingSupport_0_Slice2_2', 2, 2.700000047683716, 0.08334994636243209, (0.2863655090332031, 0.2910614013671875))
+('CourtLandingSupport_0_Slice2_0', 'RetainingWall_Fit2_ShoulderFit0', 1, 96.0, 0.344999556541552, (2.299999237060547, 0.14999985694885254))
+('CourtLandingSupport_0_Slice2_1', 'RetainingWall_Fit2_ShoulderFit1', 1, 96.0, 0.4039387254052116, (2.1257548517784173, 0.20000004768371582))
+('CourtLandingSupport_0_Slice2_2', 'RetainingWall_Fit2_ShoulderFit2', 1, 96.0, 0.03606072331922405, (0.2863655090332031, 0.20000004768371582))
+CourtLandingSupport_0_Slice0_0 finite-interface path: CourtLandingSupport_0_Slice0_0 -> CourtLandingSupport_0_Slice0_1 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice0_1 finite-interface path: CourtLandingSupport_0_Slice0_1 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice0_2 finite-interface path: CourtLandingSupport_0_Slice0_2 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice1_0 finite-interface path: CourtLandingSupport_0_Slice1_0 -> CourtLandingSupport_0_Slice2_0 -> RetainingWall_Fit2_ShoulderFit0
+CourtLandingSupport_0_Slice1_1 finite-interface path: CourtLandingSupport_0_Slice1_1 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice1_2 finite-interface path: CourtLandingSupport_0_Slice1_2 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice1_3 finite-interface path: CourtLandingSupport_0_Slice1_3 -> CourtLandingSupport_0_Slice2_1 -> RetainingWall_Fit2_ShoulderFit1
+CourtLandingSupport_0_Slice1_4 finite-interface path: CourtLandingSupport_0_Slice1_4 -> CourtLandingSupport_0_Slice2_1 -> RetainingWall_Fit2_ShoulderFit1
+CourtLandingSupport_0_Slice1_5 finite-interface path: CourtLandingSupport_0_Slice1_5 -> CorbelWing_76_1_-1 -> Column_76
+CourtLandingSupport_0_Slice2_0 finite-interface path: CourtLandingSupport_0_Slice2_0 -> RetainingWall_Fit2_ShoulderFit0
+CourtLandingSupport_0_Slice2_1 finite-interface path: CourtLandingSupport_0_Slice2_1 -> RetainingWall_Fit2_ShoulderFit1
+CourtLandingSupport_0_Slice2_2 finite-interface path: CourtLandingSupport_0_Slice2_2 -> RetainingWall_Fit2_ShoulderFit2
+Corbel/shaft root area 0.3600037479409366m2; nominal600x600mm. Capacities remain unverified.

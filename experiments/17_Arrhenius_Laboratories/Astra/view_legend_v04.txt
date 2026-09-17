@@ -1,0 +1,43 @@
+Frozen v04 visual evidence legend. All Workbench images use prefix experiment_17_astra_v04_blender_view_ and suffix .png.
+Azimuth is camera position: 0=east,90=north,180=west,270=south. Orthographic unless stated otherwise. Hidden collections describe presentation only, not absent construction.
+01 northeast elevated orbit, foundations hidden.
+02 northwest elevated orbit, foundations hidden.
+03 southwest elevated orbit, foundations hidden.
+04 southeast elevated orbit, foundations hidden.
+05 near-vertical whole-building top view.
+06 south elevation, camera looking north.
+07 east elevation, camera looking west.
+08 north elevation, camera looking south.
+09 west elevation, camera looking east.
+10 southwest frame-only elevated view; hides facade,roof,interior,insert,site,foundations,floors.
+11 southwest underside view; hides site and foundations deliberately.
+12 south silhouette, low oblique from azimuth280/elevation7; reference05. Focus(27,26,10),radius38.
+13 south-west corner close view, azimuth230/elevation12; reference02. Focus(10,5,9),radius17.
+14 west long-facade detail, azimuth185/elevation8; reference06. Focus(0,40,9),radius15.
+15 courtyard looking north, azimuth270/elevation22; reference04. Focus(27,67,7),radius29.
+16 longitudinal courtyard section at x34.5, viewed from east; site/foundations hidden.
+17 transverse section at y61, viewed from south; site/foundations hidden; reference08.
+18 west stair stack section at x3.65, viewed from west; facade/site/foundations/interior partitions hidden; focus(3.65,61,8),radius11.
+19 internal frame close view at(9,36,8),radius16; frame-only hides facade/roof/interior/insert/site/foundations/floors.
+20 ground-floor overhead cut at z1.5.
+21 level1 overhead cut at z5.1, occupied floor z3.6.
+22 level2 overhead cut at z8.7, occupied floor z7.2.
+23 level3 overhead cut at z12.3, occupied floor z10.8.
+24 level4 overhead cut at z15.9, occupied floor z14.4.
+25 south link/facade section at x27, from west; focus(27,5,8),radius12.
+26 west facade corbel/window connection close-up near(0,36,7.2),radius3.5.
+27 west stair rim/header from below; focus(3.65,61,3.4),radius4; facade/roof/interior/site/foundations/floors hidden.
+28 west stair stack section at x3.65 with exterior facade retained; site/foundations/interior partitions hidden; focus(3.65,61,8),radius11.
+29 west level4 stair overhead detail; cutz15.9,focus(5.2,61,14.4),radius5.5.
+30 west level1 room/corridor plan crop; cutz5.1,focus(9,49,3.6),radius12. Uncapped Workbench walls are faint; use separate labelled mesh plans for room topology.
+31 east passage/insert/grade section at x34.3, viewed from east; focus(34.3,73,3),radius17. Foundations deliberately hidden.
+32 north level1 stair/gallery/core plan crop; cutz5.1,focus(31,109,3.6),radius8.
+33 south level1 stair/gallery/core plan crop; cutz5.1,focus(42,11,3.6),radius7.
+34 west-wing/insert access link section at y75,from south; focus(18.2,75,3.6),radius4.
+35 corrected projecting south upper enclosure and bracket/slab/beam section at x9,from west; focus(9,.1,13.8),radius5.3; site/foundations/interior hidden.
+36 corrected south-west upper enclosure corner,azimuth235/elevation12; focus(.7,.3,13.5),radius5.4.
+37 ground entrance/porch/foyer plan crop; cutz1.5,focus(22.5,5,0),radius7.
+Standard Cycles: experiment_17_astra_v04_cycles_view_12_muted_none_no_foundation.png, corresponding15 and28 filenames. Same camera definitions as WB12/15/28, truthful material transmission.
+38/39: retained interior perspective detail trials, not the final comparison choice.
+40: FINAL interior perspective experiment_17_astra_v04_cycles_view_40_interior.png. Eye(33.0,10.1,5.2),target(40.2,7.5,5.5),35mm lens; level1 eye1.60m above floor, looking toward south curved flight/open void. Exposure+2EV,world.35,fill.75,48samples. All building meshes retained; no invented light fixture. See interior_v04_40_settings.json.
+Separate labelled plan_v03_32/33/34.png are west rooms/east ground rooms/insert connection, respectively; their numbers DO NOT identify Workbench32/33/34. They are capped drawings from the prior frozen model, retained topology only where v04 evidence establishes unchanged geometry.

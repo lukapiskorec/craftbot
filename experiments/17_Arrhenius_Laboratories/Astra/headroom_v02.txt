@@ -1,0 +1,2 @@
+CONTINUOUS HEADROOM: 512 convex walking regions; minimum 2.700m; 0 violations below2.10m
+Governing: (2.700000762939453, 'StairLanding_E_3_9', 'Beam_5_10_1_1_0')

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">Upper CourtSouth attachment: actual steel and concrete section</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=21.20m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="-46.363,1341.818 419.091,1341.818 419.091,585.455 -46.363,585.455" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Beam_1_2_0_2_0</title></polygon>
+<polygon points="814.727,527.273 826.364,527.273 826.364,410.909 814.727,410.909" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_1_0_Receiver</title></polygon>
+<polygon points="535.455,527.273 547.091,527.273 547.091,410.909 535.455,410.909" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_1_0_Root</title></polygon>
+<polygon points="547.091,527.273 814.727,527.273 814.727,410.909 547.091,410.909" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtFacadeBracket_1_1_0_Web</title></polygon>
+<polygon points="-6388.182,585.455 186.364,585.455 186.364,294.546 -6388.182,294.546" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_1_2_Row1_3_0</title></polygon>
+<polygon points="186.364,585.455 535.455,585.455 535.455,294.546 186.364,294.546" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_1_2_Row2_2_0</title></polygon>
+<polygon points="826.364,934.546 1082.363,934.546 1082.363,-985.454 826.364,-985.454" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Panel_CourtSouth_1_0</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Two discrete connectors per panel; 250mm slab-to-panel gap.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">End plates 10mm; web 10mm; all upper pieces 100mm high.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Vertical anchor interfaces 0.010m2; weld interfaces 0.001m2; inferred capacity.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>

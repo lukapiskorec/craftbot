@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Panel_East_0_0_ShoulderFit0",
+    "removed_volume": 0.47635338276919953
+  },
+  {
+    "name": "Panel_East_0_0_ShoulderFit1",
+    "removed_volume": 0.6053925109303225
+  },
+  {
+    "name": "Panel_East_0_1_Fit0_ShoulderFit0",
+    "removed_volume": 5.561067167510767e-07
+  },
+  {
+    "name": "Panel_East_0_1_Fit0_ShoulderFit1",
+    "removed_volume": 0.007061231561830087
+  },
+  {
+    "name": "Panel_East_0_1_Fit0_ShoulderFit2",
+    "removed_volume": 0.0022665783834236756
+  },
+  {
+    "name": "Panel_East_0_1_Fit0_ShoulderFit4",
+    "removed_volume": 0.23821031883460403
+  },
+  {
+    "name": "Panel_East_0_1_Fit1_ShoulderFit0",
+    "removed_volume": 0.0015720881398277728
+  },
+  {
+    "name": "Panel_East_0_Base",
+    "removed_volume": 0.29502163103577184
+  },
+  {
+    "name": "Panel_East_1_0_Fit0_ShoulderFit0",
+    "removed_volume": 0.5243271964850528
+  },
+  {
+    "name": "Panel_East_1_0_Fit1_ShoulderFit2",
+    "removed_volume": 0.0015721023675546834
+  },
+  {
+    "name": "Panel_East_1_Base",
+    "removed_volume": 0.24156131599412814
+  },
+  {
+    "name": "Panel_West_0_0_ShoulderFit0",
+    "removed_volume": 0.47635067255533975
+  },
+  {
+    "name": "Panel_West_0_0_ShoulderFit1",
+    "removed_volume": 0.6053890665479941
+  },
+  {
+    "name": "Panel_West_0_1_Fit0_ShoulderFit0",
+    "removed_volume": 0.007061280656179736
+  },
+  {
+    "name": "Panel_West_0_1_Fit0_ShoulderFit1",
+    "removed_volume": 0.0022670312025794576
+  },
+  {
+    "name": "Panel_West_0_1_Fit0_ShoulderFit3",
+    "removed_volume": 0.2382084319309155
+  },
+  {
+    "name": "Panel_West_0_1_Fit0_ShoulderFit4",
+    "removed_volume": 4.719894693151002e-07
+  },
+  {
+    "name": "Panel_West_0_1_Fit1_ShoulderFit0",
+    "removed_volume": 0.0015720791954280488
+  },
+  {
+    "name": "Panel_West_0_Base",
+    "removed_volume": 0.29502003243923103
+  },
+  {
+    "name": "Panel_West_1_0_Fit0_ShoulderFit0",
+    "removed_volume": 0.5243242133240501
+  },
+  {
+    "name": "Panel_West_1_0_Fit1_ShoulderFit3",
+    "removed_volume": 0.0015720557888081468
+  },
+  {
+    "name": "Panel_West_1_0_Fit1_ShoulderFit4",
+    "removed_volume": 3.76342658640426e-08
+  },
+  {
+    "name": "Panel_West_1_Base",
+    "removed_volume": 0.24156000707626074
+  }
+]

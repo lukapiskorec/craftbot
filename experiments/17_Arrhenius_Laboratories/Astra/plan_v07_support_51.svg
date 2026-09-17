@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">Terrace wall: exact concrete fit below and above rotated shoulder</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=35.40m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="120.526,274.466 288.947,274.466 288.947,221.053 120.526,221.053" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CorbelWing_77_1_-1</title></polygon>
+<polygon points="-755.263,212.632 1085.580,212.632 1085.580,170.526 -755.263,170.526" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>NorthTerrace_Fit4</title></polygon>
+<polygon points="-704.737,743.158 1080.526,743.158 1080.526,675.789 -704.737,675.789" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceFooting_E_1</title></polygon>
+<polygon points="-721.579,675.789 120.526,675.789 120.526,212.632 -721.579,212.632" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice1_0</title></polygon>
+<polygon points="120.526,221.053 288.947,221.053 288.947,212.632 120.526,212.632" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice2_0</title></polygon>
+<polygon points="120.526,675.789 288.947,675.789 288.947,274.466 120.526,274.466" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice2_1</title></polygon>
+<polygon points="288.947,675.789 1080.526,675.789 1080.526,212.632 288.947,212.632" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_E_0_Slice3_0</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Retained wall envelope stays complete through the column station.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">Existing corbel fills only its actual intersection with the wall.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Original footing and terrace levels; no replacement soil geometry.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>

@@ -1,0 +1,359 @@
+[
+  {
+    "batch": "a",
+    "view": 10,
+    "source": "render_batch_v07_a_view_10.png",
+    "file": "experiment_17_astra_v07_blender_view_10.png",
+    "sha256": "1ef2c36c20698b7975fd2b1ad59d96a44c51d79db58cd6f4898e27de77ba2237"
+  },
+  {
+    "batch": "a",
+    "view": 11,
+    "source": "render_batch_v07_a_view_11.png",
+    "file": "experiment_17_astra_v07_blender_view_11.png",
+    "sha256": "fd052972b00a2e21b21dff4f7690dba46a6cca69573c057cd671a855d92cf77c"
+  },
+  {
+    "batch": "a",
+    "view": 12,
+    "source": "render_batch_v07_a_view_12.png",
+    "file": "experiment_17_astra_v07_blender_view_12.png",
+    "sha256": "56d924b8abe6c2eaf9c04fe78f87382b9806ab9c178e1fdb5562d174253b78b7"
+  },
+  {
+    "batch": "a",
+    "view": 13,
+    "source": "render_batch_v07_a_view_13.png",
+    "file": "experiment_17_astra_v07_blender_view_13.png",
+    "sha256": "aacf43f0d10d47dbbd25a7c36b510fd7450c694cc92bc7a2c8bf3003db20fe4d"
+  },
+  {
+    "batch": "a",
+    "view": 14,
+    "source": "render_batch_v07_a_view_14.png",
+    "file": "experiment_17_astra_v07_blender_view_14.png",
+    "sha256": "76722dc5b6808a3597124c89003ed7f14edf268a89fb10b315246514aaeef65a"
+  },
+  {
+    "batch": "a",
+    "view": 15,
+    "source": "render_batch_v07_a_view_15.png",
+    "file": "experiment_17_astra_v07_blender_view_15.png",
+    "sha256": "6d8dbeb417ee958143249e71fc6175f0449642a8c8bf7e55e00f4dc272519fff"
+  },
+  {
+    "batch": "a",
+    "view": 16,
+    "source": "render_batch_v07_a_view_16.png",
+    "file": "experiment_17_astra_v07_blender_view_16.png",
+    "sha256": "232d4b129f218025ceb1f733e34fb647d35b1b0ea89e560e0e7cb202246860d0"
+  },
+  {
+    "batch": "a",
+    "view": 17,
+    "source": "render_batch_v07_a_view_17.png",
+    "file": "experiment_17_astra_v07_blender_view_17.png",
+    "sha256": "f4cc2d95c4a2c45669dd160e1b4eaca634b5a704be27a439064e5d9bfabb7d86"
+  },
+  {
+    "batch": "a",
+    "view": 18,
+    "source": "render_batch_v07_a_view_18.png",
+    "file": "experiment_17_astra_v07_blender_view_18.png",
+    "sha256": "dbd40575d46002e9af2567674d0b6fe31ef997d6bab78519a0623ddc79de582b"
+  },
+  {
+    "batch": "a",
+    "view": 19,
+    "source": "render_batch_v07_a_view_19.png",
+    "file": "experiment_17_astra_v07_blender_view_19.png",
+    "sha256": "9e4f4c1975a9f3d54f9ecf71646c7d52051e2fe84506f91cd0de1fddb2fddeb9"
+  },
+  {
+    "batch": "a",
+    "view": 20,
+    "source": "render_batch_v07_a_view_20.png",
+    "file": "experiment_17_astra_v07_blender_view_20.png",
+    "sha256": "5a1b8822ab185b4ee6fc31e9e829361c2d2f2abad065b33ca9fcfa8fcfcefe7e"
+  },
+  {
+    "batch": "a",
+    "view": 21,
+    "source": "render_batch_v07_a_view_21.png",
+    "file": "experiment_17_astra_v07_blender_view_21.png",
+    "sha256": "51ea67b5fde778709089dc889870b0756305007afc74214961a1c11629c42dc0"
+  },
+  {
+    "batch": "a",
+    "view": 22,
+    "source": "render_batch_v07_a_view_22.png",
+    "file": "experiment_17_astra_v07_blender_view_22.png",
+    "sha256": "1d90bcedce78bb9b22c0cf7aafda431cbf7f14f90d59c84788960e0e31850b4c"
+  },
+  {
+    "batch": "a",
+    "view": 23,
+    "source": "render_batch_v07_a_view_23.png",
+    "file": "experiment_17_astra_v07_blender_view_23.png",
+    "sha256": "129792f2cb891f6a5429964c89098ac124bd8dd25b00d101116c6552e230f69f"
+  },
+  {
+    "batch": "a",
+    "view": 24,
+    "source": "render_batch_v07_a_view_24.png",
+    "file": "experiment_17_astra_v07_blender_view_24.png",
+    "sha256": "090d0a1f0fd3ff7769537a86fcf250a6e733dfba1936534b6bde4cb287935e32"
+  },
+  {
+    "batch": "a",
+    "view": 25,
+    "source": "render_batch_v07_a_view_25.png",
+    "file": "experiment_17_astra_v07_blender_view_25.png",
+    "sha256": "acb74574b8fe30422f7a72ff4a1afb8bdd5f828079714c2f552007af486b519a"
+  },
+  {
+    "batch": "b",
+    "view": 26,
+    "source": "render_batch_v07_b_view_26.png",
+    "file": "experiment_17_astra_v07_blender_view_26.png",
+    "sha256": "439314a4c00f2aa87fae2b4b5e63e413b0341e4dbf6a12a92deec800830b519d"
+  },
+  {
+    "batch": "b",
+    "view": 27,
+    "source": "render_batch_v07_b_view_27.png",
+    "file": "experiment_17_astra_v07_blender_view_27.png",
+    "sha256": "d044fb696b96dd4e8f7686daefd24fb000d45eb1a7b507482a0ba91d9ca114d0"
+  },
+  {
+    "batch": "b",
+    "view": 28,
+    "source": "render_batch_v07_b_view_28.png",
+    "file": "experiment_17_astra_v07_blender_view_28.png",
+    "sha256": "bf49d9d5647e22287e3ecd11ae1a7358a0e195e56186182e633f9f47e574c850"
+  },
+  {
+    "batch": "b",
+    "view": 29,
+    "source": "render_batch_v07_b_view_29.png",
+    "file": "experiment_17_astra_v07_blender_view_29.png",
+    "sha256": "4d8faa20d6e0b5bc8d9e52aa661e83c5cf18c0ac337dcbe252765c4dc5c03bbd"
+  },
+  {
+    "batch": "b",
+    "view": 30,
+    "source": "render_batch_v07_b_view_30.png",
+    "file": "experiment_17_astra_v07_blender_view_30.png",
+    "sha256": "ad382cd6731329bb0c131eaa87c1bd9635c166c16e8e2885abb08bef069262e8"
+  },
+  {
+    "batch": "b",
+    "view": 31,
+    "source": "render_batch_v07_b_view_31.png",
+    "file": "experiment_17_astra_v07_blender_view_31.png",
+    "sha256": "d0253ebd5f0ce0b5cbfb94b0b07293c4135d2d70604b5f65a0e32a51f92ee129"
+  },
+  {
+    "batch": "b",
+    "view": 32,
+    "source": "render_batch_v07_b_view_32.png",
+    "file": "experiment_17_astra_v07_blender_view_32.png",
+    "sha256": "cfed71126931fb0c82ad25205e177cee6bbae8fd6f2ea0f07544cc4175a1d0ce"
+  },
+  {
+    "batch": "b",
+    "view": 33,
+    "source": "render_batch_v07_b_view_33.png",
+    "file": "experiment_17_astra_v07_blender_view_33.png",
+    "sha256": "e18774973de56ea6e7f158e91dd5c7b1261c9b051dbb4607f5e3e95ee9aa3b1e"
+  },
+  {
+    "batch": "b",
+    "view": 34,
+    "source": "render_batch_v07_b_view_34.png",
+    "file": "experiment_17_astra_v07_blender_view_34.png",
+    "sha256": "3db8b2ede508742adeeb874a83c435315d93de17fc509d7ba49d71e8cacfe792"
+  },
+  {
+    "batch": "b",
+    "view": 35,
+    "source": "render_batch_v07_b_view_35.png",
+    "file": "experiment_17_astra_v07_blender_view_35.png",
+    "sha256": "4c56d8081730cedef4ff63e5e34b0e56441c220b99e93e78fc4c5146a767523b"
+  },
+  {
+    "batch": "b",
+    "view": 36,
+    "source": "render_batch_v07_b_view_36.png",
+    "file": "experiment_17_astra_v07_blender_view_36.png",
+    "sha256": "17dd1b705ba3a05535804ca167ae5f507d521dd47c84446df4cd29fac25c3a0d"
+  },
+  {
+    "batch": "b",
+    "view": 37,
+    "source": "render_batch_v07_b_view_37.png",
+    "file": "experiment_17_astra_v07_blender_view_37.png",
+    "sha256": "00cd9774d24ff2ecb3d8f8a30172cf7c3771a4fe457aa30eb5a8b751b4d1974d"
+  },
+  {
+    "batch": "b",
+    "view": 41,
+    "source": "render_batch_v07_b_view_41.png",
+    "file": "experiment_17_astra_v07_blender_view_41.png",
+    "sha256": "dcae81c4ef29f9e8cabbf4b5fd260a9e5cf4d2f71271b0d136b2c06da7dbdafd"
+  },
+  {
+    "batch": "b",
+    "view": 42,
+    "source": "render_batch_v07_b_view_42.png",
+    "file": "experiment_17_astra_v07_blender_view_42.png",
+    "sha256": "e2259d360ca57f117c86576311f40b88d51cb6ddbfb6b161a1efe03948ebfebb"
+  },
+  {
+    "batch": "b",
+    "view": 43,
+    "source": "render_batch_v07_b_view_43.png",
+    "file": "experiment_17_astra_v07_blender_view_43.png",
+    "sha256": "6d93176f9c017339c54f00ad0fb941abae62e07d56beb4c230a53e2039c75c27"
+  },
+  {
+    "batch": "b",
+    "view": 44,
+    "source": "render_batch_v07_b_view_44.png",
+    "file": "experiment_17_astra_v07_blender_view_44.png",
+    "sha256": "6cbf1d5ed7d8e41b546d77fb2086dade3c31758e2736cd1e086a59144eed2a23"
+  },
+  {
+    "batch": "b",
+    "view": 45,
+    "source": "render_batch_v07_b_view_45.png",
+    "file": "experiment_17_astra_v07_blender_view_45.png",
+    "sha256": "c977aaf66ca95e81b88691545ea99c4349c52f89389fe158a103f25871b553db"
+  },
+  {
+    "batch": "b",
+    "view": 46,
+    "source": "render_batch_v07_b_view_46.png",
+    "file": "experiment_17_astra_v07_blender_view_46.png",
+    "sha256": "65092f693f9cb8b81eedf8863a4008f9eeff9cf701edea1c9938c06e453b6771"
+  },
+  {
+    "batch": "b",
+    "view": 47,
+    "source": "render_batch_v07_b_view_47.png",
+    "file": "experiment_17_astra_v07_blender_view_47.png",
+    "sha256": "055c72bc400ee24d19625ae2e5cec5fc42df1c890dbb84145a7dc2bad0c523f9"
+  },
+  {
+    "batch": "b",
+    "view": 48,
+    "source": "render_batch_v07_b_view_48.png",
+    "file": "experiment_17_astra_v07_blender_view_48.png",
+    "sha256": "ebd6e984eb80633ab13ae1a733799d463f5686fa91763c9c15bda9c9c51acbd6"
+  },
+  {
+    "batch": "b",
+    "view": 49,
+    "source": "render_batch_v07_b_view_49.png",
+    "file": "experiment_17_astra_v07_blender_view_49.png",
+    "sha256": "c1e52572d93753abe55afef1b271b23f83093211588b504e9501cb3a614ed044"
+  },
+  {
+    "batch": "b",
+    "view": 50,
+    "source": "render_batch_v07_b_view_50.png",
+    "file": "experiment_17_astra_v07_blender_view_50.png",
+    "sha256": "d616391eced53257e35e67cf8cbab9adbaf929be11ec562e9df9a035c6322b5d"
+  },
+  {
+    "batch": "b",
+    "view": 51,
+    "source": "render_batch_v07_b_view_51.png",
+    "file": "experiment_17_astra_v07_blender_view_51.png",
+    "sha256": "08c8a917fa2872951c6d7913bc9593c8234f6f148171c223c6341bd034d0bde4"
+  },
+  {
+    "batch": "b",
+    "view": 52,
+    "source": "render_batch_v07_b_view_52.png",
+    "file": "experiment_17_astra_v07_blender_view_52.png",
+    "sha256": "c5789007c224c96026b8376e57f875806846c8e73e06b1225bf390d8010382b2"
+  },
+  {
+    "batch": "b",
+    "view": 53,
+    "source": "render_batch_v07_b_view_53.png",
+    "file": "experiment_17_astra_v07_blender_view_53.png",
+    "sha256": "dee8fba6bdebca2d3e7caf63c78db683c7eceb4a9eece2635507ae0ecebf7ff3"
+  },
+  {
+    "batch": "b",
+    "view": 54,
+    "source": "render_batch_v07_b_view_54.png",
+    "file": "experiment_17_astra_v07_blender_view_54.png",
+    "sha256": "c744ac78feaed663f7632a51061cdc214856302377600fdd42b2d89d322db91b"
+  },
+  {
+    "batch": "c",
+    "view": 1,
+    "source": "render_batch_v07_c_view_01.png",
+    "file": "experiment_17_astra_v07_blender_view_01.png",
+    "sha256": "8cb3c394cffa0d0ff28ab6301e64a5b3e0c22dc9b5fed54c44242dedaf580b56"
+  },
+  {
+    "batch": "c",
+    "view": 2,
+    "source": "render_batch_v07_c_view_02.png",
+    "file": "experiment_17_astra_v07_blender_view_02.png",
+    "sha256": "dc5a7556835c3adaf128e39113ec1cefdee9a7a27de12298d1eb235cb2ba23b8"
+  },
+  {
+    "batch": "c",
+    "view": 3,
+    "source": "render_batch_v07_c_view_03.png",
+    "file": "experiment_17_astra_v07_blender_view_03.png",
+    "sha256": "321065932e2bd05ff0bd976319b568330aa39fa5051eddc04c3d6515692bd8c9"
+  },
+  {
+    "batch": "c",
+    "view": 4,
+    "source": "render_batch_v07_c_view_04.png",
+    "file": "experiment_17_astra_v07_blender_view_04.png",
+    "sha256": "5ab5e8a3cb4a45901085e083b5074523a4a787ca33858a66be9170a5dc6578a8"
+  },
+  {
+    "batch": "c",
+    "view": 5,
+    "source": "render_batch_v07_c_view_05.png",
+    "file": "experiment_17_astra_v07_blender_view_05.png",
+    "sha256": "959439e871b03a4e8cb6a4493510c18aca0ce06ab63caebbf05fb61d361ff45c"
+  },
+  {
+    "batch": "c",
+    "view": 6,
+    "source": "render_batch_v07_c_view_06.png",
+    "file": "experiment_17_astra_v07_blender_view_06.png",
+    "sha256": "d24fe980b2903c6bd1b3e066ed31977449fe5f7964dc794c7947a6f6086feb50"
+  },
+  {
+    "batch": "c",
+    "view": 7,
+    "source": "render_batch_v07_c_view_07.png",
+    "file": "experiment_17_astra_v07_blender_view_07.png",
+    "sha256": "ecb649b470e6523cac852c00484f09e1af565b221ca01967c32e121c9c2dd036"
+  },
+  {
+    "batch": "c",
+    "view": 8,
+    "source": "render_batch_v07_c_view_08.png",
+    "file": "experiment_17_astra_v07_blender_view_08.png",
+    "sha256": "6f9468ee7a80cf5f20fd0b3198faf14067ec2df03337ab24712c0ce5c9159472"
+  },
+  {
+    "batch": "c",
+    "view": 9,
+    "source": "render_batch_v07_c_view_09.png",
+    "file": "experiment_17_astra_v07_blender_view_09.png",
+    "sha256": "de2c08911f720211d05b839bd8ed66a2a949cab7bdecc75d7f0b2fe506df98ea"
+  }
+]

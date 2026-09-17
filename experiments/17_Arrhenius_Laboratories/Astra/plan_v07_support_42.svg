@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1000" viewBox="0 0 1300 1000">
+<defs><clipPath id="drawing"><rect x="65" y="100" width="1170" height="665"/></clipPath></defs>
+<rect x="0" y="0" width="1300" height="1000" fill="#ffffff"/>
+<text x="55" y="45" font-size="23" font-family="Arial">Terrace: retained construction; earth/base deliberately omitted</text>
+<text x="55" y="78" font-size="16" font-family="Arial">Actual mesh section x=34.30m. Grey retained, blue fitted support; earth omitted.</text>
+<g clip-path="url(#drawing)">
+<polygon points="116.774,404.516 135.484,404.516 135.484,385.806 116.774,385.806" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingLedge_0_Slice0_0</title></polygon>
+<polygon points="79.355,385.806 88.710,385.806 88.710,353.065 79.355,353.065" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice0_1</title></polygon>
+<polygon points="88.710,367.097 108.256,367.097 108.256,353.065 88.710,353.065" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice1_1</title></polygon>
+<polygon points="88.710,385.806 108.256,385.806 108.256,367.097 88.710,367.097" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice1_4</title></polygon>
+<polygon points="108.256,367.097 135.484,367.097 135.484,353.065 108.256,353.065" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice2_0</title></polygon>
+<polygon points="108.256,385.806 135.484,385.806 135.484,367.097 108.256,367.097" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtLandingSupport_0_Slice2_1</title></polygon>
+<polygon points="51.290,367.097 79.355,367.097 79.355,353.065 51.290,353.065" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStair_19</title></polygon>
+<polygon points="79.355,353.065 135.484,353.065 135.484,339.032 79.355,339.032" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>CourtStairTopLanding</title></polygon>
+<polygon points="51.290,399.839 79.355,385.806 79.355,367.097 51.290,367.097" fill="#82afc0" stroke="#303030" stroke-width="1"><title>CourtWaist_19</title></polygon>
+<polygon points="1230.000,643.065 1258.065,643.065 1258.065,619.677 1230.000,619.677" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_0_3_Row0_11_0</title></polygon>
+<polygon points="1230.000,306.290 1258.065,306.290 1258.065,282.903 1230.000,282.903" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>FloorSlab_1_3_Row0_11_1</title></polygon>
+<polygon points="163.549,362.419 1186.033,362.419 1186.033,339.032 163.549,339.032" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>NorthTerrace_Fit4</title></polygon>
+<polygon points="1186.032,334.355 1206.613,334.355 1206.613,180.000 1186.032,180.000" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Panel_CourtNorth_5_0</title></polygon>
+<polygon points="1186.032,619.677 1206.613,619.677 1206.613,577.581 1186.032,577.581" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Panel_CourtNorth_5_Base</title></polygon>
+<polygon points="107.419,657.097 191.613,657.097 191.613,619.677 107.419,619.677" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>RetainingBase_Fit6</title></polygon>
+<polygon points="135.484,367.097 163.549,367.097 163.549,339.032 135.484,339.032" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>RetainingWall_Fit2_ShoulderFit0</title></polygon>
+<polygon points="135.484,619.677 163.549,619.677 163.549,367.097 135.484,367.097" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>RetainingWall_Fit2_ShoulderFit1</title></polygon>
+<polygon points="1127.097,657.097 1211.290,657.097 1211.290,619.677 1127.097,619.677" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceFooting_N_0</title></polygon>
+<polygon points="1155.161,619.677 1183.226,619.677 1183.226,362.419 1155.161,362.419" fill="#82afc0" stroke="#303030" stroke-width="1"><title>TerraceWall_N_0_Slice0_0</title></polygon>
+<polygon points="1189.867,571.500 1191.552,571.500 1191.552,340.435 1189.867,340.435" fill="#a8d8e2" stroke="#303030" stroke-width="1"><title>Window_CourtNorth_5_0_Glass0</title></polygon>
+<polygon points="1186.032,340.435 1195.387,340.435 1195.387,334.355 1186.032,334.355" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Window_CourtNorth_5_0_Head</title></polygon>
+<polygon points="1186.032,577.581 1195.387,577.581 1195.387,571.500 1186.032,571.500" fill="#c8c6bf" stroke="#303030" stroke-width="1"><title>Window_CourtNorth_5_0_Sill</title></polygon>
+</g>
+<text x="55" y="810" font-size="19" font-family="Arial">Actual concrete wall seats; remaining earth-bearing footprint unmodeled.</text>
+<text x="55" y="842" font-size="19" font-family="Arial">North wall stops 30mm before glazing; 30mm slab edge is a cantilever.</text>
+<text x="55" y="874" font-size="19" font-family="Arial">Retained strip footings terminate at an unmodeled founding boundary.</text>
+<text x="55" y="935" font-size="16" font-family="Arial">Inferred construction geometry; reinforcement, joints, soil and capacities are not calculated.</text>
+</svg>
