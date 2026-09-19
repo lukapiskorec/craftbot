@@ -61,11 +61,12 @@ sheets.write(os.path.join(HERE, 'pdf'), os.path.join(HERE, 'svg'))      # HERE =
 - A layered assembly gets three views on one sheet: the template with the middle layer grey (`Drawing(..., shade=is_web)`, a function of a member), a side view with the layer codes, and a small axonometric. `annotate` labels plies that share one outline once, with the codes joined (`L2+L4`).
 - `Drawing(members, right, up, cut=c)` removes what is nearer to the viewer than `c`, measured along the viewer axis cross(right, up). With `X, Z` the viewer stands at -y, so the section at y = 700 looking towards +y is `cut=-700`. A section plane that lands on a seam between boards cuts nothing: move it a fraction of a board.
 - An axonometric that is not at model size needs its own `scale_text` ('Axonometric, scale 1:20.').
-- Title block: sheet number and title, experiment title, 100 mm check bar, studio mark, QR code to the viewer model, scale text. Printing is at 100 %.
+- Title block: sheet number and title, project, model, 100 mm check bar, studio mark in MEK-Mono, QR code to the viewer model, scale, units, date. Printing is at 100 %. The layout is `title_blocks.FOOTERS['k']`; `SheetSet(..., footer='a')` to `'k'` picks another, and `tools/footer_study/pdf/00_all_versions.pdf` shows them all. `subtitle` fills the MODEL field, so keep it short ('GPT-6 v02, stick model').
+- `SheetSet.write` prints the PDFs with headless Chrome, which embeds the fonts (Segoe UI from Windows, MEK-Mono from `viewer/fonts`). The SVGs name the fonts without embedding them; `sheet_png.py` adds MEK-Mono when it rasterizes.
 
 ## Checking the sheets
 
-PDFs cannot be inspected directly, so `SheetSet.write` also writes SVG. Rasterize with `tools/sheet_png.py` (headless Chrome) and read the PNG:
+`SheetSet.write` also writes SVG, the quickest thing to look at. Rasterize with `tools/sheet_png.py` (headless Chrome) and read the PNG:
 
 ```
 python tools/sheet_png.py <set>/svg/11_frame_f0_template.svg out.png

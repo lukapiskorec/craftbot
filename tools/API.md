@@ -150,6 +150,11 @@ Cut list and stick order for a model built from stock sticks.
 Drafting kit for fabrication sheets: views, sections, labels, title block.
 
 
+### `title_blocks.py`
+
+Title blocks (footers) for the fabrication sheets, selectable by key.
+
+
 ### `hidden_lines.py`
 
 Exact hidden-line removal for convex, non-intersecting solids.

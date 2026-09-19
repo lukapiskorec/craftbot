@@ -52,9 +52,12 @@ The three scripts hold what is specific to this model: the parametric
 geometry, the prices, the sheet list, the frame template and the unrolled
 roof. The drawing, measuring, packing, hidden-line and PDF code is the
 fabrication kit in `tools/` (`export_members`, `cutlist`, `drafting`,
-`hidden_lines`, `vector_pdf`, `qr_code`; see `tools/README.md`).
-`fab_cutlist.py` needs only the Python standard library. `fab_drawings.py`
-also needs numpy, for the axonometrics.
+`title_blocks`, `hidden_lines`, `vector_pdf`, `qr_code`; see
+`tools/README.md`). `fab_cutlist.py` needs only the Python standard library.
+`fab_drawings.py` also needs numpy, for the axonometrics, and Chrome, which
+prints the PDFs and embeds the title block fonts (Segoe UI, MEK-Mono). The
+title block is footer `k` of `tools/title_blocks.py`, the default; pass
+`footer='a'` to `'k'` to `SheetSet` for another.
 
 ## Sheets
 

@@ -66,12 +66,36 @@ Drafting kit for fabrication sheets: views, sections, labels, title block.
 - `free_area(w, h, pad_left=16)`: (width, height) in mm that a drawing may fill on a w x h sheet.
 - `min_scale(extent_m, paper=A2)`: Smallest whole model scale (15 for 1:15) at which the plan and both elevations of a model with real extents (x, y, z) in metres each fit one sheet at 1:1.
 - `place(bounds, w, h, pad_left=16)`: Offsets that centre a bounding box in the free area of a w x h sheet.
-- class `SheetSet(scale, experiment, subtitle, viewer_url=None, studio='', paper=A2)`: A numbered set of sheets with one title block.
+- class `SheetSet(scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT)`: A numbered set of sheets with one title block.
   - `blank(self, landscape=False)`: An empty sheet of the set's paper.
   - `add(self, title, sheet, note='', scale_text=None)`: Finish a composed sheet with the title block and append it.
   - `view(self, title, drawing, note='', labelled=(), layers=None, scale_text=None)`: One drawing centred on its own sheet, portrait or landscape to suit, with its marks and, for the `labelled` members, lengths and lollipops.
-  - `title_block(self, sheet, number, title, note, scale_text=None)`: Border, title, note line, 100 mm print check bar, studio mark and QR code.
+  - `title_block(self, sheet, number, title, note, scale_text=None)`: Border, note line and the title block of the set's `footer`.
   - `write(self, pdf_dir, svg_dir=None)`: Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when `svg_dir` is given.
+
+### `title_blocks.py`
+
+Title blocks (footers) for the fabrication sheets, selectable by key.
+
+- class `Block(number, title, note, experiment, subtitle, scale, scale_text=None, studio='', qr=None, date=None)`: The texts of one sheet's title block.
+- `mek_advance()`: Advance width of MEK-Mono in em, read from the font's head and hmtx tables.
+- `box(sheet, x, y, w, h, fill=0.0, lw=0.01)`: 
+- `frame(sheet, title_h, lw, top_lw=None)`: Sheet border and the line above the title block.
+- `qr(sheet, matrix, qx, qy, side)`: QR code with its bottom-left corner at (qx, qy), dark modules merged into row runs.
+- `bar(sheet, style, cx, by, font=SANS)`: The 100 mm print check bar centred on cx with its base line at by, in one of the BARS styles.
+- `three_lines(s, b, font, h=30, rows=(20.5, 12, 4.5), sizes=(5, 3.8, 2.6, 3.0), title=None, weights=(400, 400, 400))`: The left and right columns of the unlabelled versions: three lines of text each, QR code far right.
+- `footer_a(s, b)`: The first layout and sizes in Arial.
+- `footer_b(s, b)`: MEK-Mono for everything.
+- `footer_c(s, b)`: Bahnschrift in bold and light.
+- `footer_e(s, b)`: Segoe UI Light, tall 38 mm block with more air.
+- `labelled(s, b, h, font, label_font=MEK, label_weight=400, label_size=2.2, tabs=False, number='box', bar_style='weights', right='grid', note='label', border=THIN, top=HEAVY, strong=600, light=400, title_size=4.6, studio_size=3.8, check_font=None)`: The labelled title block, a small caps label above every value.
+- `footer_d(s, b)`: Inter, compact 26 mm block.
+- `footer_f(s, b)`: D refined, Inter, 28 mm.
+- `footer_g(s, b)`: Bahnschrift bold and light, 26 mm.
+- `footer_h(s, b)`: Arial, 30 mm.
+- `footer_i(s, b)`: Inter, 28 mm.
+- `footer_j(s, b)`: Segoe UI semibold and regular, 32 mm with more air.
+- `footer_k(s, b)`: The default.
 
 ### `hidden_lines.py`
 
@@ -88,10 +112,12 @@ Vector drawing canvas that writes PDF and SVG with the standard library.
   - `poly(self, pts, fill=1.0, lw=THIN, dash=False, stroke=0.0)`: Closed polygon; `fill` and `stroke` are greys 0..1, `fill=None` leaves it open to what is below.
   - `line(self, a, b, lw=THIN, dash=False)`: Straight line from a to b.
   - `circle(self, x, y, r, fill=1.0, lw=THIN)`: Circle as a 24-gon.
-  - `text(self, x, y, s, size=2.5, anchor='start')`: Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'.
+  - `text(self, x, y, s, size=2.5, anchor='start', font='Arial', weight=400, italic=False, spacing=0.0, underline=False, white=False)`: Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'.
   - `pdf_stream(self)`: The page as an uncompressed PDF content stream.
   - `svg(self)`: The page as an SVG document, for a quick look in a browser.
-- `write_pdf(path, sheets)`: Write the sheets as the pages of one PDF 1.4 file.
+- `font_css(text)`: @font-face rules, fonts embedded as base64, for the FONT_FILES families named in `text`.
+- `print_pdf(path, sheets, chrome=None)`: Print the sheets as the pages of one PDF with headless Chrome, each page at its sheet's size.
+- `write_pdf(path, sheets)`: Write the sheets as the pages of one PDF 1.4 file, standard library only, all text in Helvetica.
 
 ### `qr_code.py`
 

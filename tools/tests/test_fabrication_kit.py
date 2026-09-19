@@ -11,6 +11,7 @@ import qr_code
 import cutlist
 import vector_pdf
 import drafting
+import title_blocks
 from hidden_lines import visible_lines
 
 
@@ -144,6 +145,18 @@ class Drafting(unittest.TestCase):
             sheets.write(os.path.join(out, "pdf"), os.path.join(out, "svg"))
             self.assertEqual(sorted(os.listdir(os.path.join(out, "pdf"))), ["00_all_sheets.pdf", "01_plan_test.pdf"])
             self.assertEqual(os.listdir(os.path.join(out, "svg")), ["01_plan_test.svg"])
+
+    def test_every_footer_draws_and_the_default_names_its_fonts(self):
+        for key in title_blocks.FOOTERS:
+            sheets = drafting.SheetSet(15, "Experiment", "subtitle", viewer_url="https://example.org/x", studio="{mark}", footer=key)
+            sheets.add("Title", sheets.blank(landscape=key == "a"), "note")
+            self.assertIn("MEK-Mono", sheets.sheets[0][1].svg())
+        self.assertEqual(title_blocks.DEFAULT, "k")
+        default = drafting.SheetSet(15, "E", "s")
+        default.add("Title", default.blank())
+        self.assertIn("Segoe UI", default.sheets[0][1].svg())
+        with self.assertRaises(AssertionError):
+            drafting.SheetSet(15, "E", "s", footer="z")
 
 
 if __name__ == "__main__":

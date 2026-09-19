@@ -48,7 +48,8 @@ model millimetres.
 | `cutlist.py` | | `measure` (length along the longest edge, section across it, square or angled ends), `pack` (first fit, longest first, with kerf), `write_cutlist` (`cutlist.csv`, `order.md` with spare and price; asserts every piece fits its stick section) |
 | `drafting.py` | numpy for `Axo` | `Drawing` (plan, elevation, section by painter's hidden lines), `Axo` (axonometric with exact hidden lines), `Flat` and `unroll` (a folded strip laid flat), `annotate` and `lollipop` (cut length on the piece, profile and layer beside it), `depth_layers` (L1 on the paper), `add_marks` / `add_tag` (levels, axes, leaders), `min_scale`, `place`, `SheetSet` (numbering, title block with 100 mm check bar and QR code, PDF and SVG output) |
 | `hidden_lines.py` | numpy | `visible_lines`: exact hidden-line removal for convex, non-intersecting solids in any orthographic view; a face that only touches an edge hides nothing |
-| `vector_pdf.py` | | `Sheet` canvas in mm (polygons, lines, circles, text), `write_pdf`, SVG output, paper sizes and line weights; standard library only |
+| `vector_pdf.py` | Chrome for `print_pdf` | `Sheet` canvas in mm (polygons, lines, circles, styled text), SVG output, `print_pdf` (headless Chrome, embeds the fonts a sheet uses), `write_pdf` (standard library, Helvetica only), paper sizes and line weights |
+| `title_blocks.py` | | the sheet footers `FOOTERS['a'..'k']`, picked with `SheetSet(..., footer='k')`; `DEFAULT` is `k`; `footer_study/footer_study.py` prints them all as strips for comparison |
 | `qr_code.py` | | `qr_matrix`: byte mode, level L, versions 1 to 5 (106 bytes) |
 | `sheet_png.py` | Chrome | rasterizes a sheet SVG to PNG, whole or a zoomed square, so an agent can look at a drawing |
 

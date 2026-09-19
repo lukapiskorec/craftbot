@@ -23,7 +23,7 @@ MODULES = ["craftbot_lib", "geometry2d", "planes", "ruled", "framing", "sheathin
 HARNESS = ["render_views", "sheet_png", "check_overlaps", "check_contacts", "check_bearing", "triage", "closeout",
            "export_all_models", "layers", "callouts", "api_card"]
 # Fabrication kit: runs without Blender on members.json (export_members.py writes it from Blender).
-FABRICATION = ["export_members", "cutlist", "drafting", "hidden_lines", "vector_pdf", "qr_code"]
+FABRICATION = ["export_members", "cutlist", "drafting", "title_blocks", "hidden_lines", "vector_pdf", "qr_code"]
 OUT = os.path.join(HERE, "API.md")
 OUT_FABRICATION = os.path.join(HERE, "API_FABRICATION.md")
 

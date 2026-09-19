@@ -10,8 +10,9 @@ millimetres, and draws on `vector_pdf.Sheet` pages at 1:1 to the model.
 - `annotate` writes the cut length on each piece and a lollipop beside it
   with the stick profile and the layer code; `depth_layers` numbers the
   layers from the paper up.
-- `SheetSet` numbers the sheets, draws the title block (print check bar,
-  QR code to the viewer) and writes the PDFs and SVGs.
+- `SheetSet` numbers the sheets, draws the title block picked with `footer`
+  from `title_blocks.py` (print check bar, QR code to the viewer) and
+  writes the PDFs, printed by headless Chrome, and the SVGs.
 - `unroll` lays a folded strip of planar facets flat.
 
 A sheet that does not fit raises: pick the model scale so the largest
@@ -21,13 +22,13 @@ Provenance: experiment 16 fabrication set.
 """
 import os
 import math
-import datetime
 
-from vector_pdf import Sheet, write_pdf, A2, THIN, MEDIUM, HEAVY
+from vector_pdf import Sheet, print_pdf, A2, THIN, MEDIUM, HEAVY
+from title_blocks import FOOTERS, DEFAULT, Block
 from cutlist import measure, long_axis, sub, dot, cross, unit
 from qr_code import qr_matrix
 
-MARGIN, TITLE_H = 10.0, 30.0     # mm: sheet border, title block height
+MARGIN, TITLE_H = 10.0, 32.0     # mm: sheet border, height of the default title block
 GREY = 0.85
 X, Y, Z = [1, 0, 0], [0, 1, 0], [0, 0, 1]
 
@@ -329,9 +330,12 @@ def place(bounds, w, h, pad_left=16):
 class SheetSet:
     """A numbered set of sheets with one title block. `scale` is the model
     scale (15 for 1:15), `experiment` and `subtitle` go in the title block,
-    `viewer_url` becomes the QR code, `studio` is the mark under the check bar."""
+    `viewer_url` becomes the QR code, `studio` is the mark under the check bar,
+    `footer` is a key of `title_blocks.FOOTERS` ('a' to 'k')."""
 
-    def __init__(self, scale, experiment, subtitle, viewer_url=None, studio='', paper=A2):
+    def __init__(self, scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT):
+        assert footer in FOOTERS, f'footer {footer!r} is not one of {" ".join(FOOTERS)}'
+        self.footer = footer
         self.scale, self.experiment, self.subtitle = scale, experiment, subtitle
         self.studio, self.paper = studio, paper
         self.qr = qr_matrix(viewer_url) if viewer_url else None
@@ -359,41 +363,9 @@ class SheetSet:
         self.add(title, sheet, note, scale_text)
 
     def title_block(self, sheet, number, title, note, scale_text=None):
-        """Border, title, note line, 100 mm print check bar, studio mark and QR code."""
-        w, h, scale = sheet.w, sheet.h, self.scale
-        sheet.poly([(MARGIN, MARGIN), (w-MARGIN, MARGIN), (w-MARGIN, h-MARGIN), (MARGIN, h-MARGIN)], fill=None, lw=MEDIUM)
-        sheet.line((MARGIN, MARGIN+TITLE_H), (w-MARGIN, MARGIN+TITLE_H), MEDIUM)
-        if note:
-            sheet.text(MARGIN+4, MARGIN+TITLE_H+3, note, 2.7)
-        sheet.text(MARGIN+4, MARGIN+20.5, f'{number:02d}  {title}', 5)
-        sheet.text(MARGIN+4, MARGIN+12, self.experiment, 3.8)
-        sheet.text(MARGIN+4, MARGIN+4.5, f'{self.subtitle}. CraftBot fabrication set, {datetime.date.today().isoformat()}', 2.6)
-        # Print check and studio mark, centred.
-        bx, by = w/2-50, MARGIN+14.5
-        sheet.text(w/2, by+6, f'100 mm in 1:{scale} = {100*scale/1000:.1f} m in 1:1', 2.8, 'middle')
-        sheet.line((bx, by), (bx+100, by), MEDIUM)
-        for i in range(11):
-            sheet.line((bx+10*i, by), (bx+10*i, by+(3 if i % 5 == 0 else 1.8)), MEDIUM)
-        sheet.text(w/2, MARGIN+5, self.studio, 3.6, 'middle')
-        # QR code to the online viewer, dark modules merged into row runs.
-        side = 24.0
-        qx, qy = w-MARGIN-3-side, MARGIN+3
-        if self.qr:
-            n = len(self.qr)
-            cell = side/n
-            for r, row in enumerate(self.qr):
-                c = 0
-                while c < n:
-                    run = c
-                    while run < n and row[run]:
-                        run += 1
-                    if run > c:
-                        y1 = qy+side-r*cell
-                        sheet.poly([(qx+c*cell, y1), (qx+run*cell, y1), (qx+run*cell, y1-cell), (qx+c*cell, y1-cell)], fill=0.0, lw=0.01)
-                    c = run+1
-            sheet.text(qx-5, MARGIN+20.5, '3D model in CraftBot online viewer', 3.0, 'end')
-        sheet.text(qx-5, MARGIN+12, scale_text or f'Scale 1:{scale}, drawn 1:1 to the model.', 3.0, 'end')
-        sheet.text(qx-5, MARGIN+4.5, 'All numbers on this sheet are model mm.', 2.6, 'end')
+        """Border, note line and the title block of the set's `footer`."""
+        FOOTERS[self.footer](sheet, Block(number, title, note, self.experiment, self.subtitle, self.scale,
+                                          scale_text, self.studio, self.qr))
 
     def write(self, pdf_dir, svg_dir=None):
         """Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when
@@ -404,8 +376,8 @@ class SheetSet:
                 os.remove(os.path.join(folder, old))
         for i, (title, sheet) in enumerate(self.sheets, 1):
             slug = f'{i:02d}_' + ''.join(c if c.isalnum() else '_' for c in title.lower()).strip('_').replace('__', '_')
-            write_pdf(os.path.join(pdf_dir, slug+'.pdf'), [sheet])
+            print_pdf(os.path.join(pdf_dir, slug+'.pdf'), [sheet])
             if svg_dir:
                 with open(os.path.join(svg_dir, slug+'.svg'), 'w', encoding='utf-8') as f:
                     f.write(sheet.svg())
-        write_pdf(os.path.join(pdf_dir, '00_all_sheets.pdf'), [s for _, s in self.sheets])
+        print_pdf(os.path.join(pdf_dir, '00_all_sheets.pdf'), [s for _, s in self.sheets])

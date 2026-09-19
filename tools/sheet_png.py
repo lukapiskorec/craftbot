@@ -20,6 +20,9 @@ import argparse
 import tempfile
 import subprocess
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from vector_pdf import font_css  # noqa: E402
+
 CHROME = [r"C:\Program Files\Google\Chrome\Application\chrome.exe",
           r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
@@ -45,7 +48,7 @@ def render(svg_path, png_path, zoom=None, width=1500, chrome=None):
     with tempfile.TemporaryDirectory() as tmp:
         copy = os.path.join(tmp, "sheet.svg")
         with open(copy, "w", encoding="utf-8") as f:
-            f.write(text.replace(root, fitted, 1))
+            f.write(text.replace(root, fitted + "<style>" + font_css(text) + "</style>", 1))      # MEK-Mono is a file, not a system font
         subprocess.run([chrome or find_chrome(), "--headless=new", "--disable-gpu", "--hide-scrollbars",
                         f"--window-size={width},{height}", "--screenshot=" + os.path.abspath(png_path),
                         "file:///" + copy.replace(os.sep, "/").lstrip("/")],
