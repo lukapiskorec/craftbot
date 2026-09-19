@@ -65,12 +65,12 @@ Planes, half-spaces and clipped members in 3D (needs Blender's mathutils).
 - `plane_nd(half_space)`: (n, d) plane form of a half-space (p, n): n .
 - `vplane(axis, value)`: Vertical plane x = value ('x') or y = value ('y') in (n, d) form.
 - `isect(p1, p2, p3)`: Intersection point of three (n, d) planes.
-- class `Roof`: Roof plane z = z0 + s * (c - out .
+- class `Roof(name, out, c, z0, s)`: Roof plane z = z0 + s * (c - out .
   - `z(self, x, y)`: 
   - `below(self, off=0.0)`: Half-space under the plane shifted `off` along its normal.
   - `above(self, off=0.0)`: 
   - `plane(self, off=0.0)`: (n, d) form for isect().
-- class `Frame`: Plane through o spanned by orthonormal u, v; n = u x v.
+- class `Frame(o, u, v)`: Plane through o spanned by orthonormal u, v; n = u x v.
   - `to2d(self, q)`: 
   - `point(self, a, b, t=0.0)`: 
   - `clip(self, poly, p, n)`: Clip a 2D polygon by the 3D half-space (p, n) restricted to the plane (thickness ignored; see slab_clip for a slab).
@@ -86,7 +86,7 @@ Planes, half-spaces and clipped members in 3D (needs Blender's mathutils).
 
 Bilinear (hyperbolic paraboloid) surfaces and the members that live on them: studs / rafters along rulings, plate-like boards on best-fit patches. For warped, twisted and leaning walls and roofs.
 
-- class `Ruled`: Bilinear surface between the segments A0-A1 (u = 0) and B0-B1 (u = 1); `out` picks the sign of the normal.
+- class `Ruled(A0, A1, B0, B1, out)`: Bilinear surface between the segments A0-A1 (u = 0) and B0-B1 (u = 1); `out` picks the sign of the normal.
   - `P(self, t, u)`: 
   - `dt(self, t, u)`: 
   - `du(self, t, u)`: 
@@ -116,7 +116,7 @@ Building-element generators on top of craftbot_lib: stud walls with framed openi
 
 Board sheathing on planar roof (or wall) facets, with the checks that go with it.
 
-- class `Facet`: One planar surface to be boarded.
+- class `Facet(name, O, U, N, underside=0.0, thick=0.019)`: One planar surface to be boarded.
   - `plane(self, offset=0.0)`: (n, d) plane parallel to the facet, shifted `offset` along N.
   - `uv(self, P)`: 
   - `xyz(self, u, v, h)`: 
@@ -133,11 +133,48 @@ Board sheathing on planar roof (or wall) facets, with the checks that go with it
 - `drop_member(name, facets, clearance=0.002)`: Lower the box member `name` (hip, valley, ridge) along its own depth axis until its top edge sits `clearance` under the sheathing underside of every facet in `facets` ("dropping the hip").
 - `report_protrusions(frame_names, facet_regions, tol=0.001)`: Print and return every framing member (by name) whose corner pokes more than `tol` through a sheathed area.
 
+## Fabrication kit (not used in an experiment run; signatures in API_FABRICATION.md)
+
+### `export_members.py`
+
+Export the mesh members of a Blender scene as members.json for fabrication.
+
+
+### `cutlist.py`
+
+Cut list and stick order for a model built from stock sticks.
+
+
+### `drafting.py`
+
+Drafting kit for fabrication sheets: views, sections, labels, title block.
+
+
+### `hidden_lines.py`
+
+Exact hidden-line removal for convex, non-intersecting solids.
+
+
+### `vector_pdf.py`
+
+Vector drawing canvas that writes PDF and SVG with the standard library.
+
+
+### `qr_code.py`
+
+Minimal QR code encoder: byte mode, error correction L, versions 1 to 5.
+
+
 ## Harness scripts (run from the repo root)
 
 ### `render_views.py`
 
 (no module docstring)
+
+
+### `sheet_png.py`
+
+Rasterize a drawing sheet SVG to PNG with headless Chrome, whole or zoomed.
 
 
 ### `check_overlaps.py`

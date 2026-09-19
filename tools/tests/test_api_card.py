@@ -19,6 +19,15 @@ class ApiCardTest(unittest.TestCase):
         # the point of the card: about 3 k tokens, not the 17 k of the modules
         self.assertLess(len(api_card.build()), 20000)
 
+    def test_fabrication_kit_has_its_own_card(self):
+        text = api_card.build_fabrication()
+        for m in api_card.FABRICATION:
+            self.assertIn(f"### `{m}.py`", text)
+            self.assertIn(f"### `{m}.py`", api_card.build())      # named on the main card, without signatures
+        for fn in ("write_members(", "write_cutlist(", "visible_lines(members, right, up)", "class `SheetSet(scale, experiment, subtitle", "min_scale("):
+            self.assertIn(fn, text)
+        self.assertNotIn("write_cutlist(", api_card.build())
+
     def test_bearing_api_and_codex_closeout_are_documented(self):
         text = api_card.build()
         self.assertIn("check_bearing(foot, seat, tol=1e-06)", text)

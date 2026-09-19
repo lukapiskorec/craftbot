@@ -1,9 +1,11 @@
 # tools/
 
-Code shared by CraftBot experiments. Two groups: the **modelling kits** an
+Code shared by CraftBot experiments. Three groups: the **modelling kits** an
 experiment script imports (extracted from the Fable runs of experiments
-01-13), and the **harness scripts** that run, check and export a model.
-The skills in `skills/` say when and why; this folder is the how.
+01-13), the **harness scripts** that run, check and export a model, and the
+**fabrication kit** that turns a finished model into A2 drawings and a stick
+order for a physical scale model. The skills in `skills/` say when and why;
+this folder is the how.
 
 Start a new experiment from `experiment_template.py`. Put `tools/` on
 `sys.path` (the template does it) and import what you need:
@@ -31,6 +33,31 @@ member with a bird's mouth is body + tail, a wall with a hole is pieces,
 prisms are wound outward, and `place_element` replaces an object of the
 same name (name every piece with all its loop indices).
 
+## Fabrication kit
+
+Drawings, cut lists and a stick order for building a model by hand from
+stock sticks. It is not part of an experiment run; `skills/draft-fabrication-plans`
+is the procedure, `experiments/16_Expressive_Structure/fabrication/GPT-6/` the
+worked example, and `API_FABRICATION.md` the generated card of signatures.
+Everything after the export runs without Blender, on one `members.json` in
+model millimetres.
+
+| Module | Needs | Contents |
+|---|---|---|
+| `export_members.py` | Blender | `write_members` (every mesh as world vertices in model mm, faces, collection path, viewer layer, stick profile from the `stock` property; asserts outward face winding), `scene_extent`; as a CLI on a saved `.blend`, and without `--scale` it prints the smallest scale whose plan and elevations fit A2 |
+| `cutlist.py` | | `measure` (length along the longest edge, section across it, square or angled ends), `pack` (first fit, longest first, with kerf), `write_cutlist` (`cutlist.csv`, `order.md` with spare and price; asserts every piece fits its stick section) |
+| `drafting.py` | numpy for `Axo` | `Drawing` (plan, elevation, section by painter's hidden lines), `Axo` (axonometric with exact hidden lines), `Flat` and `unroll` (a folded strip laid flat), `annotate` and `lollipop` (cut length on the piece, profile and layer beside it), `depth_layers` (L1 on the paper), `add_marks` / `add_tag` (levels, axes, leaders), `min_scale`, `place`, `SheetSet` (numbering, title block with 100 mm check bar and QR code, PDF and SVG output) |
+| `hidden_lines.py` | numpy | `visible_lines`: exact hidden-line removal for convex, non-intersecting solids in any orthographic view; a face that only touches an edge hides nothing |
+| `vector_pdf.py` | | `Sheet` canvas in mm (polygons, lines, circles, text), `write_pdf`, SVG output, paper sizes and line weights; standard library only |
+| `qr_code.py` | | `qr_matrix`: byte mode, level L, versions 1 to 5 (106 bytes) |
+| `sheet_png.py` | Chrome | rasterizes a sheet SVG to PNG, whole or a zoomed square, so an agent can look at a drawing |
+
+```
+blender --background model.blend --python tools/export_members.py -- members.json                       # extent and smallest scale for A2
+blender --background model.blend --python tools/export_members.py -- members.json --scale 15 --exp 16 --stock 3x5
+python tools/sheet_png.py <set>/svg/21_axonometric.svg out.png [--zoom LEFT TOP SIZE]                 # mm from the top-left corner
+```
+
 ## Harness scripts
 
 | Script | Purpose |
@@ -45,7 +72,7 @@ same name (name every piece with all its loop indices).
 | `check_contacts.py` | Contact check: every mesh object must have another within 2 mm (touching counts). Lists floating members, which the overlap check cannot see: treads on nothing, boards nailed to nothing, studs short of their plate. |
 | `check_bearing.py` | Full-foot bearing on explicitly paired horizontal convex faces: checks coplanarity, polygon containment, supported area and edge overhang. Pure-Python core plus Blender mesh-face adapter; complements contact and overlap checks. |
 | `triage.py` | Groups penetrating pairs into name families (pure Python): one row per geometric cause with a count, depth and example, so a version with hundreds of pairs reads as three or four fixes. |
-| `api_card.py` | Generates `API.md`, the compact card of every kit function and class with signature and first docstring sentence, from the source with `ast`. `--check` fails when the card is stale. Agents read the card, not the modules. |
+| `api_card.py` | Generates `API.md`, the compact card of every kit function and class with signature and first docstring sentence, from the source with `ast`, and `API_FABRICATION.md`, the same for the fabrication kit (kept apart so the Builder's card stays under its size limit). `--check` fails when either card is stale. Agents read the cards, not the modules. |
 | `closeout.py` | One command per close-out: `version NN vXX` (export, layers bake and audit, index, view set, renders, viewer screenshot) and `run NN --session-id ID` (rationale sections, hand-off files, prompt file, callouts, API card, index, transcript copy last). Accepts explicit Claude/Codex `--transcript-source`; archives only after all checks pass. `--no-archive` writes a separate preflight report. |
 | `experiment_template.py` | Starting point for a new experiment script (parameter block, derived levels, kits, named collections). Renders clean through `render_views.py`. |
 | `views_template.py` | Starting point for an experiment's `views_<slug>.py` (view keys explained, mandatory views, colours). |
