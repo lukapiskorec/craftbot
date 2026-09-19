@@ -155,8 +155,6 @@
 <text x="317.00" y="286.10" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">150.0</text>
 <text x="317.00" y="136.10" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">150.0</text>
 <text x="185.50" y="388.30" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">142.0</text>
-<text x="185.50" y="388.30" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">142.0</text>
-<text x="250.50" y="388.30" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">142.0</text>
 <text x="250.50" y="388.30" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">142.0</text>
 <text x="148.00" y="477.35" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">70.0</text>
 <text x="288.00" y="477.35" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">70.0</text>
@@ -172,7 +170,6 @@
 <text x="218.00" y="178.60" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">210.0</text>
 <text x="218.00" y="128.60" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">210.0</text>
 <text x="218.00" y="79.85" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">210.0</text>
-<text x="218.00" y="336.10" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">70.0</text>
 <text x="218.00" y="336.10" font-family="Helvetica,Arial" font-size="1.7" text-anchor="middle">70.0</text>
 <polyline points="119.40,385.50 112.00,385.50" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="119.40,198.00 112.00,198.00" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
@@ -235,9 +232,7 @@
 <polyline points="318.60,285.50 326.00,285.50" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="318.60,135.50 326.00,135.50" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="183.90,387.70 176.50,387.70" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="187.10,387.70 194.50,387.70" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="252.10,387.70 259.50,387.70" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="248.90,387.70 241.50,387.70" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="148.00,478.35 148.00,485.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="288.00,478.35 288.00,485.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="148.00,429.60 148.00,437.00" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
@@ -253,7 +248,6 @@
 <polyline points="218.00,126.40 218.00,119.00" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="218.00,77.65 218.00,70.25" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="218.00,337.10 218.00,344.50" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="218.00,333.90 218.00,326.50" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polygon points="115.30,385.50 115.19,384.65 114.86,383.85 114.33,383.17 113.65,382.64 112.85,382.31 112.00,382.20 111.15,382.31 110.35,382.64 109.67,383.17 109.14,383.85 108.81,384.65 108.70,385.50 108.81,386.35 109.14,387.15 109.67,387.83 110.35,388.36 111.15,388.69 112.00,388.80 112.85,388.69 113.65,388.36 114.33,387.83 114.86,387.15 115.19,386.35" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="112.00" y="385.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">2x10</text>
 <text x="112.00" y="386.95" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L1</text>
@@ -436,16 +430,10 @@
 <text x="326.00" y="136.95" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L1</text>
 <polygon points="179.80,387.70 179.69,386.85 179.36,386.05 178.83,385.37 178.15,384.84 177.35,384.51 176.50,384.40 175.65,384.51 174.85,384.84 174.17,385.37 173.64,386.05 173.31,386.85 173.20,387.70 173.31,388.55 173.64,389.35 174.17,390.03 174.85,390.56 175.65,390.89 176.50,391.00 177.35,390.89 178.15,390.56 178.83,390.03 179.36,389.35 179.69,388.55" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="176.50" y="387.35" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="176.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2</text>
-<polygon points="197.80,387.70 197.69,386.85 197.36,386.05 196.83,385.37 196.15,384.84 195.35,384.51 194.50,384.40 193.65,384.51 192.85,384.84 192.17,385.37 191.64,386.05 191.31,386.85 191.20,387.70 191.31,388.55 191.64,389.35 192.17,390.03 192.85,390.56 193.65,390.89 194.50,391.00 195.35,390.89 196.15,390.56 196.83,390.03 197.36,389.35 197.69,388.55" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="194.50" y="387.35" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="194.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L3</text>
+<text x="176.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2+L3</text>
 <polygon points="262.80,387.70 262.69,386.85 262.36,386.05 261.83,385.37 261.15,384.84 260.35,384.51 259.50,384.40 258.65,384.51 257.85,384.84 257.17,385.37 256.64,386.05 256.31,386.85 256.20,387.70 256.31,388.55 256.64,389.35 257.17,390.03 257.85,390.56 258.65,390.89 259.50,391.00 260.35,390.89 261.15,390.56 261.83,390.03 262.36,389.35 262.69,388.55" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="259.50" y="387.35" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="259.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2</text>
-<polygon points="244.80,387.70 244.69,386.85 244.36,386.05 243.83,385.37 243.15,384.84 242.35,384.51 241.50,384.40 240.65,384.51 239.85,384.84 239.17,385.37 238.64,386.05 238.31,386.85 238.20,387.70 238.31,388.55 238.64,389.35 239.17,390.03 239.85,390.56 240.65,390.89 241.50,391.00 242.35,390.89 243.15,390.56 243.83,390.03 244.36,389.35 244.69,388.55" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="241.50" y="387.35" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="241.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L3</text>
+<text x="259.50" y="389.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2+L3</text>
 <polygon points="151.30,485.75 151.19,484.90 150.86,484.10 150.33,483.42 149.65,482.89 148.85,482.56 148.00,482.45 147.15,482.56 146.35,482.89 145.67,483.42 145.14,484.10 144.81,484.90 144.70,485.75 144.81,486.60 145.14,487.40 145.67,488.08 146.35,488.61 147.15,488.94 148.00,489.05 148.85,488.94 149.65,488.61 150.33,488.08 150.86,487.40 151.19,486.60" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="148.00" y="485.40" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
 <text x="148.00" y="487.20" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2</text>
@@ -490,10 +478,7 @@
 <text x="218.00" y="71.70" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2</text>
 <polygon points="221.30,344.50 221.19,343.65 220.86,342.85 220.33,342.17 219.65,341.64 218.85,341.31 218.00,341.20 217.15,341.31 216.35,341.64 215.67,342.17 215.14,342.85 214.81,343.65 214.70,344.50 214.81,345.35 215.14,346.15 215.67,346.83 216.35,347.36 217.15,347.69 218.00,347.80 218.85,347.69 219.65,347.36 220.33,346.83 220.86,346.15 221.19,345.35" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="218.00" y="344.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="218.00" y="345.95" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2</text>
-<polygon points="221.30,326.50 221.19,325.65 220.86,324.85 220.33,324.17 219.65,323.64 218.85,323.31 218.00,323.20 217.15,323.31 216.35,323.64 215.67,324.17 215.14,324.85 214.81,325.65 214.70,326.50 214.81,327.35 215.14,328.15 215.67,328.83 216.35,329.36 217.15,329.69 218.00,329.80 218.85,329.69 219.65,329.36 220.33,328.83 220.86,328.15 221.19,327.35" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="218.00" y="326.15" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">3x5</text>
-<text x="218.00" y="327.95" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L3</text>
+<text x="218.00" y="345.95" font-family="Helvetica,Arial" font-size="1.5" text-anchor="middle">L2+L3</text>
 <polygon points="10.00,584.00 410.00,584.00 410.00,10.00 10.00,10.00" fill="none" stroke="#000000" stroke-width="0.25" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="10.00,554.00 410.00,554.00" fill="none" stroke="#000000" stroke-width="0.25" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="14.00" y="551.00" font-family="Helvetica,Arial" font-size="2.7" text-anchor="start">Glue-up template seen from outside: boards behind, rails in front. Numbers: cut length in mm. Circles: stick profile and layer, L1 lies on the paper.</text>

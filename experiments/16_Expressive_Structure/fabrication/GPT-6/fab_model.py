@@ -1,5 +1,5 @@
 # Fabrication model of experiment 16, GPT-6 v02, regenerated for a stick model.
-# Parametric copy of ../GPT-6/experiment_16_gpt6_v02.py: same room, frame spacing,
+# Parametric copy of ../../GPT-6/experiment_16_gpt6_v02.py: same room, frame spacing,
 # column undulation and roof field; the two timber stocks are replaced by the
 # real sizes of the model sticks (stick mm x SCALE). Writes members.json in
 # model millimetres and runs the overlap and contact checks.
@@ -7,12 +7,11 @@
 #   blender --background --python fab_model.py
 import os
 import sys
-import json
 import math
 import bpy
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_TOOLS = os.path.normpath(os.path.join(_HERE, '..', '..', '..', 'tools'))
+_TOOLS = os.path.normpath(os.path.join(_HERE, '..', '..', '..', '..', 'tools'))
 if _TOOLS not in sys.path:
     sys.path.insert(0, _TOOLS)
 
@@ -20,7 +19,7 @@ import craftbot_lib as craftbot
 import geometry2d as g2
 from check_overlaps import find_overlaps
 from check_contacts import find_floating
-from layers import classify
+from export_members import write_members
 from mathutils import Vector
 
 # PARAMETERS: model scale and the two Karapori sticks (mm, thickness x face).
@@ -303,31 +302,8 @@ for depth, a, b in sorted(overlaps, reverse=True)[:30]:
 for name in list(floating)[:30]:
     print(f'  FLOATING {name}')
 
-# The drawings cull back faces, so every face normal must point outwards.
-for o in meshes:
-    centre = sum((v.co for v in o.data.vertices), Vector())/len(o.data.vertices)
-    for face in o.data.polygons:
-        assert face.normal.dot(face.center-centre) > 0, ('face wound inwards', o.name)
-
-# EXPORT: world meshes in model millimetres.
-k = 1000/SCALE
-parent = {c.name: p for p in bpy.data.collections for c in p.children}
-def group_path(c):
-    return (group_path(parent[c.name])+'/' if c.name in parent else '')+c.name
-members = []
-for o in meshes:
-    M = o.matrix_world
-    members.append({
-        'name': o.name,
-        'group': group_path(o.users_collection[0]),
-        'layer': classify('16', group_path(o.users_collection[0]), o.name),
-        'stock': o['stock'],
-        'red': abs(o.color[0]-RED[0]) < 1e-4,
-        'verts': [[round(c*k, 4) for c in (M@v.co)] for v in o.data.vertices],
-        'faces': [list(p.vertices) for p in o.data.polygons],
-    })
-with open(os.path.join(_HERE, 'members.json'), 'w') as f:
-    json.dump({'scale': SCALE, 'stick_length': 300, 'frames': FRAMES,
-               'frame_y': [round(y*k, 4) for y in FRAME_Y], 'members': members}, f)
+# EXPORT: world meshes in model millimetres (asserts outward face winding).
+write_members(os.path.join(_HERE, 'members.json'), SCALE, exp_id='16', stick_length=300,
+              frames=FRAMES, frame_y=[round(y*1000/SCALE, 4) for y in FRAME_Y])
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(_HERE, 'fab_model.blend'))
 print('Wrote members.json and fab_model.blend')
