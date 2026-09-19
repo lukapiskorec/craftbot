@@ -138,8 +138,11 @@ To use the team, run `/run-experiment NN [brief]` in Claude Code from the repo r
 | [`api_card.py`](tools/api_card.py), [`API.md`](tools/API.md) | the generated one-page card of the kits that the Builder reads instead of the modules |
 | [`closeout.py`](tools/closeout.py) | one command to close out a version or a run: viewer export, layers, index, view set, screenshot, rationale and callout checks, transcript |
 | [`experiment_template.py`](tools/experiment_template.py) | starting point for a new experiment script |
+| [`export_members.py`](tools/export_members.py), [`cutlist.py`](tools/cutlist.py), [`drafting.py`](tools/drafting.py), [`hidden_lines.py`](tools/hidden_lines.py), [`vector_pdf.py`](tools/vector_pdf.py), [`qr_code.py`](tools/qr_code.py) | the fabrication kit: A2 plans, sections, axonometrics and glue-up templates as vector PDF, plus a cut list and stick order, for building a finished model by hand from stock sticks ([`API_FABRICATION.md`](tools/API_FABRICATION.md)) |
 
 Point your agent at both folders in its project instructions, one line each, as described under Skills above.
+
+Drafting fabrication plans is separate from an experiment run. [`skills/draft-fabrication-plans/SKILL.md`](skills/draft-fabrication-plans/SKILL.md) is the procedure, invoked with `/draft-fabrication-plans NN` in Claude Code or `$draft-fabrication-plans NN` in Codex; Each set lives in `experiments/<NN>/fabrication/<Run>/`, one subfolder per run folder, so the models of one experiment stay apart; [`experiments/16_Expressive_Structure/fabrication/GPT-6/`](experiments/16_Expressive_Structure/fabrication/GPT-6/) is the worked example, a 1:15 stick model on 22 A2 sheets.
 
 ## Headless execution
 

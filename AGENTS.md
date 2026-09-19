@@ -76,6 +76,8 @@ Before starting or continuing an experiment, check `skills/` and load the releva
 
 To run an experiment end to end, use the host-specific entry point: `/run-experiment NN [brief]` in Claude Code or `$run-experiment NN [brief]` in Codex. Both entry points follow `skills/running-craftbot-experiment/SKILL.md`. A request in plain words to run, start, continue or redo an experiment uses the same host-specific entry point.
 
+Drafting fabrication plans (A2 drawings, glue-up templates, a cut list and stick order for building a finished model by hand) is separate from an experiment run: `/draft-fabrication-plans NN` in Claude Code or `$draft-fabrication-plans NN` in Codex, both following `skills/draft-fabrication-plans/SKILL.md`. A set goes in `experiments/<NN>/fabrication/<Run>/`, one subfolder per run folder. A request in plain words for fabrication or production files uses the same entry point.
+
 ## Tools
 
 Before writing geometry code for an experiment, read `tools/README.md` and build on the modules in `tools/` (`craftbot_lib`, `geometry2d`, `planes`, `ruled`, `framing`, `sheathing`) instead of re-deriving helpers; start scripts from `tools/experiment_template.py` and render with `tools/render_views.py`. Promote a helper into `tools/` once a second experiment needs it.
