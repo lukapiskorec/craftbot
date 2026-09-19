@@ -155,6 +155,7 @@ OVERRIDES = {
     ],
     "16": [
         (r"ground/(lower|upper)sleepers\|", FRAME),
+        (r"^entrance\|", FIXT),            # GPT-6 run: door header belongs with its jambs
     ],
     "17": [
         # Arrhenius window assemblies and stair rims are viewer fixtures;
