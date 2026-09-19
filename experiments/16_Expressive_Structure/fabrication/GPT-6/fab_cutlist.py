@@ -5,18 +5,57 @@
 import os
 import sys
 import json
+import csv
+import math
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', 'tools')))
-from cutlist import write_cutlist
+from cutlist import write_cutlist, pack
 
 PRICE = {'3x5': 0.40, '2x10': 0.50}   # EUR per stick, karapori.fi, 2026-09-18
 URL = 'https://karapori.fi/products/mantyrima-3-x-3-mm'
+
+# Alternative stock: 1 m Bauhaus slats ripped into strips on a small hobby saw.
+# stick: (slat, slat width mm, rip width mm, EUR per slat on 2026-09-20, url)
+SLATS = {'2x10': ('10 x 70 x 1000', 70, 2, 3.38, 'https://www.bauhaus.fi/hobbylista-maler-manty-puuvalmis-10-x-70-x-1000-mm'),
+         '3x5': ('5 x 40 x 1000', 40, 3, 1.88, 'https://www.bauhaus.fi/hobbylista-maler-manty-puuvalmis-5-x-40-x-1000-mm')}
+SLAT_LENGTH = 1000
+RIP_KERF = 1.0
 
 
 def load():
     with open(os.path.join(HERE, 'members.json')) as f:
         return json.load(f)
+
+
+def write_slat_order():
+    """Put the slat order at the top of order.md: 1 m slats ripped into the two sticks."""
+    lengths = {stock: [] for stock in SLATS}
+    with open(os.path.join(HERE, 'cutlist.csv')) as f:
+        for row in csv.DictReader(f):
+            lengths[row['stick']] += [float(row['length_mm'])]*int(row['qty'])
+    out = ['## Slat order, Bauhaus', '',
+           f'Hobbylista Maler, pine, {SLAT_LENGTH} mm long, ripped into strips with a {RIP_KERF:.0f} mm rip kerf. '
+           'Pieces are packed into full-length strips with 1 mm per crosscut. The order adds 10% spare strips, rounded up.', '',
+           '| Stick | Slat | Strips per slat | Strips packed | Strips with spare | Slats to order | EUR each | EUR |',
+           '|---|---|---|---|---|---|---|---|']
+    order, total = {}, 0.0
+    for stock, (slat, width, rip, price, url) in SLATS.items():
+        per_slat = int((width+RIP_KERF)//(rip+RIP_KERF))
+        packed = len(pack(lengths[stock], SLAT_LENGTH, 1.0))
+        strips = math.ceil(packed*1.10)
+        order[stock] = math.ceil(strips/per_slat)
+        total += order[stock]*price
+        out.append(f'| {stock} mm | [{slat} mm]({url}) | {per_slat} | {packed} | {strips} | **{order[stock]}** | {price:.2f} | {order[stock]*price:.2f} |')
+    out += [f'| | | | | | | total | **{total:.2f}** |', '',
+            'Prices of 2026-09-20, on offer until 2026-10-04 (regular 4.50 and 2.50 EUR).', '',
+            '## Stick order, Karapori (reference)', '']
+    path = os.path.join(HERE, 'order.md')
+    with open(path, encoding='utf-8') as f:
+        title, _, rest = f.read().partition('\n\n')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(title+'\n\n'+'\n'.join(out)+'\n'+rest)
+    return order
 
 
 if __name__ == '__main__':
@@ -25,3 +64,4 @@ if __name__ == '__main__':
                           intro=f'Mäntyrima 30 cm from {URL}. {len(data["members"])} pieces, frames {data["frames"]}.',
                           prices=PRICE, kerf=1.0, spare=0.10)
     print('Sticks to order:', order)
+    print('Slats to order:', write_slat_order())

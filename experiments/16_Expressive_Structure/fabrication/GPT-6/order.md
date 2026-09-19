@@ -1,5 +1,19 @@
 # Stick order, experiment 16 GPT-6 v02 at 1:15
 
+## Slat order, Bauhaus
+
+Hobbylista Maler, pine, 1000 mm long, ripped into strips with a 1 mm rip kerf. Pieces are packed into full-length strips with 1 mm per crosscut. The order adds 10% spare strips, rounded up.
+
+| Stick | Slat | Strips per slat | Strips packed | Strips with spare | Slats to order | EUR each | EUR |
+|---|---|---|---|---|---|---|---|
+| 2x10 mm | [10 x 70 x 1000 mm](https://www.bauhaus.fi/hobbylista-maler-manty-puuvalmis-10-x-70-x-1000-mm) | 23 | 47 | 52 | **3** | 3.38 | 10.14 |
+| 3x5 mm | [5 x 40 x 1000 mm](https://www.bauhaus.fi/hobbylista-maler-manty-puuvalmis-5-x-40-x-1000-mm) | 10 | 70 | 77 | **8** | 1.88 | 15.04 |
+| | | | | | | total | **25.18** |
+
+Prices of 2026-09-20, on offer until 2026-10-04 (regular 4.50 and 2.50 EUR).
+
+## Stick order, Karapori (reference)
+
 Mäntyrima 30 cm from https://karapori.fi/products/mantyrima-3-x-3-mm. 1401 pieces, frames [0, 1, 2, 3, 4, 5, 6].
 Packing assumes 1 mm per cut. The order adds 10% spare, rounded up.
 
