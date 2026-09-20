@@ -1,10 +1,17 @@
-# The exhibition pedestal sheet of the set: the full model on its pedestal
-# as a dimensioned axonometric, the pedestal exploded into its six boards,
-# and a side view with a visitor for scale. Four uncut 18 x 400 x 1200 boards are the sides, lapped pinwheel
+# The exhibition pedestal sheets of the set, each with the full model on a
+# pedestal as a dimensioned axonometric and a side view with a visitor for
+# scale. `pedestal_sheet` is the tall pedestal, also exploded into its six
+# boards: four uncut 18 x 400 x 1200 boards are the sides, lapped pinwheel
 # fashion; a fifth board gives the top and bottom panels set inside them.
-# Called by fab_drawings.py. All numbers are real mm, as on every sheet.
-from vector_pdf import THIN, MEDIUM, text_width
+# `platform_sheet` is the low 900 x 900 x 450 pedestal, drawn as one volume,
+# with the model at one end and the drawing set lying open in front of it,
+# as a spiral-bound booklet or as an accordion. Called by fab_drawings.py.
+# All numbers are real mm, as on every sheet.
+import math
+
+from vector_pdf import FINE, THIN, MEDIUM, text_width
 from drafting import Drawing, Axo, Y, Z, lollipop, place
+from drawing_assets import person, size
 
 BOARD_T, BOARD_W, BOARD_L = 18.0, 400.0, 1200.0
 HALF = (BOARD_W+BOARD_T)/2      # half the outer footprint, 209
@@ -13,43 +20,19 @@ MAIN, EXPLODED, SIDE = 1/4, 1/10, 1/10      # drawing scales
 TOTAL_AT = 190.0                # mm from the pedestal corner to the total height dimension
 SPREAD, LIFT, DROP = 140.0, 260.0, 350.0     # mm the sides and the panels move apart in the exploded view, and the two near sides drop to show the far ones
 
-# Outline of a standing visitor facing -x, traced from outputs/person_sample.png:
-# (x from the middle of the figure, height) in mm, scaled to 1750 tall.
-VISITOR = [(24, 1749), (33, 1750), (46, 1749), (68, 1744), (83, 1739), (91, 1734), (97, 1728), (101, 1720), (119, 1682), (123, 1667),
-           (126, 1648), (123, 1623), (119, 1608), (110, 1588), (102, 1571), (94, 1562), (93, 1558), (94, 1551), (109, 1528), (119, 1516),
-           (129, 1509), (207, 1471), (227, 1459), (235, 1451), (239, 1445), (247, 1431), (254, 1416), (260, 1397), (265, 1377), (281, 1263),
-           (281, 1252), (283, 1235), (283, 1207), (284, 1191), (283, 1167), (284, 1133), (281, 1109), (276, 1080), (271, 1061), (256, 1021),
-           (234, 969), (230, 954), (227, 940), (229, 916), (229, 892), (220, 877), (212, 845), (208, 834), (207, 827), (208, 810),
-           (207, 794), (209, 764), (209, 725), (211, 709), (211, 648), (209, 631), (208, 605), (216, 572), (213, 554), (214, 548),
-           (227, 526), (233, 498), (242, 402), (242, 306), (240, 290), (238, 253), (231, 183), (231, 172), (229, 159), (225, 137),
-           (223, 129), (219, 122), (209, 109), (206, 98), (207, 83), (213, 54), (212, 39), (215, 22), (215, 12), (210, 9),
-           (201, 7), (192, 7), (142, 2), (118, 2), (102, 0), (83, 2), (72, 2), (31, 7), (25, 9), (22, 12),
-           (21, 18), (25, 30), (29, 39), (32, 42), (39, 47), (57, 53), (65, 56), (70, 60), (82, 74), (100, 97),
-           (103, 103), (108, 118), (108, 126), (103, 141), (104, 146), (109, 154), (124, 166), (126, 169), (129, 174), (132, 214),
-           (136, 231), (136, 240), (129, 271), (126, 292), (126, 314), (132, 351), (135, 378), (135, 391), (130, 415), (129, 437),
-           (124, 447), (107, 464), (103, 471), (102, 478), (105, 493), (105, 498), (89, 524), (83, 537), (80, 557), (73, 583),
-           (69, 609), (48, 707), (45, 709), (42, 705), (36, 687), (19, 646), (-7, 572), (-9, 563), (-8, 546), (-11, 532),
-           (-13, 527), (-18, 522), (-21, 518), (-19, 514), (-12, 502), (-10, 484), (-8, 473), (-7, 467), (-10, 454), (-10, 445),
-           (-5, 419), (-4, 395), (-4, 371), (-5, 354), (-5, 279), (-12, 227), (-15, 216), (-22, 196), (-23, 188), (-23, 183),
-           (-18, 162), (-18, 140), (-13, 124), (-11, 94), (-6, 61), (-6, 54), (-9, 44), (-8, 36), (-6, 26), (-6, 20),
-           (-7, 17), (-10, 14), (-15, 13), (-66, 13), (-83, 11), (-129, 11), (-146, 9), (-210, 9), (-249, 14), (-279, 20),
-           (-283, 22), (-284, 28), (-279, 41), (-275, 48), (-269, 53), (-262, 56), (-249, 59), (-210, 58), (-197, 61), (-183, 68),
-           (-170, 78), (-145, 106), (-142, 111), (-137, 129), (-131, 146), (-126, 172), (-126, 177), (-129, 199), (-128, 207), (-126, 218),
-           (-116, 246), (-116, 257), (-121, 279), (-125, 321), (-127, 356), (-135, 428), (-131, 452), (-137, 474), (-144, 522), (-144, 541),
-           (-142, 557), (-144, 576), (-141, 593), (-141, 609), (-140, 620), (-140, 635), (-142, 652), (-142, 661), (-137, 731), (-138, 736),
-           (-141, 740), (-155, 751), (-161, 759), (-165, 768), (-168, 785), (-172, 797), (-173, 805), (-171, 814), (-161, 840), (-152, 871),
-           (-152, 877), (-155, 890), (-154, 897), (-147, 929), (-144, 951), (-137, 973), (-136, 986), (-129, 1026), (-122, 1087), (-121, 1104),
-           (-114, 1124), (-106, 1161), (-107, 1181), (-102, 1237), (-111, 1290), (-113, 1312), (-107, 1331), (-107, 1344), (-109, 1360), (-106, 1386),
-           (-103, 1399), (-94, 1423), (-86, 1438), (-81, 1445), (-70, 1454), (-50, 1464), (-17, 1483), (-10, 1489), (-7, 1495), (-9, 1508),
-           (-13, 1516), (-20, 1519), (-39, 1520), (-44, 1523), (-48, 1527), (-49, 1532), (-49, 1547), (-53, 1560), (-55, 1569), (-54, 1586),
-           (-56, 1590), (-65, 1598), (-66, 1601), (-65, 1608), (-56, 1624), (-55, 1628), (-55, 1634), (-59, 1641), (-61, 1654), (-58, 1667),
-           (-52, 1682), (-52, 1689), (-59, 1706), (-59, 1711), (-57, 1718), (-52, 1722), (-39, 1726), (-7, 1741), (7, 1746)]
-VISITOR_AT = 645.0              # mm from the pedestal centre to the middle of the visitor
-VISITOR_HALF = max(x for x, _ in VISITOR)
+VISITOR_GAP = 150.0             # mm from the pedestal face to the visitor's toe
+VISITOR_HALF, VISITOR_H = size('person')[0]/2, size('person')[1]      # the visitor of tools/drawing_assets.py
 STUB = 5.5                      # mm on the sheet, an extension line: two 2 mm dashes and the 1.5 mm gap
 CLEAR = 1.5                     # mm on the sheet between a dimension line and the box of its number
-VISITOR_DROP = 0.9              # mm on the sheet the traced soles sink into the floor line
 DIM_OFF = 12.0                  # mm on the sheet from the side view to its height dimensions
+PLATFORM, PLATFORM_H = 900.0, 450.0      # the low pedestal: square side and height
+PLATFORM_AXO, PRINTS = 1/5, 1/15          # drawing scales of the axonometric and of the two print diagrams
+SETBACK = 40.0                  # mm from the end of the platform to the model
+PAGE_W, PAGE_H, PAGES = 420.0, 594.0, 24      # the drawing set: A2 portrait sheets
+SPINE = 10.0                    # mm between the two pages of the open booklet, the spiral
+BOOK_GAP = 20.0                 # mm from the model to the booklet
+FOLD = 72.0                     # degrees, slope of the accordion panels drawn half unfolded
+OPEN_AT = (10, 11)              # sheet numbers of this set shown on the open booklet, left and right page
 
 
 def board(name, x0, x1, y0, y1, z0, z1):
@@ -88,10 +71,10 @@ def dimension(sheet, axo, ox, oy, p, q, away, text, anchor):
         x, y = on(at(point, length))
         mx, my = on(at(point, 0))
         reach = STUB/((mx-x)**2+(my-y)**2)**0.5
-        sheet.line((x, y), (x+(mx-x)*reach, y+(my-y)*reach), THIN, dash=True)
-        sheet.line((x-1.2, y-1.2), (x+1.2, y+1.2), MEDIUM)
+        sheet.line((x, y), (x+(mx-x)*reach, y+(my-y)*reach), FINE, dash=True)
+        sheet.line((x-1.2, y-1.2), (x+1.2, y+1.2), THIN)
     a, b = on(at(p, length)), on(at(q, length))
-    sheet.line(a, b, THIN)
+    sheet.line(a, b, FINE)
     # The number sits beside the middle of the line, on the right for 'start' and on the left for 'end', its box CLEAR away
     # from the line measured square to it, so a number beside a sloping line stands as clear as one beside a vertical line.
     nx, ny = b[1]-a[1], a[0]-b[0]
@@ -103,6 +86,27 @@ def dimension(sheet, axo, ox, oy, p, q, away, text, anchor):
     width, height = text_width(text, size), 0.72*size
     off = CLEAR+abs(nx)*width/2+abs(ny)*height/2
     sheet.text((a[0]+b[0])/2+nx*off, (a[1]+b[1])/2+ny*off-height/2, text, size, 'middle')
+
+
+def side_width(half):
+    """Width on the sheet of `side_view` for a pedestal `half` deep each side of its centre."""
+    return (2*half+VISITOR_GAP+2*VISITOR_HALF)*SIDE+2*DIM_OFF+20
+
+
+def side_view(sheet, solids, half, top, left, soy):
+    """Side view 1:10 seen from +x with the visitor facing the pedestal, its floor line at `soy` and its left end
+    (the number of the height dimension) at `left`. `top` is the height of pedestal and model."""
+    sox = left+10+DIM_OFF+half*SIDE      # the pedestal centre
+    Drawing([scaled(m, SIDE) for m in solids], Y, Z).paint(sheet, sox, soy)
+    visitor_at = half+VISITOR_GAP+VISITOR_HALF
+    right = sox+(visitor_at+VISITOR_HALF)*SIDE+DIM_OFF
+    sheet.line((sox-half*SIDE-DIM_OFF-3, soy), (right+3, soy), MEDIUM)
+    person(sheet, sox+visitor_at*SIDE, soy, SIDE)      # over the floor line
+    for height, x in ((top, sox-half*SIDE-DIM_OFF), (VISITOR_H, right)):
+        sheet.line((x, soy), (x, soy+height*SIDE), FINE)
+        for y in (soy, soy+height*SIDE):
+            sheet.line((x-1.2, y-1.2), (x+1.2, y+1.2), THIN)
+        sheet.text(x+(-2 if x < sox else 2), soy+height*SIDE/2, f'{height:.0f}', 3.2, 'end' if x < sox else 'start')
 
 
 def pedestal_sheet(sheets, members):
@@ -122,7 +126,7 @@ def pedestal_sheet(sheets, members):
     ax0, ay0, ax1, ay1 = main.bounds()
     ex0, ey0, ex1, ey1 = exploded.bounds()
     reach = main.point([HALF+TOTAL_AT, -HALF, 0])[0]+16      # right end of the height dimensions and their numbers
-    column = max(ex1-ex0, (VISITOR_AT+VISITOR_HALF+HALF)*SIDE+2*DIM_OFF+20)      # the right column: exploded view, board list, side view
+    column = max(ex1-ex0, side_width(HALF))      # the right column: exploded view, board list, side view
     ox, oy = place((ax0-24, ay0-36, reach+column, ay1), sheet.w, sheet.h, pad_left=0)
     main.paint(sheet, ox, oy)
 
@@ -170,20 +174,153 @@ def pedestal_sheet(sheets, members):
         sheet.text(tx+100, ty-6*i, count, 2.6, 'end')
 
     # Side view with a visitor, at the foot of the right column.
-    side = Drawing([scaled(m, SIDE) for m in list(boards.values())+model], Y, Z)
-    sox, soy = ox+reach+10+DIM_OFF+HALF*SIDE, oy+ay0-20
-    side.paint(sheet, sox, soy)
-    right = sox+(VISITOR_AT+VISITOR_HALF)*SIDE+DIM_OFF
-    sheet.line((sox-HALF*SIDE-DIM_OFF-3, soy), (right+3, soy), MEDIUM)
-    sheet.poly([(sox+(VISITOR_AT+x)*SIDE, soy+z*SIDE-VISITOR_DROP) for x, z in VISITOR], 1.0, MEDIUM)      # over the floor line
-    for height, x in ((top, sox-HALF*SIDE-DIM_OFF), (max(z for _, z in VISITOR), right)):
-        sheet.line((x, soy), (x, soy+height*SIDE), THIN)
-        for y in (soy, soy+height*SIDE):
-            sheet.line((x-1.2, y-1.2), (x+1.2, y+1.2), MEDIUM)
-        sheet.text(x+(-2 if x < sox else 2), soy+height*SIDE/2, f'{height:.0f}', 3.2, 'end' if x < sox else 'start')
+    side_view(sheet, list(boards.values())+model, HALF, top, ox+reach, oy+ay0-20)
     sheet.text(ox+reach+column/2, oy+ay0-32, 'Side view 1:10 with a visitor 1.75 m tall', 2.6, 'middle')
 
     note = (f'Pedestal {2*HALF:.0f} x {2*HALF:.0f} x {BOARD_L:.0f}, with the model {2*HALF:.0f} x {2*HALF:.0f} x {top:.0f}. '
             'Each side laps the edge of the next and is screwed into it; top and bottom panels sit inside the sides, flush with their ends, '
             'and are screwed through the sides. Circles: board section and board code. The bottom panel carries the ballast.')
     sheets.add('Pedestal with model', sheet, note, scale_text='Axonometric 1:4, others 1:10.')
+
+
+def prism(name, profile, y0, y1):
+    """A convex (x, z) profile extruded from y0 to y1, faces wound outwards."""
+    if sum(a[0]*b[1]-b[0]*a[1] for a, b in zip(profile, profile[1:]+profile[:1])) > 0:
+        profile = profile[::-1]      # clockwise seen from -y, so the side faces below point outwards
+    n = len(profile)
+    verts = [[x, y, z] for y in (y0, y1) for x, z in profile]
+    faces = [list(range(n)), list(range(2*n-1, n-1, -1))]+[[i, n+i, n+(i+1) % n, (i+1) % n] for i in range(n)]
+    mid = [sum(v[a] for v in verts)/len(verts) for a in range(3)]
+    for k, face in enumerate(faces):
+        a, b, c = (verts[j] for j in face[:3])
+        u, w = [b[t]-a[t] for t in range(3)], [c[t]-b[t] for t in range(3)]
+        normal = [u[1]*w[2]-u[2]*w[1], u[2]*w[0]-u[0]*w[2], u[0]*w[1]-u[1]*w[0]]
+        if sum(normal[t]*(a[t]-mid[t]) for t in range(3)) < 0:
+            faces[k] = face[::-1]
+    return {'name': name, 'group': 'Prints', 'layer': 'pedestal', 'stock': None, 'verts': verts, 'faces': faces}
+
+
+def booklet(y0, z0, thick=2.0):
+    """The drawing set as an open spiral-bound booklet lying on z0: two portrait pages from y0 back, and the wire loops."""
+    inner, outer = SPINE/2, SPINE/2+PAGE_W
+    # The reader stands at +y and looks towards -y, so the left page is the one at +x.
+    parts = [board('Page_left', inner, outer, y0, y0+PAGE_H, z0, z0+thick),
+             board('Page_right', -outer, -inner, y0, y0+PAGE_H, z0, z0+thick)]
+    loops = int(PAGE_H//27)
+    for k in range(loops):
+        y = y0+(PAGE_H-27*(loops-1))/2+27*k
+        parts.append(board(f'Loop_{k}', -inner-5, inner+5, y-2, y+2, z0+thick, z0+thick+3))
+    return parts
+
+
+def accordion(turned=4.0, waiting=8.0, panels=4, thick=1.5, trim=4.0):
+    """The drawing set as an accordion lying on z = 0: the stack already read on the left, the stack still folded on
+    the right, and `panels` sheets between them half unfolded at FOLD degrees."""
+    run, rise = PAGE_W*math.cos(math.radians(FOLD)), PAGE_W*math.sin(math.radians(FOLD))
+    parts = [board('Stack_read', -PAGE_W, 0, 0, PAGE_H, 0, turned)]
+    for k in range(panels):
+        (xa, za), (xb, zb) = ((k*run, turned+(rise if k % 2 else 0)), ((k+1)*run, turned+(0 if k % 2 else rise)))
+        ux, uz = (xb-xa)/PAGE_W, (zb-za)/PAGE_W
+        xa, za, xb, zb = xa+ux*trim, za+uz*trim, xb-ux*trim, zb-uz*trim      # clear of the next panel at the fold
+        nx, nz = -uz*thick/2, ux*thick/2
+        parts.append(prism(f'Panel_{k}', [(xa+nx, za+nz), (xb+nx, zb+nz), (xb-nx, zb-nz), (xa-nx, za-nz)], 0, PAGE_H))
+    parts.append(board('Stack_folded', panels*run, panels*run+PAGE_W, 0, PAGE_H, 0, waiting))
+    return parts
+
+
+def lay_sheet(sheet, source, place_at, scale):
+    """Draw the sheet `source` of the set on `sheet` through `place_at`, which maps a point of the source in mm from
+    its bottom-left corner to the target: polygons and lines as they are, line widths times `scale`, every text as
+    a fine bar of its length, since type this small does not print."""
+    for op in source.ops:
+        if op[0] == 'poly':
+            _, pts, fill, lw, dash, stroke = op
+            sheet.poly([place_at(x, y) for x, y in pts], fill, max(lw*scale, 0.03), False, stroke)
+        elif not op[6][5]:      # text, but not white text on a black ground
+            _, x, y, text, size, anchor = op[:6]
+            width = text_width(text, size)
+            x -= {'start': 0, 'middle': width/2, 'end': width}[anchor]
+            sheet.line(place_at(x, y+0.3*size), place_at(x+width, y+0.3*size), max(0.35*size*scale, 0.03))
+
+
+def platform_sheet(sheets, members):
+    half = PLATFORM/2
+    platform = board('Platform', -half, half, -half, half, 0, PLATFORM_H)
+    # The model is turned half round and stands at the -y end, its door towards the prints and the visitor at +y.
+    turned = [dict(m, verts=[[-x, -y, z] for x, y, z in m['verts']]) for m in members]
+    low = min(v[2] for m in turned for v in m['verts'])
+    back = min(v[1] for m in turned for v in m['verts'])
+    model = [moved(m, dy=-half+SETBACK-back, dz=PLATFORM_H-low) for m in turned]
+    span = lambda axis: (min(v[axis] for m in model for v in m['verts']), max(v[axis] for m in model for v in m['verts']))
+    (mx0, mx1), (my0, my1), (_, top) = span(0), span(1), span(2)
+    book = booklet(my1+BOOK_GAP, PLATFORM_H)
+    assert my1+BOOK_GAP+PAGE_H <= half and SPINE/2+PAGE_W <= half, 'the open booklet does not fit the platform'
+
+    toward = (-1, 1, 0.8)      # seen from the door side, which is now +y
+    main = Axo([platform]+book+model, PLATFORM_AXO, toward)
+    prints = [Axo(booklet(0, 0), PRINTS), Axo(accordion(), PRINTS)]
+    sheet = sheets.blank(landscape=True)
+    ax0, ay0, ax1, ay1 = main.bounds()
+    reach = main.point([-half, -half-TOTAL_AT, 0])[0]+16      # right end of the height dimensions and their numbers
+    column = side_width(half)
+    side_h = max(top, VISITOR_H)*SIDE
+    heights = [a.bounds()[3]-a.bounds()[1] for a in prints]
+    stack = 10+side_h+12+sum(h+26 for h in heights)      # side view, then each diagram with its dimensions and two lines of label
+    ox, oy = place((ax0-24, ay0-28, reach+24+column, max(ay1, ay0-28+stack)), sheet.w, sheet.h, pad_left=0)
+    main.paint(sheet, ox, oy)
+    # Two sheets of this set lie on the open booklet, read from +y: bottom edge at the front, left page at +x.
+    front, page_top = my1+BOOK_GAP+PAGE_H, PLATFORM_H+2.0
+    for number, x_left in zip(OPEN_AT, (SPINE/2+PAGE_W, -SPINE/2)):
+        if number <= len(sheets.sheets):
+            source = sheets.sheets[number-1][1]
+            assert (source.w, source.h) == (PAGE_W, PAGE_H), f'sheet {number} is not A2 portrait'
+            on_page = lambda u, v, x_left=x_left: tuple(c+o for c, o in zip(main.point([x_left-u, front-v, page_top]), (ox, oy)))
+            lay_sheet(sheet, source, on_page, PLATFORM_AXO)
+
+    dim = lambda *args, **kw: dimension(sheet, main, ox, oy, *args, **kw)
+    # Platform footprint at the floor; on its top the model footprint, its setback and the gap to the booklet.
+    dim([-half, half, 0], [half, half, 0], (0, 100, 0), f'{PLATFORM:.0f}', 'end')
+    dim([-half, half, 0], [-half, -half, 0], (-100, 0, 0), f'{PLATFORM:.0f}', 'start')
+    side = [mx0, 0, PLATFORM_H]
+    for y0, y1 in ((-half, my0), (my0, my1), (my1, my1+BOOK_GAP)):
+        dim([mx0, y0, PLATFORM_H], [mx0, y1, PLATFORM_H], (-60, 0, 0), f'{y1-y0:.0f}', 'start')
+    # Heights on the right: platform and model, then the total.
+    corner = [-half, -half]
+    dim(corner+[0], corner+[PLATFORM_H], (0, -90, 0), f'{PLATFORM_H:.0f}', 'start')
+    dim(corner+[PLATFORM_H], corner+[top], (0, -90, 0), f'{top-PLATFORM_H:.0f}', 'start')
+    dim(corner+[0], corner+[top], (0, -TOTAL_AT, 0), f'{top:.0f}', 'start')
+    # Booklet label in the empty corner above the left edge of the platform.
+    lx, ly = ox+ax0-10, oy+main.point([half, half, PLATFORM_H])[1]+42
+    sheet.text(lx, ly, 'Booklet', 3.2, weight=600)
+    sheet.text(lx, ly-5, f'{PAGES} sheets A2, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}', 2.6)
+    px, py = main.point([SPINE/2+PAGE_W, my1+BOOK_GAP+PAGE_H*0.3, PLATFORM_H+2])      # the outer edge of the left page
+    sheet.line((lx+22, ly-7), (px+ox, py+oy), FINE)
+    sheet.text(ox+(ax0+ax1)/2, oy+ay0-24, 'Axonometric 1:5, seen from the door side, with the booklet', 2.6, 'middle')
+
+    left = ox+reach+24
+    side_view(sheet, [platform]+book+model, half, top, left, oy+ay0-10)
+    sheet.text(left+column/2, oy+ay0-24, 'Side view 1:10 with a visitor 1.75 m tall', 2.6, 'middle')
+
+    # The two ways to lay out the prints, above the side view: booklet, then accordion.
+    labels = [('Booklet', f'{PAGES} sheets A2 portrait, spiral bound, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}'),
+              ('Accordion', f'{PAGES} sheets A2 joined along the long edge, folded {PAGE_W:.0f} x {PAGE_H:.0f}, {PAGES*PAGE_W/1000:.2f} m unfolded')]
+    run = 4*PAGE_W*math.cos(math.radians(FOLD))
+    marks = [[([SPINE/2, 0, 0], [SPINE/2+PAGE_W, 0, 0], (0, -90, 0), PAGE_W, 'start'),
+              ([-SPINE/2-PAGE_W, 0, 0], [-SPINE/2-PAGE_W, PAGE_H, 0], (-90, 0, 0), PAGE_H, 'end')],
+             [([run, 0, 0], [run+PAGE_W, 0, 0], (0, -90, 0), PAGE_W, 'start'),
+              ([-PAGE_W, 0, 0], [-PAGE_W, PAGE_H, 0], (-90, 0, 0), PAGE_H, 'end')]]
+    y = oy+ay0-10+side_h+12      # foot of the lower diagram
+    for axo, (name, what), dims in reversed(list(zip(prints, labels, marks))):
+        bx0, by0, bx1, by1 = axo.bounds()
+        dox, doy = left+(column-(bx1-bx0))/2-bx0, y+8-by0
+        axo.paint(sheet, dox, doy)
+        for p0, p1, away, length, anchor in dims:
+            dimension(sheet, axo, dox, doy, p0, p1, away, f'{length:.0f}', anchor)
+        sheet.text(left+10, doy+by1+10, name, 3.2, weight=600)
+        sheet.text(left+10, doy+by1+5, what+f', drawn 1:{1/PRINTS:.0f}', 2.6)
+        y = doy+by1+18
+
+    note = (f'Low pedestal {PLATFORM:.0f} x {PLATFORM:.0f} x {PLATFORM_H:.0f}, {top:.0f} high with the model ({mx1-mx0:.0f} x {my1-my0:.0f} in plan), which stands '
+            f'{SETBACK:.0f} from the far edge, centred across, its door towards the prints and the visitor. The {PAGES} A2 sheets of this set lie in front of it, open at sheets {OPEN_AT[0]} and {OPEN_AT[1]}, '
+            'as a booklet or as an accordion. The pedestal is drawn as one volume; its boards are not designed yet.')
+    sheets.add('Low pedestal with model', sheet, note, scale_text='Axonometric 1:5, side view 1:10.')

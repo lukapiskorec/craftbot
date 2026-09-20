@@ -170,6 +170,11 @@ Vector drawing canvas that writes PDF and SVG with the standard library.
 Minimal QR code encoder: byte mode, error correction L, versions 1 to 5.
 
 
+### `drawing_assets.py`
+
+Entourage for drawing sheets: outlines of people (later trees, symbols) placed on a Sheet at a scale.
+
+
 ## Harness scripts (run from the repo root)
 
 ### `render_views.py`

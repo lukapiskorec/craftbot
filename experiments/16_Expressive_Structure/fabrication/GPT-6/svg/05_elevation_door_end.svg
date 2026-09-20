@@ -1607,17 +1607,17 @@
 <polygon points="113.00,518.75 113.00,515.75 108.00,515.75 108.00,518.75" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polygon points="328.00,518.75 328.00,515.75 323.00,515.75 323.00,518.75" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polygon points="348.00,518.75 348.00,515.75 343.00,515.75 343.00,518.75" fill="#ffffff" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="12.00,513.75 60.83,513.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,513.75 60.83,513.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="512.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+0</text>
-<polyline points="12.00,413.75 60.83,413.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,413.75 60.83,413.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="412.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+100</text>
-<polyline points="12.00,313.75 60.83,313.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,313.75 60.83,313.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="312.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+200</text>
-<polyline points="12.00,213.75 60.83,213.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,213.75 60.83,213.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="212.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+300</text>
-<polyline points="12.00,163.75 60.83,163.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,163.75 60.83,163.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="162.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+350</text>
-<polyline points="12.00,113.75 60.83,113.75" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
+<polyline points="12.00,113.75 60.83,113.75" fill="none" stroke="#000000" stroke-width="0.07" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 1.5"/>
 <text x="12.00" y="112.95" font-family="Arial,Helvetica,Arial" font-size="2.4" text-anchor="start">+400</text>
 <polygon points="10.00,584.00 410.00,584.00 410.00,10.00 10.00,10.00" fill="none" stroke="#000000" stroke-width="0.13" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="10.00,552.00 410.00,552.00" fill="none" stroke="#000000" stroke-width="0.25" stroke-linejoin="round" stroke-linecap="round"/>
@@ -2001,7 +2001,7 @@
 <text x="279.00" y="556.40" font-family="Segoe UI,Helvetica,Arial" font-size="2.0" text-anchor="start" font-weight="600" letter-spacing="0.3">3D MODEL</text>
 <text x="279.00" y="562.09" font-family="Segoe UI,Helvetica,Arial" font-size="3.4" text-anchor="start">CraftBot online viewer</text>
 <text x="279.00" y="576.30" font-family="Segoe UI,Helvetica,Arial" font-size="2.0" text-anchor="start" font-weight="600" letter-spacing="0.3">DATE</text>
-<text x="279.00" y="580.50" font-family="Segoe UI,Helvetica,Arial" font-size="3.0" text-anchor="start">2026-09-20</text>
+<text x="279.00" y="580.50" font-family="Segoe UI,Helvetica,Arial" font-size="3.0" text-anchor="start">2026-09-21</text>
 <text x="327.00" y="556.40" font-family="Segoe UI,Helvetica,Arial" font-size="2.0" text-anchor="start" font-weight="600" letter-spacing="0.3">SCALE</text>
 <text x="327.00" y="562.09" font-family="Segoe UI,Helvetica,Arial" font-size="3.4" text-anchor="start" font-weight="600">1:15, drawn 1:1 to the model</text>
 <text x="327.00" y="576.30" font-family="Segoe UI,Helvetica,Arial" font-size="2.0" text-anchor="start" font-weight="600" letter-spacing="0.3">UNITS</text>

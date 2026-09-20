@@ -28,7 +28,7 @@ import subprocess
 
 A2 = (420.0, 594.0)     # mm, portrait; use A2[::-1] for landscape
 A3 = (297.0, 420.0)
-THIN, MEDIUM, HEAVY = 0.13, 0.25, 0.45   # line widths, mm
+FINE, THIN, MEDIUM, HEAVY = 0.07, 0.13, 0.25, 0.45   # line widths, mm; FINE is for dimension lines, leaders and datums only
 
 # Font families that are files, not system fonts. `font_css` embeds the ones a page uses.
 FONT_FILES = {'MEK-Mono': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'viewer', 'fonts', 'MEK-Mono.otf')}

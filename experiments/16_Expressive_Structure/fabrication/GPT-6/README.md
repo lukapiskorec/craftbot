@@ -45,7 +45,7 @@ python fab_drawings.py
 | `members.json`, `fab_model.blend` | `fab_model.py` | every member as a mesh in model mm, with stick and group; the script also runs the overlap and contact checks |
 | `order.md` | `fab_cutlist.py` | sticks to order per profile, with 10 % spare and price |
 | `cutlist.csv` | `fab_cutlist.py` | every distinct piece: stick, part, length, rip width, square or angled ends, quantity |
-| `pdf/NN_*.pdf`, `pdf/00_all_sheets.pdf` | `fab_drawings.py` | 23 A2 sheets, vector, drawn 1:1 to the model |
+| `pdf/NN_*.pdf`, `pdf/00_all_sheets.pdf` | `fab_drawings.py` | 24 A2 sheets, vector, drawn 1:1 to the model |
 | `svg/` | `fab_drawings.py` | the same sheets for a quick look in a browser |
 
 The three scripts hold what is specific to this model: the parametric
@@ -67,13 +67,30 @@ template per frame F0 to F6. 18 side wall, 19 door wall, 20 far wall templates.
 21 axonometric of the viewer layer "frame", 22 axonometric of "cladding ext"
 and "fixtures" (both 1:20). 23 the model on its exhibition pedestal (1:4),
 the pedestal exploded into its boards and a side view with a 1.75 m visitor
-(both 1:10), from `fab_pedestal.py`.
+(both 1:10), from `fab_pedestal.py`. The visitor is `person` of
+`tools/drawing_assets.py`.
 
 The pedestal is 418 x 418 x 1200 mm, 1688 mm with the model. Four uncut
 18 x 400 x 1200 boards are the sides, each lapping the edge of the next. A
 fifth board gives the 382 x 382 top and bottom panels, set inside the sides and
 flush with their ends. Everything is screwed. The bottom panel carries about
 20 kg of ballast: empty, a 30 N push at the top edge tips the pedestal.
+
+24 is a second pedestal design on trial, also from `fab_pedestal.py`: a low
+900 x 900 x 450 mm pedestal, 938 mm high with the model. The model stands
+40 mm from the far edge, turned so its door faces the visitor, and the 24 A2
+sheets of this set lie open in front of it. The axonometric (1:5, side view
+1:10) shows them as a spiral-bound booklet, open 850 x 594 mm, with sheets 10 and
+11 of the set laid on its pages (the sheets' own polygons and lines put through
+the axonometric, text as fine bars; `OPEN_AT` picks the sheets); two 1:15
+diagrams show the booklet and the alternative, an accordion of the sheets
+joined along the long edge (10.08 m unfolded). The open booklet leaves about
+20 mm to the model and to the front edge. The pedestal is drawn as one volume;
+its boards are not designed yet.
+
+Dimension lines, leaders, level datums and axis ticks on every sheet use the
+`FINE` line weight (0.07 mm) of `tools/vector_pdf.py`, thinner than any line of
+the drawing itself.
 
 Print at 100 %, no "fit to page". Each sheet has a 100 mm check bar. Every
 number on a sheet is model mm, the level marks included.

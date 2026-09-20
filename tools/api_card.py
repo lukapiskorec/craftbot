@@ -23,7 +23,7 @@ MODULES = ["craftbot_lib", "geometry2d", "planes", "ruled", "framing", "sheathin
 HARNESS = ["render_views", "sheet_png", "check_overlaps", "check_contacts", "check_bearing", "triage", "closeout",
            "export_all_models", "layers", "callouts", "api_card"]
 # Fabrication kit: runs without Blender on members.json (export_members.py writes it from Blender).
-FABRICATION = ["export_members", "cutlist", "drafting", "title_blocks", "hidden_lines", "vector_pdf", "qr_code"]
+FABRICATION = ["export_members", "cutlist", "drafting", "title_blocks", "hidden_lines", "vector_pdf", "qr_code", "drawing_assets"]
 OUT = os.path.join(HERE, "API.md")
 OUT_FABRICATION = os.path.join(HERE, "API_FABRICATION.md")
 
@@ -109,7 +109,7 @@ def build_fabrication():
            "members.json is `{scale, stick_length, <extra keys>, members}`; a member is `{name, group (collection path),",
            "layer (viewer layer), stock ('3x5' = thickness x face in mm, or null for a part not cut from sticks), verts,",
            "faces}`. `drafting` exports the axes `X`, `Y`, `Z` (lists) and `vector_pdf` the papers `A2`, `A3` (portrait,",
-           "mm) and the line weights `THIN`, `MEDIUM`, `HEAVY`. A view is given by its `right` and `up` axes; the viewer",
+           "mm) and the line weights `FINE` (dimension lines, leaders, datums), `THIN`, `MEDIUM`, `HEAVY`. A view is given by its `right` and `up` axes; the viewer",
            "stands at cross(right, up), so `Drawing(members, X, Z)` is the elevation seen from -y and `X, Y` the plan.", ""]
     for m in FABRICATION:
         out += module_card(m, True)

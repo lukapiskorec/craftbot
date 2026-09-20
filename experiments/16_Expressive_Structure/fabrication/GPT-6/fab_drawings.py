@@ -9,12 +9,12 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', 'tools')))
-from vector_pdf import THIN, MEDIUM, HEAVY
+from vector_pdf import FINE, THIN, MEDIUM, HEAVY
 from cutlist import measure
 from drafting import (SheetSet, Drawing, Axo, Flat, X, Y, Z, NEG, GREY, in_groups, centre, area, faces_of,
                       depth_layers, annotate, lollipop, add_marks, add_tag, paint_extras, place, unroll)
 from fab_cutlist import load
-from fab_pedestal import pedestal_sheet
+from fab_pedestal import pedestal_sheet, platform_sheet
 
 VIEWER_URL = 'https://lukapiskorec.github.io/craftbot/?model=models%2F16_Expressive_Structure%2Fgpt6_v02.json'
 STICK_T = 3.0      # mm, thickness of one frame layer (the 3x5 slat on edge)
@@ -108,7 +108,7 @@ def unrolled_roof(sheets, members):
             if k:
                 sheet.line((pts[0][0]+ox, pts[0][1]+oy), (pts[3][0]+ox, pts[3][1]+oy), HEAVY)
             lx, ly = cx, pts[0][1]+oy-8
-            sheet.line((cx, pts[0][1]+oy+1.5), (lx, ly), THIN)
+            sheet.line((cx, pts[0][1]+oy+1.5), (lx, ly), FINE)
             lollipop(sheet, lx, ly, '2x10', f'P{k+1}')
     for x, y, label in strips:
         sheet.text(x+ox-6, y+oy-1, label, 2.8, 'end')
@@ -173,6 +173,7 @@ def build_sheets():
             add_tag(axo, axo.point([x_end, y, z_low]), axo.point([x_end-24, y, z_low]), label)
         sheets.view(title, axo, note, scale_text='Axonometric, scale 1:20.')
     pedestal_sheet(sheets, members)
+    platform_sheet(sheets, members)
     return sheets
 
 

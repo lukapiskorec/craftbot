@@ -51,6 +51,7 @@ model millimetres.
 | `vector_pdf.py` | Chrome for `print_pdf` | `Sheet` canvas in mm (polygons, lines, circles, styled text), SVG output, `print_pdf` (headless Chrome, embeds the fonts a sheet uses), `write_pdf` (standard library, Helvetica only), paper sizes and line weights |
 | `title_blocks.py` | | the sheet footers `FOOTERS['a'..'k']`, picked with `SheetSet(..., footer='k')`; `DEFAULT` is `k`; `footer_study/footer_study.py` prints them all as strips for comparison |
 | `qr_code.py` | | `qr_matrix`: byte mode, level L, versions 1 to 5 (106 bytes) |
+| `drawing_assets.py` | (Pillow, numpy, scipy to trace) | entourage outlines placed on a sheet at a scale: `person` (1.75 m visitor), `outline_asset`, `size`; `trace` turns a silhouette image into a new outline, which is then kept as data in the file |
 | `sheet_png.py` | Chrome | rasterizes a sheet SVG to PNG, whole or a zoomed square, so an agent can look at a drawing |
 
 ```

@@ -9,7 +9,7 @@ not intersect; `export_members.py` needs Blender, the rest runs on its members.j
 members.json is `{scale, stick_length, <extra keys>, members}`; a member is `{name, group (collection path),
 layer (viewer layer), stock ('3x5' = thickness x face in mm, or null for a part not cut from sticks), verts,
 faces}`. `drafting` exports the axes `X`, `Y`, `Z` (lists) and `vector_pdf` the papers `A2`, `A3` (portrait,
-mm) and the line weights `THIN`, `MEDIUM`, `HEAVY`. A view is given by its `right` and `up` axes; the viewer
+mm) and the line weights `FINE` (dimension lines, leaders, datums), `THIN`, `MEDIUM`, `HEAVY`. A view is given by its `right` and `up` axes; the viewer
 stands at cross(right, up), so `Drawing(members, X, Z)` is the elevation seen from -y and `X, Y` the plan.
 
 ### `export_members.py`
@@ -129,3 +129,13 @@ Minimal QR code encoder: byte mode, error correction L, versions 1 to 5.
 - `build(version, words, mask)`: Module matrix for the codewords under one of the eight masks.
 - `penalty(m)`: Mask penalty score of a matrix (runs, blocks, finder look-alikes, balance).
 - `qr_matrix(text)`: QR matrix for `text` with the lowest-penalty mask.
+
+### `drawing_assets.py`
+
+Entourage for drawing sheets: outlines of people (later trees, symbols) placed on a Sheet at a scale.
+
+- `size(name)`: (width, height) in real mm of an asset.
+- `outline_asset(sheet, name, x, y, scale, mirror=False, fill=1.0, lw=MEDIUM, sink=0.0)`: Draw the asset `name` on `sheet` at `scale` (1/10 for 1:10) with the middle of its base at (x, y); `mirror` turns it to face +x, `fill` is a grey 0..1 or None, `sink` lowers it by that many mm on the sheet (traced soles are not level).
+- `person(sheet, x, y, scale, mirror=False, fill=1.0, lw=MEDIUM, sink=0.9)`: A standing visitor 1750 mm tall, feet at (x, y), facing left (-x) unless `mirror`.
+- `trace(image_path, height, smooth=9, tolerance=0.35)`: Outline of the largest dark shape of an image (a silhouette on a light or transparent ground) as `(x, height)` in mm, scaled to `height` mm: the boundary pixels are followed, smoothed with a running mean over `smooth` pixels and thinned to `tolerance` pixels (Douglas-Peucker).
+- `svg(name)`: The asset as an SVG document in real mm, black outline and white fill.

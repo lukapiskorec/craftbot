@@ -23,7 +23,7 @@ Provenance: experiment 16 fabrication set.
 import os
 import math
 
-from vector_pdf import Sheet, print_pdf, A2, THIN, MEDIUM, HEAVY
+from vector_pdf import Sheet, print_pdf, A2, FINE, THIN, MEDIUM, HEAVY
 from title_blocks import FOOTERS, DEFAULT, Block
 from cutlist import measure, long_axis, sub, dot, cross, unit
 from qr_code import qr_matrix
@@ -244,7 +244,7 @@ def annotate(sheet, drawing, members, layers, ox, oy, min_length=12):
     for (px, py), (cx, cy), stock, layer in pending:
         dx, dy = cx-px, cy-py
         d = math.hypot(dx, dy)
-        sheet.line((px+dx/d*1.6+ox, py+dy/d*1.6+oy), (cx+ox, cy+oy), THIN)
+        sheet.line((px+dx/d*1.6+ox, py+dy/d*1.6+oy), (cx+ox, cy+oy), FINE)
     for _, (cx, cy), stock, layer in pending:
         lollipop(sheet, cx+ox, cy+oy, stock, layer)
 
@@ -286,17 +286,17 @@ def paint_extras(sheet, drawing, ox, oy):
     x0, y0, x1, y1 = drawing.bounds()
     for kind, value, label in drawing.extra:
         if kind == 'level':       # horizontal datum at the left edge, model mm
-            sheet.line((MARGIN+2, value+oy), (x0+ox-3, value+oy), THIN, dash=True)
+            sheet.line((MARGIN+2, value+oy), (x0+ox-3, value+oy), FINE, dash=True)
             sheet.text(MARGIN+2, value+oy+0.8, label, 2.4)
         elif kind == 'axis_x':    # frame axis under the drawing
-            sheet.line((value+ox, y0+oy-2), (value+ox, y0+oy-7), THIN)
+            sheet.line((value+ox, y0+oy-2), (value+ox, y0+oy-7), FINE)
             sheet.text(value+ox, y0+oy-10.5, label, 2.6, 'middle')
         elif kind == 'axis_y':
-            sheet.line((x0+ox-2, value+oy), (x0+ox-7, value+oy), THIN)
+            sheet.line((x0+ox-2, value+oy), (x0+ox-7, value+oy), FINE)
             sheet.text(x0+ox-8, value+oy-0.9, label, 2.6, 'end')
         elif kind == 'tag':       # leader from a point on the drawing to a label on its left
             (ax, ay), (bx, by) = value
-            sheet.line((ax+ox, ay+oy), (bx+ox, by+oy), THIN)
+            sheet.line((ax+ox, ay+oy), (bx+ox, by+oy), FINE)
             sheet.text(bx+ox-1.5, by+oy-1.1, label, 3.2, 'end')
 
 
