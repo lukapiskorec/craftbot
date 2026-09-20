@@ -14,6 +14,7 @@ from cutlist import measure
 from drafting import (SheetSet, Drawing, Axo, Flat, X, Y, Z, NEG, GREY, in_groups, centre, area, faces_of,
                       depth_layers, annotate, lollipop, add_marks, add_tag, paint_extras, place, unroll)
 from fab_cutlist import load
+from fab_pedestal import pedestal_sheet
 
 VIEWER_URL = 'https://lukapiskorec.github.io/craftbot/?model=models%2F16_Expressive_Structure%2Fgpt6_v02.json'
 STICK_T = 3.0      # mm, thickness of one frame layer (the 3x5 slat on edge)
@@ -146,8 +147,8 @@ def build_sheets():
     add('Elevation, side plus x', members, Y, Z, levels=True, axes=('axis_x', 1))
     add('Elevation, side minus x', members, NEG(Y), Z, levels=True, axes=('axis_x', -1))
     bay = (DATA['frame_y'][0]+DATA['frame_y'][1])/2
-    add('Cross section, first bay', members, X, Z, cut=-bay, levels=True,
-        note='Cut midway between F0 and F1, looking away from the door. Cut members shaded.')
+    add('Cross section, first bay', members, NEG(X), Z, cut=bay, levels=True,
+        note='Cut midway between F0 and F1, looking towards the door wall from inside, so -x is on the right. Cut members shaded.')
     add('Long section, centre line', members, NEG(Y), Z, cut=mm(0.02), levels=True, axes=('axis_x', -1),
         note='Cut 1.3 mm off the centre line so it passes through boards, not between them. Looking towards -x. Cut members shaded.')
     for j, y in zip(DATA['frames'], DATA['frame_y']):
@@ -171,6 +172,7 @@ def build_sheets():
         for y, label in FRAME_AXES:
             add_tag(axo, axo.point([x_end, y, z_low]), axo.point([x_end-24, y, z_low]), label)
         sheets.view(title, axo, note, scale_text='Axonometric, scale 1:20.')
+    pedestal_sheet(sheets, members)
     return sheets
 
 

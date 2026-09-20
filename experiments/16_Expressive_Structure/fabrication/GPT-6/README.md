@@ -45,7 +45,7 @@ python fab_drawings.py
 | `members.json`, `fab_model.blend` | `fab_model.py` | every member as a mesh in model mm, with stick and group; the script also runs the overlap and contact checks |
 | `order.md` | `fab_cutlist.py` | sticks to order per profile, with 10 % spare and price |
 | `cutlist.csv` | `fab_cutlist.py` | every distinct piece: stick, part, length, rip width, square or angled ends, quantity |
-| `pdf/NN_*.pdf`, `pdf/00_all_sheets.pdf` | `fab_drawings.py` | 22 A2 sheets, vector, drawn 1:1 to the model |
+| `pdf/NN_*.pdf`, `pdf/00_all_sheets.pdf` | `fab_drawings.py` | 23 A2 sheets, vector, drawn 1:1 to the model |
 | `svg/` | `fab_drawings.py` | the same sheets for a quick look in a browser |
 
 The three scripts hold what is specific to this model: the parametric
@@ -62,10 +62,18 @@ title block is footer `k` of `tools/title_blocks.py`, the default; pass
 ## Sheets
 
 01 ground mat plan, 02 plan section, 03 roof framing plan, 04 roof boards
-unrolled. 05 to 08 elevations. 09 cross section, 10 long section. 11 to 17 one
+unrolled. 05 to 08 elevations. 09 cross section (first bay, looking at the door wall from inside), 10 long section. 11 to 17 one
 template per frame F0 to F6. 18 side wall, 19 door wall, 20 far wall templates.
 21 axonometric of the viewer layer "frame", 22 axonometric of "cladding ext"
-and "fixtures" (both 1:20).
+and "fixtures" (both 1:20). 23 the model on its exhibition pedestal (1:4),
+the pedestal exploded into its boards and a side view with a 1.75 m visitor
+(both 1:10), from `fab_pedestal.py`.
+
+The pedestal is 418 x 418 x 1200 mm, 1688 mm with the model. Four uncut
+18 x 400 x 1200 boards are the sides, each lapping the edge of the next. A
+fifth board gives the 382 x 382 top and bottom panels, set inside the sides and
+flush with their ends. Everything is screwed. The bottom panel carries about
+20 kg of ballast: empty, a 30 N push at the top edge tips the pedestal.
 
 Print at 100 %, no "fit to page". Each sheet has a 100 mm check bar. Every
 number on a sheet is model mm, the level marks included.

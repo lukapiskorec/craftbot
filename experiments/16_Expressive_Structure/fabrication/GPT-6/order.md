@@ -55,3 +55,28 @@ Packing assumes 1 mm per cut. The order adds 10% spare, rounded up.
 | 3x5 | SoleRunner | 4 | 225.0 to 225.0 |
 
 Every piece with its length is in `cutlist.csv`.
+
+## Weight estimates
+
+Volumes are measured on the meshes of `members.json` and of the pedestal boards in `fab_pedestal.py`, as built, without offcuts or spare. Weight is volume times density at about 12 % moisture; the low and high columns are the usual spread of the material, not a tolerance of the model.
+
+### Model
+
+| Part | Pieces | Volume l | kg at 450 | kg at 520 kg/m3 | kg at 600 |
+|---|---|---|---|---|---|
+| 2x10 mm sticks, pine | 470 | 0.881 | 0.40 | 0.46 | 0.53 |
+| 3x5 mm sticks, pine | 931 | 0.994 | 0.45 | 0.52 | 0.60 |
+| **model** | 1401 | **1.875** | 0.84 | 0.98 | 1.13 |
+
+The model weighs about **0.98 kg**. Glue adds a few per cent, about 39 g at 4 %.
+
+### Pedestal
+
+| Boards | Volume l | Pine panel kg | MDF kg |
+|---|---|---|---|
+| 4 sides 18 x 400 x 1200 | 34.56 | 18.0 | 25.9 |
+| top and bottom 18 x 382 x 382 | 5.25 | 2.7 | 3.9 |
+| **pedestal, empty** | **39.81** | **20.7** | **29.9** |
+| with 20 kg ballast | | 40.7 | 49.9 |
+
+Pine panel at 520 kg/m3 (17.9 to 23.9 kg over 450 to 600), MDF at 750 kg/m3 (27.9 to 31.9 kg over 700 to 800). Screws add about 0.2 kg. The fifth board is bought whole: its offcut, 18 x 400 x 436 plus two 18 mm strips, is not in these numbers.
