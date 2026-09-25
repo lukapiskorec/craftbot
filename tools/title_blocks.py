@@ -16,8 +16,16 @@ version chosen in the footer study, the others stay as references.
     h  Arial, outlined number box, crossing ticks, right side as a list
     i  Inter, labels white on black tabs, fine 5 mm ticks
     j  Segoe UI, Segoe caps labels, heavy bar with hanging ticks, ruled columns
-    k  DEFAULT: j without the rules, medium top line, large studio mark, h's bar with 0, 50, 100
+    k  j without the rules, medium top line, large studio mark, h's bar with 0, 50, 100
+    l  k mirrored for binding, number box right, QR left, credits band underneath, 40 mm
+    m  32 mm, credits as a list column between the bar and the title, one left column
+    n  32 mm, three rows of pairs left, bar over fine print in the middle
+    o  32 mm, credits listed under the bar, check sentence folded into SCALE
+    p  32 mm, credits as run-in fine print under the left pairs
+    q  32 mm, credits as run-in fine print under the title
+    r  DEFAULT: 32 mm, M revised by Luka: two list columns after the QR code, 1 m real scale bar, title over project over studio
 
+`HEIGHTS` gives the height of each block, which `drafting` keeps clear.
 `python tools/footer_study/footer_study.py` prints every footer as a strip
 for comparison. The studio mark is always MEK-Mono (`viewer/fonts`); the
 other faces are system fonts, so a sheet must be printed with
@@ -29,10 +37,11 @@ import struct
 import datetime
 
 from vector_pdf import THIN, MEDIUM, HEAVY, FONT_FILES
+from fonts import advance
 
 MARGIN = M = 10.0      # mm, sheet border
 MEK, SANS, DIN, INTER, SEGOE = 'MEK-Mono', 'Arial', 'Bahnschrift', 'Inter', 'Segoe UI'
-DEFAULT = 'k'
+DEFAULT = 'r'
 VIEWER = 'CraftBot online viewer'
 UNITS = 'All numbers on this sheet are model mm.'
 
@@ -42,11 +51,14 @@ class Block:
     for 1:15), `scale_text` replaces the scale sentence (an axonometric at
     another scale), `qr` is a `qr_code.qr_matrix` or None."""
 
-    def __init__(self, number, title, note, experiment, subtitle, scale, scale_text=None, studio='', qr=None, date=None):
+    def __init__(self, number, title, note, experiment, subtitle, scale, scale_text=None, studio='', qr=None, date=None,
+                 credits=()):
         self.number, self.title, self.note = f'{number:02d}', title, note
         self.experiment, self.subtitle, self.studio, self.qr = experiment, subtitle, studio, qr
+        self.credits = list(credits)      # (LABEL, value) pairs of the set, for the band of footer l
         self.date = date or datetime.date.today().isoformat()
         self.check = f'100 mm in 1:{scale} = {100*scale/1000:.1f} m in 1:1'
+        self.scale_num = scale
         self.scale_sentence = scale_text or f'Scale 1:{scale}, drawn 1:1 to the model.'
         self.scale_value = scale_text.rstrip('.') if scale_text else f'1:{scale}, drawn 1:1 to the model'
         self.set_line = f'{subtitle}. CraftBot fabrication set, {self.date}'
@@ -317,4 +329,401 @@ def footer_k(s, b):
              right='columns', top=MEDIUM, title_size=5.4, studio_size=5.2)
 
 
+def footer_l(s, b):
+    """K mirrored for binding in a folder: the sheet number and title on the right, the QR code on the left
+    with the 3D MODEL label beside it, and under the block a two-line band of small print with the credits
+    of the set (supervision, agents, workflow, disclaimer, source code), wrapped in the order given."""
+    w, h, font = s.w, HEIGHTS['l'], SEGOE
+    frame(s, h, THIN, MEDIUM)
+    band = 11.0                                 # height of the small print under the block
+    base = M+band
+    label_y, low_y = M+h-4.2, base+3.0          # baselines: upper labels, lower values
+    title_size = 5.4
+    high_y, low_label_y = label_y-1.8-0.72*title_size, low_y+4.2
+
+    def label(x, y, word, anchor='start'):
+        s.text(x, y, word, 2.0, anchor, font=font, weight=600, spacing=0.3)
+
+    def pair(x, word, value, upper=True, size=3.0, weight=400, anchor='start'):
+        label(x, label_y if upper else low_label_y, word, anchor)
+        s.text(x, high_y if upper else low_y, value, size, anchor, font=font, weight=weight)
+
+    if b.note:      # wrapped onto a second line when it is too long for the sheet, the first line on top
+        lines, words = [''], b.note.split()
+        for word in words:
+            if lines[-1] and advance(lines[-1]+' '+word, 2.8, font) > w-2*M-21:
+                lines.append('')
+            lines[-1] = (lines[-1]+' '+word).strip()
+        label(M+4, M+h+3.5+3.6*(len(lines)-1), 'NOTE')
+        for i, line in enumerate(lines):
+            s.text(M+17, M+h+3.5+3.6*(len(lines)-1-i), line, 2.8, font=font)
+
+    # Left: QR code, then the viewer and the date, then scale and units.
+    side = 24.0
+    y0 = base+(h-band-side)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, side)
+    pair(M+4+side+5, '3D MODEL', VIEWER if b.qr else '', size=3.4)
+    pair(M+4+side+5, 'DATE', b.date, upper=False)
+    pair(M+4+side+57, 'SCALE', b.scale_value, size=3.4, weight=600)
+    pair(M+4+side+57, 'UNITS', 'model mm', upper=False)
+
+    # Middle: print check, then the studio mark.
+    s.text(w/2, label_y-0.4, b.check, 2.8, 'middle', font=font)
+    bar(s, 'cross_numbers', w/2, label_y-6.4, font)
+    s.text(w/2, low_y, b.studio, 5.2, 'middle', font=MEK)
+
+    # Right: the sheet number in its black box, title and project flush against it.
+    x1 = w-M-4-side
+    box(s, x1, y0, side, side)
+    s.text(x1+side/2, y0+side-3.6, 'SHEET', 2.0, 'middle', font=font, weight=600, spacing=0.3, white=True)
+    s.text(x1+side/2, y0+side*0.16, b.number, side*0.5, 'middle', font=font, weight=700, white=True)
+    pair(x1-5, 'TITLE', b.title, size=title_size, weight=600, anchor='end')
+    pair(x1-5, 'PROJECT', b.experiment, upper=False, anchor='end')
+
+    # The band: label and value pairs left to right, wrapped onto the second line when the first is full.
+    x, lines, gap = M+4, [M+7.0, M+2.9], 7.0
+    for word, value in b.credits:
+        need = advance(word, 2.0, font, 600)+len(word)*0.3+2.0+advance(value, 2.4, font)
+        if x+need > w-M-4 and lines and x > M+4:
+            lines.pop(0)
+            x = M+4
+        if not lines:
+            break
+        label(x, lines[0], word)
+        s.text(x+advance(word, 2.0, font, 600)+len(word)*0.3+2.0, lines[0], value, 2.4, font=font)
+        x += need+gap
+
+
+# ---- the 32 mm variants with the credits inside the block (m to q), sharing these pieces
+QR_SIDE = 24.0
+SIDE_TITLE = 5.4      # mm, the title at full size
+
+
+def fitted(text, avail, size, font, weight=400, spacing=0.0, floor=3.0):
+    """The largest size down to `floor` at which `text` fits `avail` mm."""
+    while advance(text, size, font, weight)+len(text)*spacing > avail and size-0.2 >= floor:
+        size -= 0.2
+    return size
+
+
+def label_text(s, x, y, word, size=2.0, anchor='start', font=SEGOE, white=False):
+    s.text(x, y, word, size, anchor, font=font, weight=600, spacing=0.3, white=white)
+
+
+def label_width(word, size=2.0, font=SEGOE):
+    return advance(word, size, font, 600)+len(word)*0.3
+
+
+def wrap(text, width, size, font=SEGOE, weight=400):
+    """Lines of `text` no wider than `width`."""
+    lines = ['']
+    for word in text.split():
+        trial = (lines[-1]+' '+word).strip()
+        if lines[-1] and advance(trial, size, font, weight) > width:
+            lines.append(word)
+        else:
+            lines[-1] = trial
+    return lines
+
+
+def run_in(s, x, top, width, size, items, font=SEGOE, pitch=None):
+    """Fine print: LABEL value pairs flowed as one paragraph inside `width`, wrapping on words.
+    Returns the last baseline."""
+    pitch = pitch or 1.3*size
+    y, cx = top-size, x
+    space = advance(' ', size, font)
+
+    def put(word, bold):
+        nonlocal cx, y
+        w = label_width(word, size*0.9, font) if bold else advance(word, size, font)
+        if cx > x and cx+w > x+width:
+            cx, y = x, y-pitch
+        if bold:
+            label_text(s, cx, y, word, size*0.9, font=font)
+        else:
+            s.text(cx, y, word, size, font=font)
+        cx += w+space*(1.8 if bold else 1)
+    for word, value in items:
+        put(word, True)
+        for token in value.split():
+            put(token, False)
+        cx += 2.5
+    return y
+
+
+def listing(s, x, top, width, size, items, font=SEGOE, pitch=None, label_w=None):
+    """Fine print as a list: the label in its own column, the value wrapped beside it. Returns the last baseline."""
+    if not items:
+        return top
+    pitch = pitch or 1.3*size
+    label_w = label_w or max(label_width(word, size*0.9, font) for word, _ in items)+2.0
+    y = top-size
+    for word, value in items:
+        label_text(s, x, y, word, size*0.9, font=font)
+        for line in wrap(value, width-label_w, size, font):
+            s.text(x+label_w, y, line, size, font=font)
+            y -= pitch
+    return y+pitch
+
+
+def left_pairs(s, b, high_y, low_y, label_y, low_label_y, font=SEGOE, columns=2, size=3.4):
+    """QR code, then [3D MODEL / DATE] and, with two columns, [SCALE / UNITS]. Returns the right edge."""
+    x = M+4+QR_SIDE+5
+
+    def pair(x, word, value, upper, size=3.0, weight=400):
+        label_text(s, x, label_y if upper else low_label_y, word, font=font)
+        s.text(x, high_y if upper else low_y, value, size, font=font, weight=weight)
+    pair(x, '3D MODEL', VIEWER if b.qr else '', True, size)
+    if columns == 2:
+        pair(x, 'DATE', b.date, False)
+        x2 = x+advance(VIEWER, size, font)+8
+        pair(x2, 'SCALE', b.scale_value, True, size, 600)
+        pair(x2, 'UNITS', 'model mm', False)
+        return x2+advance(b.scale_value, size, font, 600)
+    pair(x, 'SCALE', b.scale_value, False, 3.0, 600)
+    return x+max(advance(VIEWER, size, font), advance(b.scale_value, 3.0, font, 600))
+
+
+def bar_stack(s, b, cx, label_y, studio_y, font=SEGOE):
+    """Check text over the bar over the studio mark, centred on cx."""
+    s.text(cx, label_y-0.4, b.check, 2.8, 'middle', font=font)
+    bar(s, 'cross_numbers', cx, label_y-6.4, font)
+    s.text(cx, studio_y, b.studio, 5.2, 'middle', font=MEK)
+
+
+def right_title(s, b, x_right, avail, high_y, low_y, label_y, low_label_y, font=SEGOE, project=True):
+    """TITLE and PROJECT flush right at x_right, the title shrunk to fit `avail`. Returns the title size."""
+    size = fitted(b.title, avail, SIDE_TITLE, font, 600)
+    label_text(s, x_right, label_y, 'TITLE', anchor='end', font=font)
+    s.text(x_right, high_y, b.title, size, 'end', font=font, weight=600)
+    if project:
+        label_text(s, x_right, low_label_y, 'PROJECT', anchor='end', font=font)
+        s.text(x_right, low_y, b.experiment, fitted(b.experiment, avail, 3.0, font, floor=2.4), 'end', font=font)
+    return size
+
+
+def number_box(s, b, y0, font=SEGOE):
+    """The sheet number white on black at the right edge. Returns its left edge."""
+    x1 = s.w-M-4-QR_SIDE
+    box(s, x1, y0, QR_SIDE, QR_SIDE)
+    label_text(s, x1+QR_SIDE/2, y0+QR_SIDE-3.6, 'SHEET', anchor='middle', font=font, white=True)
+    s.text(x1+QR_SIDE/2, y0+QR_SIDE*0.16, b.number, QR_SIDE*0.5, 'middle', font=font, weight=700, white=True)
+    return x1
+
+
+def note_line(s, b, h, font=SEGOE):
+    """The note above the block, wrapped onto a second line when too long, the first line on top."""
+    if not b.note:
+        return
+    lines = wrap(b.note, s.w-2*M-21, 2.8, font)
+    label_text(s, M+4, M+h+3.5+3.6*(len(lines)-1), 'NOTE', font=font)
+    for i, line in enumerate(lines):
+        s.text(M+17, M+h+3.5+3.6*(len(lines)-1-i), line, 2.8, font=font)
+
+
+def footer_m(s, b):
+    """Credits as a list column. One left column (3D MODEL over SCALE), the bar, then DATE, UNITS and the
+    credits as a small list with the label beside each value, and the title shrunk to what is left."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    label_y, low_y = M+h-4.4, M+3.5
+    high_y, low_label_y = label_y-1.8-0.72*SIDE_TITLE, low_y+4.2
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    left = left_pairs(s, b, high_y, low_y, label_y, low_label_y, columns=1, size=3.0)
+    cx = left+8+53
+    bar_stack(s, b, cx, label_y, low_y)
+    items = [('DATE', b.date), ('UNITS', 'model mm')]+b.credits
+    lx, lw = cx+53+8, 96.0
+    listing(s, lx, M+h-3.6, lw, 1.8, items, pitch=2.35)
+    x1 = number_box(s, b, y0)
+    right_title(s, b, x1-5, x1-5-(lx+lw+6), high_y, low_y, label_y, low_label_y)
+
+
+def footer_n(s, b):
+    """Three rows. Six labelled pairs left of the bar (3D MODEL, DATE, SUPERVISION; SCALE, UNITS, SOURCE CODE),
+    the bar over three lines of fine print (AGENTS, WORKFLOW, DISCLAIMER) in the middle, the title,
+    project and studio mark on the right."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    rows = [M+25.2, M+16.0, M+6.8]      # value baselines; labels 3.4 above
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    credit = dict(b.credits)
+    cols = [[('3D MODEL', VIEWER if b.qr else '', 400), ('DATE', b.date, 400), ('SUPERVISION', credit.get('SUPERVISION', ''), 400)],
+            [('SCALE', b.scale_value, 600), ('UNITS', 'model mm', 400), ('SOURCE CODE', credit.get('SOURCE CODE', ''), 400)]]
+    x = M+4+QR_SIDE+5
+    for col in cols:
+        widest = 0
+        for (word, value, weight), y in zip(col, rows):
+            label_text(s, x, y+3.4, word, 1.8, font=font)
+            s.text(x, y, value, 2.8, font=font, weight=weight)
+            widest = max(widest, advance(value, 2.8, font, weight))
+        x += widest+7
+    cx = x+53
+    s.text(cx, rows[0]+3.0, b.check, 2.6, 'middle', font=font)
+    bar(s, 'cross_numbers', cx, rows[0]-2.8, font)
+    fine = [(word, credit[word]) for word in ('AGENTS', 'WORKFLOW', 'DISCLAIMER') if word in credit]
+    run_in(s, cx-50, rows[1]-2.6, 100, 1.7, fine, pitch=2.25)
+    x1 = number_box(s, b, y0)
+    right = x1-5
+    avail = right-(cx+56)
+    size = fitted(b.title, avail, SIDE_TITLE, font, 600)
+    label_text(s, right, rows[0]+3.4, 'TITLE', 1.8, anchor='end', font=font)
+    s.text(right, rows[0]-1.0, b.title, size, 'end', font=font, weight=600)
+    label_text(s, right, rows[1]+1.0, 'PROJECT', 1.8, anchor='end', font=font)
+    s.text(right, rows[1]-2.6, b.experiment, fitted(b.experiment, avail, 2.8, font, floor=2.2), 'end', font=font)
+    s.text(right, rows[2]-0.5, b.studio, 4.2, 'end', font=MEK)
+
+
+def footer_o(s, b):
+    """Credits under the bar. Left and right as in k, the title at full size; the middle stacks the studio mark,
+    the bar and a small list of the credits. The print check sentence moves into the SCALE value."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    label_y, low_y = M+h-4.4, M+3.5
+    high_y, low_label_y = label_y-1.8-0.72*SIDE_TITLE, low_y+4.2
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    scale_value = b.scale_value+', '+b.check.split(' = ')[0]+' = '+b.check.split(' = ')[1].replace(' in 1:1', '')
+    x = M+4+QR_SIDE+5
+    label_text(s, x, label_y, '3D MODEL', font=font)
+    s.text(x, high_y, VIEWER if b.qr else '', 3.2, font=font)
+    label_text(s, x, low_label_y, 'DATE', font=font)
+    s.text(x, low_y, b.date, 3.0, font=font)
+    x2 = x+advance(VIEWER, 3.2, font)+8
+    label_text(s, x2, label_y, 'SCALE', font=font)
+    s.text(x2, high_y, scale_value, 2.8, font=font, weight=600)
+    label_text(s, x2, low_label_y, 'UNITS', font=font)
+    s.text(x2, low_y, 'model mm', 3.0, font=font)
+    cx = x2+advance(scale_value, 2.8, font, 600)+10+50
+    s.text(cx, M+h-6.0, b.studio, 3.8, 'middle', font=MEK)
+    bar(s, 'cross_numbers', cx, M+h-9.6, font)
+    listing(s, cx-50, M+h-16.4, 104, 1.7, b.credits, pitch=2.2)
+    x1 = number_box(s, b, y0)
+    right_title(s, b, x1-5, x1-5-(cx+56), high_y, low_y, label_y, low_label_y)
+
+
+def footer_p(s, b):
+    """Credits as fine print under the left pairs: the rows move up a little and four lines of run-in
+    small print fill the left section beneath DATE and UNITS. Bar and title as in k."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    label_y, low_y = M+29.3, M+15.6
+    high_y, low_label_y = label_y-1.8-0.72*SIDE_TITLE, low_y+3.9
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    left = left_pairs(s, b, high_y, low_y, label_y, low_label_y, size=3.2)
+    cx = max(s.w/2, left+12+53)
+    bar_stack(s, b, cx, label_y, M+5.5)
+    run_in(s, M+4+QR_SIDE+5, M+12.6, cx-53-10-(M+4+QR_SIDE+5), 1.8, b.credits, pitch=2.3)
+    x1 = number_box(s, b, y0)
+    right_title(s, b, x1-5, x1-5-(cx+56), high_y, low_y, label_y, low_label_y)
+
+
+def footer_q(s, b):
+    """Credits as fine print under the title: everything about the project sits in the right section next
+    to the sheet number. Left pairs and bar as in k, rows moved up a little."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    label_y, low_y = M+29.3, M+15.6
+    high_y, low_label_y = label_y-1.8-0.72*SIDE_TITLE, low_y+3.9
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    left = left_pairs(s, b, high_y, low_y, label_y, low_label_y)
+    cx = left+10+53
+    bar_stack(s, b, cx, label_y, M+5.5)
+    x1 = number_box(s, b, y0)
+    lx = cx+56+8
+    right_title(s, b, x1-5, x1-5-lx, high_y, low_y, label_y, low_label_y)
+    run_in(s, lx, M+12.6, x1-5-lx, 1.7, b.credits, pitch=2.2)
+
+
+def real_bar(s, x0, y, scale, font=SEGOE):
+    """A print check bar of 1 m real on the line y: ticks every 10 cm standing on it, heavier at 0, 50
+    and 100 cm, labelled in real centimetres above them. Returns its length on the sheet."""
+    length = 1000/scale
+    s.line((x0, y), (x0+length, y), THIN)
+    for cm in range(0, 101, 10):
+        x = x0+cm*length/100
+        heavy = cm in (0, 100)
+        s.line((x, y), (x, y+(2.4 if heavy or cm == 50 else 1.5)), HEAVY if heavy else MEDIUM if cm == 50 else THIN)
+        if cm in (0, 50, 100):
+            s.text(x, y+3.4, f'{cm}cm', 2.2, 'middle', font=font)
+    return length
+
+
+def spread(s, x, top, bottom, width, size, items, font=SEGOE, pitch=None):
+    """`listing` spread evenly between `top` (the cap line of the first label) and `bottom` (the baseline
+    of the last line): the lines of one item keep their pitch, the gaps between items share the rest."""
+    if not items:
+        return
+    pitch = pitch or 1.3*size
+    label_w = max(label_width(word, size*0.9, font) for word, _ in items)+2.0
+    wrapped = [(word, wrap(value, width-label_w, size, font)) for word, value in items]
+    y = top-0.72*size
+    inner = sum((len(lines)-1)*pitch for _, lines in wrapped)
+    gap = pitch if len(items) < 2 else (y-bottom-inner)/(len(items)-1)
+    for word, lines in wrapped:
+        label_text(s, x, y, word, size*0.9, font=font)
+        for line in lines:
+            s.text(x+label_w, y, line, size, font=font)
+            y -= pitch
+        y += pitch-gap
+
+
+def footer_r(s, b):
+    """M as Luka revised it: QR code, two list columns of the set's facts (DATE, SUPERVISION, AGENTS,
+    WORKFLOW, DISCLAIMER, SOURCE CODE), the scale line under its SCALE value in real centimetres,
+    title over project over the studio mark, and the sheet number."""
+    h, font = 32.0, SEGOE
+    frame(s, h, THIN, MEDIUM)
+    note_line(s, b, h)
+    y0 = M+(h-QR_SIDE)/2
+    if b.qr:
+        qr(s, b.qr, M+4, y0, QR_SIDE)
+    # Two list columns, the items split where the line count balances.
+    items = [('DATE', b.date)]+[c for c in b.credits if c[0] != 'SOURCE CODE']+[c for c in b.credits if c[0] == 'SOURCE CODE']
+    col_w, size, pitch, top = 78.0, 2.4, 3.05, y0+QR_SIDE
+    x = M+4+QR_SIDE+5
+    lines = [len(wrap(value, col_w-label_width(word, size*0.9, font)-2.0, size, font)) for word, value in items]
+    split, count = len(items), 0
+    for i, n in enumerate(lines):
+        count += n
+        if count >= sum(lines)/2:
+            split = i+1
+            break
+    for column in (items[:split], items[split:]):
+        spread(s, x, top, y0, col_w, size, column, pitch=pitch)
+        x += col_w+6
+    # The scale: label and value at the top, the bar of 1 m real on the line of the QR code's bottom edge.
+    label_text(s, x, top-0.72*size, 'SCALE', size*0.9, font=font)      # on the line of DATE and DISCLAIMER
+    s.text(x, top-0.72*size-4.6, b.scale_value+', units mm', size, font=font)
+    length = real_bar(s, x, y0, b.scale_num, font)
+    x += max(length, advance(b.scale_value+', units mm', 2.4, font))+8
+    # Title, project, studio mark, flush right against the number box.
+    x1 = number_box(s, b, y0)
+    right, avail = x1-5, x1-5-x
+    # TITLE label's cap line on the box top, the studio mark's baseline on the box bottom, the rest spaced between.
+    top_line, bottom_line = y0+QR_SIDE, y0
+    label_text(s, right, top_line-0.72*1.8, 'TITLE', 1.8, anchor='end', font=font)
+    s.text(right, top_line-7.2, b.title, fitted(b.title, avail, SIDE_TITLE, font, 600), 'end', font=font, weight=600)
+    label_text(s, right, bottom_line+10.6, 'PROJECT', 1.8, anchor='end', font=font)
+    s.text(right, bottom_line+6.4, b.experiment, fitted(b.experiment, avail, 2.8, font, floor=2.2), 'end', font=font)
+    s.text(right, bottom_line+0.3, b.studio, 4.2, 'end', font=MEK)
+
+
 FOOTERS = {name[-1]: fn for name, fn in sorted(globals().items()) if name.startswith('footer_')}
+HEIGHTS = {'a': 30, 'b': 30, 'c': 28, 'd': 26, 'e': 38, 'f': 28, 'g': 26, 'h': 30, 'i': 28, 'j': 32, 'k': 32, 'l': 40,
+           'm': 32, 'n': 32, 'o': 32, 'p': 32, 'q': 32, 'r': 32}      # mm

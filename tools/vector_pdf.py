@@ -3,7 +3,9 @@
 A `Sheet` is one page in millimetres with the origin at the bottom left. It
 collects filled polygons, lines, circles and text, then writes itself as a
 PDF page or an SVG file. Text can name a font family, weight, italic,
-tracking, underline and white ink; the SVG carries all of it.
+tracking, underline, white ink, an angle and a fitted length; the SVG
+carries all of it. `turned` gives the page a quarter turn, for a landscape
+composition on a portrait sheet.
 
 Two PDF writers. `print_pdf` prints the SVG with headless Chrome, which
 embeds the glyphs a sheet uses: this is what the sheet sets use. `write_pdf`
@@ -47,8 +49,15 @@ class Sheet:
     """One page in mm, origin bottom-left. Collects polygons, lines and
     text, then writes itself as a PDF page stream or an SVG file."""
 
-    def __init__(self, width, height):
-        self.w, self.h, self.ops = width, height, []
+    def __init__(self, width, height, turn_labels=False):
+        """`turn_labels`: the page is a composition that will be `turned` upright later, so every label
+        is set at -90 degrees now and reads upright then; `offset` turns a displacement with it."""
+        self.w, self.h, self.ops, self.turn_labels = width, height, [], turn_labels
+
+    def offset(self, dx, dy):
+        """A displacement meant for the page as it is read (dx right, dy up), turned back into this
+        composition when `turn_labels` is set; otherwise unchanged."""
+        return (dy, -dx) if self.turn_labels else (dx, dy)
 
     def poly(self, pts, fill=1.0, lw=THIN, dash=False, stroke=0.0):
         """Closed polygon; `fill` and `stroke` are greys 0..1, `fill=None` leaves it open to what is below."""
@@ -63,10 +72,28 @@ class Sheet:
         self.poly([(x+r*math.cos(i*math.pi/12), y+r*math.sin(i*math.pi/12)) for i in range(24)], fill, lw)
 
     def text(self, x, y, s, size=2.5, anchor='start', font='Arial', weight=400, italic=False,
-             spacing=0.0, underline=False, white=False):
+             spacing=0.0, underline=False, white=False, angle=0, width=None, word_spacing=0.0):
         """Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'. `font` is a family
-        name, `weight` 100 to 900, `spacing` extra tracking in mm, `white` white ink for a black ground."""
-        self.ops.append(('text', x, y, s, size, anchor, (font, weight, italic, spacing, underline, white)))
+        name, `weight` 100 to 900, `spacing` extra tracking in mm, `white` white ink for a black ground,
+        `angle` degrees counter-clockwise (90 reads upwards), `width` a length in mm the text is fitted
+        to (justified lines), `word_spacing` extra mm at every space."""
+        if self.turn_labels and angle == 0:
+            angle = -90      # upright once the page is turned
+        self.ops.append(('text', x, y, s, size, anchor, (font, weight, italic, spacing, underline, white, angle, width, word_spacing)))
+
+    def turned(self):
+        """The same page a quarter turn counter-clockwise, a landscape composition on a portrait
+        sheet: its bottom edge lies along the right edge and it is read with the sheet turned
+        clockwise. Text turns with it: a label set at -90 degrees on a `turn_labels` page reads upright."""
+        page = Sheet(self.h, self.w)
+        for op in self.ops:
+            if op[0] == 'poly':
+                _, pts, fill, lw, dash, stroke = op
+                page.ops.append(('poly', [(self.h-y, x) for x, y in pts], fill, lw, dash, stroke))
+            else:
+                _, x, y, s, size, anchor, style = op
+                page.ops.append(('text', self.h-y, x, s, size, anchor, style[:6]+(style[6]+90,)+style[7:]))
+        return page
 
     def pdf_stream(self):
         """The page as an uncompressed PDF content stream."""
@@ -84,9 +111,11 @@ class Sheet:
             else:
                 _, x, y, s, size, anchor, style = op
                 width = text_width(s, size)
-                x -= {'start': 0, 'middle': width/2, 'end': width}[anchor]
+                shift = {'start': 0, 'middle': width/2, 'end': width}[anchor]
+                c, sn = math.cos(math.radians(style[6])), math.sin(math.radians(style[6]))
+                x, y = x-shift*c, y-shift*sn
                 s = s.replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
-                out.append(f'{1 if style[5] else 0} g BT /F1 {size*k:.2f} Tf {x*k:.2f} {y*k:.2f} Td ({s}) Tj ET')
+                out.append(f'{1 if style[5] else 0} g BT /F1 {size*k:.2f} Tf {c:.4f} {sn:.4f} {-sn:.4f} {c:.4f} {x*k:.2f} {y*k:.2f} Tm ({s}) Tj ET')
         return '\n'.join(out).encode('latin-1')
 
     def svg(self):
@@ -104,10 +133,12 @@ class Sheet:
                 out.append(f'<{tag} points="{d}" fill="{paint}" stroke="{grey(stroke)}" stroke-width="{lw}" '
                            f'stroke-linejoin="round" stroke-linecap="round"{dashes}/>')
             else:
-                _, x, y, s, size, anchor, (font, weight, italic, spacing, underline, white) = op
+                _, x, y, s, size, anchor, (font, weight, italic, spacing, underline, white, angle, width, word_spacing) = op
                 extras = ''.join(text for text, on in ((f' font-weight="{weight}"', weight != 400), (' font-style="italic"', italic),
                                                        (f' letter-spacing="{spacing}"', spacing), (' text-decoration="underline"', underline),
-                                                       (' fill="#fff"', white)) if on)
+                                                       (' fill="#fff"', white), (f' transform="rotate({-angle} {x:.2f} {self.h-y:.2f})"', angle),
+                                                       (f' textLength="{width or 0:.3f}" lengthAdjust="spacing"', width is not None),
+                                                       (f' word-spacing="{word_spacing:.3f}"', word_spacing)) if on)
                 out.append(f'<text x="{x:.2f}" y="{self.h-y:.2f}" font-family="{font},Helvetica,Arial" '
                            f'font-size="{size}" text-anchor="{anchor}"{extras}>{html.escape(s)}</text>')
         return '\n'.join(out+['</svg>'])

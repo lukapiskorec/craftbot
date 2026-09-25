@@ -10,7 +10,7 @@
 import math
 
 from vector_pdf import FINE, THIN, MEDIUM, text_width
-from drafting import Drawing, Axo, Y, Z, lollipop, place
+from drafting import Drawing, Axo, Y, Z, lollipop
 from drawing_assets import person, size
 
 BOARD_T, BOARD_W, BOARD_L = 18.0, 400.0, 1200.0
@@ -28,11 +28,11 @@ DIM_OFF = 12.0                  # mm on the sheet from the side view to its heig
 PLATFORM, PLATFORM_H = 900.0, 450.0      # the low pedestal: square side and height
 PLATFORM_AXO, PRINTS = 1/5, 1/15          # drawing scales of the axonometric and of the two print diagrams
 SETBACK = 40.0                  # mm from the end of the platform to the model
-PAGE_W, PAGE_H, PAGES = 420.0, 594.0, 24      # the drawing set: A2 portrait sheets
+PAGE_W, PAGE_H = 420.0, 594.0   # the drawing set: A2 portrait sheets
 SPINE = 10.0                    # mm between the two pages of the open booklet, the spiral
 BOOK_GAP = 20.0                 # mm from the model to the booklet
 FOLD = 72.0                     # degrees, slope of the accordion panels drawn half unfolded
-OPEN_AT = (10, 11)              # sheet numbers of this set shown on the open booklet, left and right page
+OPEN_AT = ('Long section, centre line', 'Frame F0 template')      # sheets of this set shown on the open booklet, left and right page
 
 
 def board(name, x0, x1, y0, y1, z0, z1):
@@ -127,7 +127,7 @@ def pedestal_sheet(sheets, members):
     ex0, ey0, ex1, ey1 = exploded.bounds()
     reach = main.point([HALF+TOTAL_AT, -HALF, 0])[0]+16      # right end of the height dimensions and their numbers
     column = max(ex1-ex0, side_width(HALF))      # the right column: exploded view, board list, side view
-    ox, oy = place((ax0-24, ay0-36, reach+column, ay1), sheet.w, sheet.h, pad_left=0)
+    ox, oy = sheets.place((ax0-24, ay0-36, reach+column, ay1), sheet, pad_left=0)
     main.paint(sheet, ox, oy)
 
     dim = lambda *args, **kw: dimension(sheet, main, ox, oy, *args, **kw)
@@ -239,11 +239,14 @@ def lay_sheet(sheet, source, place_at, scale):
         elif not op[6][5]:      # text, but not white text on a black ground
             _, x, y, text, size, anchor = op[:6]
             width = text_width(text, size)
-            x -= {'start': 0, 'middle': width/2, 'end': width}[anchor]
-            sheet.line(place_at(x, y+0.3*size), place_at(x+width, y+0.3*size), max(0.35*size*scale, 0.03))
+            c, s = math.cos(math.radians(op[6][6])), math.sin(math.radians(op[6][6]))      # reading direction of turned text
+            shift = {'start': 0, 'middle': width/2, 'end': width}[anchor]
+            x, y = x-shift*c-0.3*size*s, y-shift*s+0.3*size*c
+            sheet.line(place_at(x, y), place_at(x+width*c, y+width*s), max(0.35*size*scale, 0.03))
 
 
-def platform_sheet(sheets, members):
+def platform_sheet(sheets, members, pages=None):
+    """`pages` is the number of sheets in the finished set, for the booklet labels; by default this is the last."""
     half = PLATFORM/2
     platform = board('Platform', -half, half, -half, half, 0, PLATFORM_H)
     # The model is turned half round and stands at the -y end, its door towards the prints and the visitor at +y.
@@ -259,23 +262,28 @@ def platform_sheet(sheets, members):
     toward = (-1, 1, 0.8)      # seen from the door side, which is now +y
     main = Axo([platform]+book+model, PLATFORM_AXO, toward)
     prints = [Axo(booklet(0, 0), PRINTS), Axo(accordion(), PRINTS)]
-    sheet = sheets.blank(landscape=True)
+    pages = pages or len(sheets.sheets)+1
+    numbers = [next(i for i, (title, _) in enumerate(sheets.sheets, 1) if title == wanted) for wanted in OPEN_AT]
+    # Portrait sheet: the axonometric on top, under it the side view on the left and the two print diagrams stacked on the right.
+    sheet = sheets.blank()
     ax0, ay0, ax1, ay1 = main.bounds()
     reach = main.point([-half, -half-TOTAL_AT, 0])[0]+16      # right end of the height dimensions and their numbers
     column = side_width(half)
     side_h = max(top, VISITOR_H)*SIDE
     heights = [a.bounds()[3]-a.bounds()[1] for a in prints]
-    stack = 10+side_h+12+sum(h+26 for h in heights)      # side view, then each diagram with its dimensions and two lines of label
-    ox, oy = place((ax0-24, ay0-28, reach+24+column, max(ay1, ay0-28+stack)), sheet.w, sheet.h, pad_left=0)
+    widths = [a.bounds()[2]-a.bounds()[0] for a in prints]
+    row_h = max(10+side_h+24, sum(h+26 for h in heights))      # side view with its caption; each diagram with its dimensions and two lines of label
+    row_top = ay0-40
+    left = ax0-24      # the row starts under the left edge of the axonometric
+    ox, oy = sheets.place((left, row_top-row_h, max(reach, left+column+24+max(widths)+30), ay1), sheet, pad_left=0)
     main.paint(sheet, ox, oy)
     # Two sheets of this set lie on the open booklet, read from +y: bottom edge at the front, left page at +x.
     front, page_top = my1+BOOK_GAP+PAGE_H, PLATFORM_H+2.0
-    for number, x_left in zip(OPEN_AT, (SPINE/2+PAGE_W, -SPINE/2)):
-        if number <= len(sheets.sheets):
-            source = sheets.sheets[number-1][1]
-            assert (source.w, source.h) == (PAGE_W, PAGE_H), f'sheet {number} is not A2 portrait'
-            on_page = lambda u, v, x_left=x_left: tuple(c+o for c, o in zip(main.point([x_left-u, front-v, page_top]), (ox, oy)))
-            lay_sheet(sheet, source, on_page, PLATFORM_AXO)
+    for number, x_left in zip(numbers, (SPINE/2+PAGE_W, -SPINE/2)):
+        source = sheets.sheets[number-1][1]
+        assert (source.w, source.h) == (PAGE_W, PAGE_H), f'sheet {number} is not A2 portrait'
+        on_page = lambda u, v, x_left=x_left: tuple(c+o for c, o in zip(main.point([x_left-u, front-v, page_top]), (ox, oy)))
+        lay_sheet(sheet, source, on_page, PLATFORM_AXO)
 
     dim = lambda *args, **kw: dimension(sheet, main, ox, oy, *args, **kw)
     # Platform footprint at the floor; on its top the model footprint, its setback and the gap to the booklet.
@@ -292,35 +300,36 @@ def platform_sheet(sheets, members):
     # Booklet label in the empty corner above the left edge of the platform.
     lx, ly = ox+ax0-10, oy+main.point([half, half, PLATFORM_H])[1]+42
     sheet.text(lx, ly, 'Booklet', 3.2, weight=600)
-    sheet.text(lx, ly-5, f'{PAGES} sheets A2, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}', 2.6)
+    sheet.text(lx, ly-5, f'{pages} sheets A2, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}', 2.6)
     px, py = main.point([SPINE/2+PAGE_W, my1+BOOK_GAP+PAGE_H*0.3, PLATFORM_H+2])      # the outer edge of the left page
     sheet.line((lx+22, ly-7), (px+ox, py+oy), FINE)
     sheet.text(ox+(ax0+ax1)/2, oy+ay0-24, 'Axonometric 1:5, seen from the door side, with the booklet', 2.6, 'middle')
 
-    left = ox+reach+24
-    side_view(sheet, [platform]+book+model, half, top, left, oy+ay0-10)
-    sheet.text(left+column/2, oy+ay0-24, 'Side view 1:10 with a visitor 1.75 m tall', 2.6, 'middle')
+    soy = oy+row_top-10-side_h      # floor line of the side view, at the left of the row under the axonometric
+    side_view(sheet, [platform]+book+model, half, top, ox+left, soy)
+    sheet.text(ox+left+column/2, soy-14, 'Side view 1:10 with a visitor 1.75 m tall', 2.6, 'middle')
 
-    # The two ways to lay out the prints, above the side view: booklet, then accordion.
-    labels = [('Booklet', f'{PAGES} sheets A2 portrait, spiral bound, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}'),
-              ('Accordion', f'{PAGES} sheets A2 joined along the long edge, folded {PAGE_W:.0f} x {PAGE_H:.0f}, {PAGES*PAGE_W/1000:.2f} m unfolded')]
+    # The two ways to lay out the prints, right of the side view: booklet above, accordion below.
+    labels = [('Booklet', f'{pages} sheets A2 portrait, spiral bound, open {2*PAGE_W+SPINE:.0f} x {PAGE_H:.0f}'),
+              ('Accordion', f'{pages} sheets A2 joined along the long edge, folded {PAGE_W:.0f} x {PAGE_H:.0f}, {pages*PAGE_W/1000:.2f} m unfolded')]
     run = 4*PAGE_W*math.cos(math.radians(FOLD))
     marks = [[([SPINE/2, 0, 0], [SPINE/2+PAGE_W, 0, 0], (0, -90, 0), PAGE_W, 'start'),
               ([-SPINE/2-PAGE_W, 0, 0], [-SPINE/2-PAGE_W, PAGE_H, 0], (-90, 0, 0), PAGE_H, 'end')],
              [([run, 0, 0], [run+PAGE_W, 0, 0], (0, -90, 0), PAGE_W, 'start'),
               ([-PAGE_W, 0, 0], [-PAGE_W, PAGE_H, 0], (-90, 0, 0), PAGE_H, 'end')]]
-    y = oy+ay0-10+side_h+12      # foot of the lower diagram
+    y = oy+row_top-sum(h+26 for h in heights)      # foot of the lower diagram
+    dx = ox+left+column+24+max(widths)/2           # centre line of the diagrams
     for axo, (name, what), dims in reversed(list(zip(prints, labels, marks))):
         bx0, by0, bx1, by1 = axo.bounds()
-        dox, doy = left+(column-(bx1-bx0))/2-bx0, y+8-by0
+        dox, doy = dx-(bx0+bx1)/2, y+8-by0
         axo.paint(sheet, dox, doy)
         for p0, p1, away, length, anchor in dims:
             dimension(sheet, axo, dox, doy, p0, p1, away, f'{length:.0f}', anchor)
-        sheet.text(left+10, doy+by1+10, name, 3.2, weight=600)
-        sheet.text(left+10, doy+by1+5, what+f', drawn 1:{1/PRINTS:.0f}', 2.6)
+        sheet.text(dx-max(widths)/2, doy+by1+10, name, 3.2, weight=600)
+        sheet.text(dx-max(widths)/2, doy+by1+5, what+f', drawn 1:{1/PRINTS:.0f}', 2.6)
         y = doy+by1+18
 
     note = (f'Low pedestal {PLATFORM:.0f} x {PLATFORM:.0f} x {PLATFORM_H:.0f}, {top:.0f} high with the model ({mx1-mx0:.0f} x {my1-my0:.0f} in plan), which stands '
-            f'{SETBACK:.0f} from the far edge, centred across, its door towards the prints and the visitor. The {PAGES} A2 sheets of this set lie in front of it, open at sheets {OPEN_AT[0]} and {OPEN_AT[1]}, '
+            f'{SETBACK:.0f} from the far edge, centred across, its door towards the prints and the visitor. The {pages} A2 sheets of this set lie in front of it, open at sheets {numbers[0]} and {numbers[1]}, '
             'as a booklet or as an accordion. The pedestal is drawn as one volume; its boards are not designed yet.')
     sheets.add('Low pedestal with model', sheet, note, scale_text='Axonometric 1:5, side view 1:10.')

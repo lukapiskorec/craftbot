@@ -1,4 +1,4 @@
-"""Tests of the fabrication kit: qr_code, cutlist, hidden_lines, vector_pdf, drafting."""
+"""Tests of the fabrication kit: qr_code, cutlist, hidden_lines, vector_pdf, drafting, newsprint."""
 import math
 import os
 import sys
@@ -12,6 +12,7 @@ import cutlist
 import vector_pdf
 import drafting
 import title_blocks
+import newsprint
 from hidden_lines import visible_lines
 
 
@@ -109,7 +110,8 @@ class Drafting(unittest.TestCase):
 
     def test_min_scale_and_place_agree(self):
         scale = drafting.min_scale((4.6, 3.3, 7.3))
-        self.assertEqual(scale, 14)
+        self.assertEqual(scale, 14)      # the default footer r keeps 32 mm clear; 15 with the 40 mm footer l
+        self.assertEqual(drafting.min_scale((4.6, 3.3, 7.3), footer="l"), 15)
         w, h = vector_pdf.A2
         drafting.place((0, 0, 4600 / scale, 7300 / scale), w, h)      # fits
         with self.assertRaises(AssertionError):
@@ -146,17 +148,62 @@ class Drafting(unittest.TestCase):
             self.assertEqual(sorted(os.listdir(os.path.join(out, "pdf"))), ["00_all_sheets.pdf", "01_plan_test.pdf"])
             self.assertEqual(os.listdir(os.path.join(out, "svg")), ["01_plan_test.svg"])
 
+    def test_a_landscape_sheet_is_turned_upright_when_added(self):
+        sheets = drafting.SheetSet(15, "E", "s", credits=[("SUPERVISION", "someone")])
+        wide = sheets.blank(landscape=True)
+        wide.text(100, 20, "label", 3)
+        wide.line((0, 0), (594, 0))
+        sheets.add("Wide", wide)
+        sheet = sheets.sheets[0][1]
+        self.assertEqual((sheet.w, sheet.h), vector_pdf.A2)
+        self.assertEqual(sheet.ops[1][1], [(420, 0), (420, 594)])      # the old bottom edge lies along the right edge
+        self.assertEqual((sheet.ops[0][1], sheet.ops[0][2], sheet.ops[0][6][6]), (400, 100, 0))      # the label reads upright
+        self.assertEqual(wide.ops[0][6][6], -90)      # because the blank set it turned
+        self.assertEqual(wide.offset(0, -1), (-1, 0))
+        self.assertIn('rotate(90', wide.svg())
+        self.assertIn("SUPERVISION", sheet.svg())
+        upright = drafting.SheetSet(15, "E", "s", upright=False)
+        upright.add("Wide", upright.blank(landscape=True))
+        self.assertEqual(upright.sheets[0][1].w, 594)
+
+    def test_a_plain_page_takes_a_number_but_no_title_block(self):
+        sheets = drafting.SheetSet(15, "E", "s")
+        sheets.page("Text", sheets.blank())
+        sheets.add("Plan", sheets.blank())
+        self.assertEqual(sheets.sheets[0][1].ops, [])
+        self.assertIn(">02<", sheets.sheets[1][1].svg())
+
     def test_every_footer_draws_and_the_default_names_its_fonts(self):
         for key in title_blocks.FOOTERS:
             sheets = drafting.SheetSet(15, "Experiment", "subtitle", viewer_url="https://example.org/x", studio="{mark}", footer=key)
             sheets.add("Title", sheets.blank(landscape=key == "a"), "note")
             self.assertIn("MEK-Mono", sheets.sheets[0][1].svg())
-        self.assertEqual(title_blocks.DEFAULT, "k")
+        self.assertEqual(title_blocks.DEFAULT, "r")
         default = drafting.SheetSet(15, "E", "s")
         default.add("Title", default.blank())
         self.assertIn("Segoe UI", default.sheets[0][1].svg())
         with self.assertRaises(AssertionError):
             drafting.SheetSet(15, "E", "s", footer="z")
+
+
+class Newsprint(unittest.TestCase):
+    def test_parse_reads_headings_items_tables_and_bold(self):
+        blocks = newsprint.parse("# Head\n\nOne **two,** three.\n\n- item\n\n| A | B |\n|---|---|\n| a | b |\n\n![fig]")
+        self.assertEqual([b[0] for b in blocks], ["h1", "p", "item", "p", "p", "figure"])
+        self.assertEqual(blocks[1][1], [("One", False, False), ("two,", True, False), ("three.", False, False)])
+        self.assertEqual(blocks[4][1][0], ("a.", True, False))
+
+    def test_flow_justifies_lines_and_fills_pages(self):
+        press = newsprint.Newsprint(lambda sheet, n: sheet.h-20, {"fig": ("caption", lambda sheet, x, y, w: 30.0)})
+        blocks = newsprint.parse("## Head\n\n" + ("word " * 400) + "\n\n![fig]\n\n" + ("more text " * 200))
+        pages, fill = press.flow(blocks, 3.0)
+        self.assertEqual(len(pages), 1)
+        widths = [op[6][7] for op in pages[0].ops if op[0] == "text" and op[6][7]]
+        full = {round(press.width, 3), round(press.width - newsprint.INDENT, 3)}      # a first line is indented
+        self.assertTrue(widths and all(round(w, 3) in full for w in widths))      # justified lines fit the column
+        self.assertTrue(0 < fill < 1)
+        size, pages, fill, cut = newsprint.fit(press, blocks * 30, max_pages=2, sizes=[3.0, 2.0])
+        self.assertEqual((size, len(pages), cut), (2.0, 2, True))
 
 
 if __name__ == "__main__":

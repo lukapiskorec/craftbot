@@ -15,8 +15,17 @@ from drafting import (SheetSet, Drawing, Axo, Flat, X, Y, Z, NEG, GREY, in_group
                       depth_layers, annotate, lollipop, add_marks, add_tag, paint_extras, place, unroll)
 from fab_cutlist import load
 from fab_pedestal import pedestal_sheet, platform_sheet
+from fab_frontpage import front_pages
+
+FRONT_PAGE = True      # the text pages before the drawings (fab_frontpage.py)
 
 VIEWER_URL = 'https://lukapiskorec.github.io/craftbot/?model=models%2F16_Expressive_Structure%2Fgpt6_v02.json'
+CREDITS = [('SUPERVISION', 'Luka Piškorec, MSc ETH Arch'),
+           ('AGENTS', 'CraftBot (orchestrator), Designer, Researcher, Builder, Inspector, Runner'),
+           ('WORKFLOW', 'CraftBot (harness), GPT-6 Astra (design, 3D model), Claude Fable 5 (fabrication plans)'),
+           ('DISCLAIMER', 'This is an AI generated project. 3D model is reproducible from Python code. Drawings are derived from a 3D model '
+                          'and exact. Minor geometric and constructive inconsistencies possible on the 3D model level.'),
+           ('SOURCE CODE', 'https://github.com/lukapiskorec/craftbot')]
 STICK_T = 3.0      # mm, thickness of one frame layer (the 3x5 slat on edge)
 
 DATA = load()
@@ -99,19 +108,21 @@ def unrolled_roof(sheets, members):
         strips.append((left, top+(high-low)/2, f'Bay F{DATA["frames"][j]}-F{DATA["frames"][j+1]}'))
         top += high-low+18
     sheet = sheets.blank(landscape=True)
-    ox, oy = place(flat.bounds(), sheet.w, sheet.h, pad_left=30)
+    ox, oy = sheets.place(flat.bounds(), sheet, pad_left=30)
     flat.paint(sheet, ox, oy)
     for pts, text, k, i in labels:
         cx, cy = sum(p[0] for p in pts)/4+ox, sum(p[1] for p in pts)/4+oy
-        sheet.text(cx, cy-0.6, text, 1.7, 'middle')
+        ddx, ddy = sheet.offset(0, -0.6)
+        sheet.text(cx+ddx, cy+ddy, text, 1.7, 'middle')
         if i == 0:       # fold line at the start of every panel, and one lollipop per panel
             if k:
                 sheet.line((pts[0][0]+ox, pts[0][1]+oy), (pts[3][0]+ox, pts[3][1]+oy), HEAVY)
             lx, ly = cx, pts[0][1]+oy-8
             sheet.line((cx, pts[0][1]+oy+1.5), (lx, ly), FINE)
             lollipop(sheet, lx, ly, '2x10', f'P{k+1}')
-    for x, y, label in strips:
-        sheet.text(x+ox-6, y+oy-1, label, 2.8, 'end')
+    for x, y, label in strips:      # bay name left of the strip, which is under it once the sheet is turned
+        ddx, ddy = sheet.offset(0, -6)
+        sheet.text(x+ox-4+ddx, y+oy+ddy, label, 2.8, 'middle')
     note = ('Roof boards of each bay laid flat, door end at the bottom, -x on the left. Heavy lines: folds between the six planar panels P1 to P6 of a strip. '
             'Numbers: cut length in mm. All boards 2x10, one layer.')
     sheets.add('Roof boards, unrolled', sheet, note)
@@ -120,8 +131,10 @@ def unrolled_roof(sheets, members):
 def build_sheets():
     members = DATA['members']
     mm = lambda metres: metres*1000/SCALE
-    sheets = SheetSet(SCALE, 'Experiment 16 - Expressive Structure', 'GPT-6 v02, stick model',
-                      viewer_url=VIEWER_URL, studio='{protocell:labs}')
+    sheets = SheetSet(SCALE, 'Experiment 16 - Expressive Structure, GPT-6 v02', 'GPT-6 v02, stick model',
+                      viewer_url=VIEWER_URL, studio='{protocell:labs}', credits=CREDITS)
+    if FRONT_PAGE:
+        front_pages(sheets)
 
     def add(title, subset, right, up, cut=None, note='', axes=None, levels=False, labels=False):
         drawing = Drawing(subset, right, up, cut)
@@ -172,8 +185,8 @@ def build_sheets():
         for y, label in FRAME_AXES:
             add_tag(axo, axo.point([x_end, y, z_low]), axo.point([x_end-24, y, z_low]), label)
         sheets.view(title, axo, note, scale_text='Axonometric, scale 1:20.')
+    platform_sheet(sheets, members, pages=len(sheets.sheets)+2)      # this sheet and the tall pedestal after it
     pedestal_sheet(sheets, members)
-    platform_sheet(sheets, members)
     return sheets
 
 

@@ -175,6 +175,21 @@ Minimal QR code encoder: byte mode, error correction L, versions 1 to 5.
 Entourage for drawing sheets: outlines of people (later trees, symbols) placed on a Sheet at a scale.
 
 
+### `fonts.py`
+
+Text widths from the font files that headless Chrome prints with.
+
+
+### `newsprint.py`
+
+Newsprint pages: markdown flowed into dense justified columns on a sheet.
+
+
+### `organigram.py`
+
+The CraftBot agent team organigram as vector lines on a `vector_pdf.Sheet`.
+
+
 ## Harness scripts (run from the repo root)
 
 ### `render_views.py`

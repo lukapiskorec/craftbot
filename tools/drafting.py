@@ -12,7 +12,11 @@ millimetres, and draws on `vector_pdf.Sheet` pages at 1:1 to the model.
   layers from the paper up.
 - `SheetSet` numbers the sheets, draws the title block picked with `footer`
   from `title_blocks.py` (print check bar, QR code to the viewer) and
-  writes the PDFs, printed by headless Chrome, and the SVGs.
+  writes the PDFs, printed by headless Chrome, and the SVGs. Every sheet
+  is portrait: a landscape composition is turned a quarter turn and read
+  with the sheet turned clockwise, its labels reading upright. Compose it
+  on `blank(landscape=True)`, position it with `SheetSet.place`, and give
+  label displacements through `sheet.offset` so they turn with the page.
 - `unroll` lays a folded strip of planar facets flat.
 
 A sheet that does not fit raises: pick the model scale so the largest
@@ -24,11 +28,11 @@ import os
 import math
 
 from vector_pdf import Sheet, print_pdf, A2, FINE, THIN, MEDIUM, HEAVY
-from title_blocks import FOOTERS, DEFAULT, Block
+from title_blocks import FOOTERS, HEIGHTS, DEFAULT, Block
 from cutlist import measure, long_axis, sub, dot, cross, unit
 from qr_code import qr_matrix
 
-MARGIN, TITLE_H = 10.0, 32.0     # mm: sheet border, height of the default title block
+MARGIN = 10.0     # mm, sheet border; the title block height is `title_blocks.HEIGHTS[footer]`
 GREY = 0.85
 X, Y, Z = [1, 0, 0], [0, 1, 0], [0, 0, 1]
 
@@ -235,7 +239,8 @@ def annotate(sheet, drawing, members, layers, ox, oy, min_length=12):
             for bx0, by0, bx1, by1 in bars:
                 if bx0 <= px <= bx1 and by0-5 < py < by1+5:
                     py = by0-5
-        sheet.text(px+ox, py+oy-0.6, f'{length:.1f}', 1.7, 'middle')
+        ddx, ddy = sheet.offset(0, -0.6)
+        sheet.text(px+ox+ddx, py+oy+ddy, f'{length:.1f}', 1.7, 'middle')
         reach = 9.0
         sides = [(px-ay*reach*s, py+ax*reach*s) for s in (1, -1)]
         crowd = lambda c: sum(math.hypot(c[0]-q[1][0], c[1]-q[1][1]) < 7 for q in pending)
@@ -267,8 +272,9 @@ def merge_coincident(members, layers, drawing):
 def lollipop(sheet, x, y, upper, lower):
     """The label circle: two short lines of text, stick profile over layer code."""
     sheet.circle(x, y, 3.3)
-    sheet.text(x, y+0.35, upper, 1.5, 'middle')
-    sheet.text(x, y-1.45, lower, 1.5, 'middle')
+    for dy, text in ((0.35, upper), (-1.45, lower)):
+        ddx, ddy = sheet.offset(0, dy)
+        sheet.text(x+ddx, y+ddy, text, 1.5, 'middle')
 
 
 def add_marks(drawing, kind, marks):
@@ -288,12 +294,20 @@ def paint_extras(sheet, drawing, ox, oy):
         if kind == 'level':       # horizontal datum at the left edge, model mm
             sheet.line((MARGIN+2, value+oy), (x0+ox-3, value+oy), FINE, dash=True)
             sheet.text(MARGIN+2, value+oy+0.8, label, 2.4)
-        elif kind == 'axis_x':    # frame axis under the drawing
+        elif kind == 'axis_x':    # frame axis under the drawing; right of it once a landscape sheet is turned
             sheet.line((value+ox, y0+oy-2), (value+ox, y0+oy-7), FINE)
-            sheet.text(value+ox, y0+oy-10.5, label, 2.6, 'middle')
-        elif kind == 'axis_y':
+            if sheet.turn_labels:
+                ddx, ddy = sheet.offset(2.5, -0.9)
+                sheet.text(value+ox+ddx, y0+oy-7+ddy, label, 2.6)
+            else:
+                sheet.text(value+ox, y0+oy-10.5, label, 2.6, 'middle')
+        elif kind == 'axis_y':    # frame axis left of the drawing; under it once a landscape sheet is turned
             sheet.line((x0+ox-2, value+oy), (x0+ox-7, value+oy), FINE)
-            sheet.text(x0+ox-8, value+oy-0.9, label, 2.6, 'end')
+            if sheet.turn_labels:
+                ddx, ddy = sheet.offset(0, -4.6)
+                sheet.text(x0+ox-7+ddx, value+oy+ddy, label, 2.6, 'middle')
+            else:
+                sheet.text(x0+ox-8, value+oy-0.9, label, 2.6, 'end')
         elif kind == 'tag':       # leader from a point on the drawing to a label on its left
             (ax, ay), (bx, by) = value
             sheet.line((ax+ox, ay+oy), (bx+ox, by+oy), FINE)
@@ -301,53 +315,76 @@ def paint_extras(sheet, drawing, ox, oy):
 
 
 # ------------------------------------------------------------ the sheets
-def free_area(w, h, pad_left=16):
-    """(width, height) in mm that a drawing may fill on a w x h sheet."""
-    return w-2*MARGIN-pad_left, h-2*MARGIN-TITLE_H-14
+def free_area(w, h, pad_left=16, turned=False, title_h=HEIGHTS[DEFAULT]):
+    """(width, height) in mm that a drawing may fill on a w x h sheet with a title block `title_h`
+    tall. With `turned` the sheet is a landscape composition that will be turned upright, so the title
+    block ends up along its left edge (the bottom of the portrait sheet) and `pad_left` next to it."""
+    if turned:
+        return w-2*MARGIN-title_h-14-pad_left, h-2*MARGIN
+    return w-2*MARGIN-pad_left, h-2*MARGIN-title_h-14
 
 
-def min_scale(extent_m, paper=A2):
+def min_scale(extent_m, paper=A2, footer=DEFAULT):
     """Smallest whole model scale (15 for 1:15) at which the plan and both
     elevations of a model with real extents (x, y, z) in metres each fit one
-    sheet at 1:1. A view taller than wide goes on a portrait sheet."""
+    sheet at 1:1. A view wider than tall is composed landscape and turned."""
     ex, ey, ez = (e*1000 for e in extent_m)
     need = 0
+    title_h = HEIGHTS[footer]
     for width, height in ((ex, ey), (ex, ez), (ey, ez)):
-        free_w, free_h = free_area(*(paper if height > width else paper[::-1]))
+        free_w, free_h = free_area(*paper, title_h=title_h) if height > width else free_area(*paper[::-1], turned=True, title_h=title_h)
         need = max(need, width/free_w, height/free_h)
     return math.ceil(need)
 
 
-def place(bounds, w, h, pad_left=16):
-    """Offsets that centre a bounding box in the free area of a w x h sheet.
-    Raises when it does not fit at 1:1."""
+def place(bounds, w, h, pad_left=16, turned=False, title_h=HEIGHTS[DEFAULT]):
+    """Offsets that centre a bounding box in the free area of a w x h sheet (`turned`: a landscape
+    composition that will be turned upright, see `free_area`). Raises when it does not fit at 1:1.
+    `SheetSet.place` fills in `turned` and `title_h` for a sheet of a set."""
     x0, y0, x1, y1 = bounds
-    free_w, free_h = free_area(w, h, pad_left)
+    free_w, free_h = free_area(w, h, pad_left, turned, title_h)
     assert x1-x0 <= free_w and y1-y0 <= free_h, f'{x1-x0:.0f} x {y1-y0:.0f} mm does not fit the {w:.0f} x {h:.0f} sheet'
-    return MARGIN+pad_left+(free_w-(x1-x0))/2-x0, MARGIN+TITLE_H+10+(free_h-(y1-y0))/2-y0
+    if turned:
+        return MARGIN+title_h+10+pad_left+(free_w-(x1-x0))/2-x0, MARGIN+(free_h-(y1-y0))/2-y0
+    return MARGIN+pad_left+(free_w-(x1-x0))/2-x0, MARGIN+title_h+10+(free_h-(y1-y0))/2-y0
 
 
 class SheetSet:
     """A numbered set of sheets with one title block. `scale` is the model
     scale (15 for 1:15), `experiment` and `subtitle` go in the title block,
     `viewer_url` becomes the QR code, `studio` is the mark under the check bar,
-    `footer` is a key of `title_blocks.FOOTERS` ('a' to 'k')."""
+    `footer` is a key of `title_blocks.FOOTERS` ('a' to 'l'), `credits` the
+    (LABEL, value) pairs of the set that footer l prints in its band. With
+    `upright` (the default) every sheet is portrait: a landscape sheet is
+    turned a quarter turn when it is added."""
 
-    def __init__(self, scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT):
+    def __init__(self, scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT, credits=(),
+                 upright=True):
         assert footer in FOOTERS, f'footer {footer!r} is not one of {" ".join(FOOTERS)}'
-        self.footer = footer
+        self.footer, self.credits, self.upright = footer, credits, upright
         self.scale, self.experiment, self.subtitle = scale, experiment, subtitle
         self.studio, self.paper = studio, paper
         self.qr = qr_matrix(viewer_url) if viewer_url else None
         self.sheets = []      # (title, Sheet)
 
     def blank(self, landscape=False):
-        """An empty sheet of the set's paper."""
-        return Sheet(*(self.paper[::-1] if landscape else self.paper))
+        """An empty sheet of the set's paper. A landscape blank of an upright set will be turned when it
+        is added, so its labels are set to read upright then (`Sheet.turn_labels`, `Sheet.offset`)."""
+        return Sheet(*self.paper[::-1], turn_labels=self.upright) if landscape else Sheet(*self.paper)
+
+    def place(self, bounds, sheet, pad_left=16):
+        """`place` for a sheet of this set: a landscape blank is placed for the turn it gets when added."""
+        return place(bounds, sheet.w, sheet.h, pad_left, turned=self.upright and sheet.w > sheet.h, title_h=HEIGHTS[self.footer])
 
     def add(self, title, sheet, note='', scale_text=None):
-        """Finish a composed sheet with the title block and append it."""
+        """Finish a composed sheet with the title block and append it; a landscape sheet is turned upright first."""
+        if self.upright and sheet.w > sheet.h:
+            sheet = sheet.turned()
         self.title_block(sheet, len(self.sheets)+1, title, note, scale_text)
+        self.sheets.append((title, sheet))
+
+    def page(self, title, sheet):
+        """Append a finished sheet as it is, without border or title block (a text page); it takes a number."""
         self.sheets.append((title, sheet))
 
     def view(self, title, drawing, note='', labelled=(), layers=None, scale_text=None):
@@ -355,7 +392,7 @@ class SheetSet:
         with its marks and, for the `labelled` members, lengths and lollipops."""
         x0, y0, x1, y1 = drawing.bounds()
         sheet = self.blank(landscape=(y1-y0) <= (x1-x0))
-        ox, oy = place(drawing.bounds(), sheet.w, sheet.h)
+        ox, oy = self.place(drawing.bounds(), sheet)
         drawing.paint(sheet, ox, oy)
         paint_extras(sheet, drawing, ox, oy)
         if labelled:
@@ -365,7 +402,7 @@ class SheetSet:
     def title_block(self, sheet, number, title, note, scale_text=None):
         """Border, note line and the title block of the set's `footer`."""
         FOOTERS[self.footer](sheet, Block(number, title, note, self.experiment, self.subtitle, self.scale,
-                                          scale_text, self.studio, self.qr))
+                                          scale_text, self.studio, self.qr, credits=self.credits))
 
     def write(self, pdf_dir, svg_dir=None):
         """Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when

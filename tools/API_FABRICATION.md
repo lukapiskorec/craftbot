@@ -63,12 +63,14 @@ Drafting kit for fabrication sheets: views, sections, labels, title block.
 - `add_marks(drawing, kind, marks)`: Reference marks `[(position in drawing mm, label)]` of `kind` 'level' (dashed datum from the left border, for elevations), 'axis_x' (tick under the drawing) or 'axis_y' (tick to its left).
 - `add_tag(drawing, anchor, label_at, label)`: A leader from `anchor` to `label_at` (both 2D drawing points) with the label on its left.
 - `paint_extras(sheet, drawing, ox, oy)`: Draw the marks and tags of a drawing placed at (ox, oy).
-- `free_area(w, h, pad_left=16)`: (width, height) in mm that a drawing may fill on a w x h sheet.
-- `min_scale(extent_m, paper=A2)`: Smallest whole model scale (15 for 1:15) at which the plan and both elevations of a model with real extents (x, y, z) in metres each fit one sheet at 1:1.
-- `place(bounds, w, h, pad_left=16)`: Offsets that centre a bounding box in the free area of a w x h sheet.
-- class `SheetSet(scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT)`: A numbered set of sheets with one title block.
+- `free_area(w, h, pad_left=16, turned=False, title_h=HEIGHTS[DEFAULT])`: (width, height) in mm that a drawing may fill on a w x h sheet with a title block `title_h` tall.
+- `min_scale(extent_m, paper=A2, footer=DEFAULT)`: Smallest whole model scale (15 for 1:15) at which the plan and both elevations of a model with real extents (x, y, z) in metres each fit one sheet at 1:1.
+- `place(bounds, w, h, pad_left=16, turned=False, title_h=HEIGHTS[DEFAULT])`: Offsets that centre a bounding box in the free area of a w x h sheet (`turned`: a landscape composition that will be turned upright, see `free_area`).
+- class `SheetSet(scale, experiment, subtitle, viewer_url=None, studio='', paper=A2, footer=DEFAULT, credits=(), upright=True)`: A numbered set of sheets with one title block.
   - `blank(self, landscape=False)`: An empty sheet of the set's paper.
-  - `add(self, title, sheet, note='', scale_text=None)`: Finish a composed sheet with the title block and append it.
+  - `place(self, bounds, sheet, pad_left=16)`: `place` for a sheet of this set: a landscape blank is placed for the turn it gets when added.
+  - `add(self, title, sheet, note='', scale_text=None)`: Finish a composed sheet with the title block and append it; a landscape sheet is turned upright first.
+  - `page(self, title, sheet)`: Append a finished sheet as it is, without border or title block (a text page); it takes a number.
   - `view(self, title, drawing, note='', labelled=(), layers=None, scale_text=None)`: One drawing centred on its own sheet, portrait or landscape to suit, with its marks and, for the `labelled` members, lengths and lollipops.
   - `title_block(self, sheet, number, title, note, scale_text=None)`: Border, note line and the title block of the set's `footer`.
   - `write(self, pdf_dir, svg_dir=None)`: Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when `svg_dir` is given.
@@ -77,7 +79,7 @@ Drafting kit for fabrication sheets: views, sections, labels, title block.
 
 Title blocks (footers) for the fabrication sheets, selectable by key.
 
-- class `Block(number, title, note, experiment, subtitle, scale, scale_text=None, studio='', qr=None, date=None)`: The texts of one sheet's title block.
+- class `Block(number, title, note, experiment, subtitle, scale, scale_text=None, studio='', qr=None, date=None, credits=())`: The texts of one sheet's title block.
 - `mek_advance()`: Advance width of MEK-Mono in em, read from the font's head and hmtx tables.
 - `box(sheet, x, y, w, h, fill=0.0, lw=0.01)`: 
 - `frame(sheet, title_h, lw, top_lw=None)`: Sheet border and the line above the title block.
@@ -96,6 +98,26 @@ Title blocks (footers) for the fabrication sheets, selectable by key.
 - `footer_i(s, b)`: Inter, 28 mm.
 - `footer_j(s, b)`: Segoe UI semibold and regular, 32 mm with more air.
 - `footer_k(s, b)`: The default.
+- `footer_l(s, b)`: K mirrored for binding in a folder: the sheet number and title on the right, the QR code on the left with the 3D MODEL label beside it, and under the block a two-line band of small print with the credits of the set (supervision, agents, workflow, disclaimer, source code), wrapped in the order given.
+- `fitted(text, avail, size, font, weight=400, spacing=0.0, floor=3.0)`: The largest size down to `floor` at which `text` fits `avail` mm.
+- `label_text(s, x, y, word, size=2.0, anchor='start', font=SEGOE, white=False)`: 
+- `label_width(word, size=2.0, font=SEGOE)`: 
+- `wrap(text, width, size, font=SEGOE, weight=400)`: Lines of `text` no wider than `width`.
+- `run_in(s, x, top, width, size, items, font=SEGOE, pitch=None)`: Fine print: LABEL value pairs flowed as one paragraph inside `width`, wrapping on words.
+- `listing(s, x, top, width, size, items, font=SEGOE, pitch=None, label_w=None)`: Fine print as a list: the label in its own column, the value wrapped beside it.
+- `left_pairs(s, b, high_y, low_y, label_y, low_label_y, font=SEGOE, columns=2, size=3.4)`: QR code, then [3D MODEL / DATE] and, with two columns, [SCALE / UNITS].
+- `bar_stack(s, b, cx, label_y, studio_y, font=SEGOE)`: Check text over the bar over the studio mark, centred on cx.
+- `right_title(s, b, x_right, avail, high_y, low_y, label_y, low_label_y, font=SEGOE, project=True)`: TITLE and PROJECT flush right at x_right, the title shrunk to fit `avail`.
+- `number_box(s, b, y0, font=SEGOE)`: The sheet number white on black at the right edge.
+- `note_line(s, b, h, font=SEGOE)`: The note above the block, wrapped onto a second line when too long, the first line on top.
+- `footer_m(s, b)`: Credits as a list column.
+- `footer_n(s, b)`: Three rows.
+- `footer_o(s, b)`: Credits under the bar.
+- `footer_p(s, b)`: Credits as fine print under the left pairs: the rows move up a little and four lines of run-in small print fill the left section beneath DATE and UNITS.
+- `footer_q(s, b)`: Credits as fine print under the title: everything about the project sits in the right section next to the sheet number.
+- `real_bar(s, x0, y, scale, font=SEGOE)`: A print check bar of 1 m real on the line y: ticks every 10 cm standing on it, heavier at 0, 50 and 100 cm, labelled in real centimetres above them.
+- `spread(s, x, top, bottom, width, size, items, font=SEGOE, pitch=None)`: `listing` spread evenly between `top` (the cap line of the first label) and `bottom` (the baseline of the last line): the lines of one item keep their pitch, the gaps between items share the rest.
+- `footer_r(s, b)`: M as Luka revised it: QR code, two list columns of the set's facts (DATE, SUPERVISION, AGENTS, WORKFLOW, DISCLAIMER, SOURCE CODE), the scale line under its SCALE value in real centimetres, title over project over the studio mark, and the sheet number.
 
 ### `hidden_lines.py`
 
@@ -108,11 +130,13 @@ Exact hidden-line removal for convex, non-intersecting solids.
 Vector drawing canvas that writes PDF and SVG with the standard library.
 
 - `text_width(s, size)`: Approximate width in mm of `s` set in Helvetica at `size` mm.
-- class `Sheet(width, height)`: One page in mm, origin bottom-left.
+- class `Sheet(width, height, turn_labels=False)`: One page in mm, origin bottom-left.
+  - `offset(self, dx, dy)`: A displacement meant for the page as it is read (dx right, dy up), turned back into this composition when `turn_labels` is set; otherwise unchanged.
   - `poly(self, pts, fill=1.0, lw=THIN, dash=False, stroke=0.0)`: Closed polygon; `fill` and `stroke` are greys 0..1, `fill=None` leaves it open to what is below.
   - `line(self, a, b, lw=THIN, dash=False)`: Straight line from a to b.
   - `circle(self, x, y, r, fill=1.0, lw=THIN)`: Circle as a 24-gon.
-  - `text(self, x, y, s, size=2.5, anchor='start', font='Arial', weight=400, italic=False, spacing=0.0, underline=False, white=False)`: Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'.
+  - `text(self, x, y, s, size=2.5, anchor='start', font='Arial', weight=400, italic=False, spacing=0.0, underline=False, white=False, angle=0, width=None, word_spacing=0.0)`: Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'.
+  - `turned(self)`: The same page a quarter turn counter-clockwise, a landscape composition on a portrait sheet: its bottom edge lies along the right edge and it is read with the sheet turned clockwise.
   - `pdf_stream(self)`: The page as an uncompressed PDF content stream.
   - `svg(self)`: The page as an SVG document, for a quick look in a browser.
 - `font_css(text)`: @font-face rules, fonts embedded as base64, for the FONT_FILES families named in `text`.
@@ -139,3 +163,34 @@ Entourage for drawing sheets: outlines of people (later trees, symbols) placed o
 - `person(sheet, x, y, scale, mirror=False, fill=1.0, lw=MEDIUM, sink=0.9)`: A standing visitor 1750 mm tall, feet at (x, y), facing left (-x) unless `mirror`.
 - `trace(image_path, height, smooth=9, tolerance=0.35)`: Outline of the largest dark shape of an image (a silhouette on a light or transparent ground) as `(x, height)` in mm, scaled to `height` mm: the boundary pixels are followed, smoothed with a running mean over `smooth` pixels and thinned to `tolerance` pixels (Douglas-Peucker).
 - `svg(name)`: The asset as an SVG document in real mm, black outline and white fill.
+
+### `fonts.py`
+
+Text widths from the font files that headless Chrome prints with.
+
+- `face(family, bold=False, italic=False)`: The Pillow face of a family in one style, or None when there is no file for it.
+- `length(text, family, bold, italic)`: Advance of `text` in em, from the font file; None without one.
+- `advance(text, size, family='Times New Roman', weight=400, italic=False)`: Width in mm of `text` set at `size` mm in the family and style, from the font file.
+
+### `newsprint.py`
+
+Newsprint pages: markdown flowed into dense justified columns on a sheet.
+
+- `inline(text)`: Words of a run of markdown as (word, bold, italic); code and links are set plain.
+- `parse(markdown)`: Blocks of a markdown text: ('h1'|'h2'|'h3', words), ('p', words), ('item', words, marker), ('figure', name).
+- class `Style(size, weight=400, italic=False, before=0.0, after=0.0, centred=False, indent=INDENT)`: Type size, weight and italic of one kind of block, with its space before and after in lines.
+  - `width(self, text, bold=False, italic=False)`: 
+- `styles(size)`: Block styles for a body size in mm.
+- `break_lines(words, style, width, first_indent)`: Lines of (runs, justified) for words (word, bold, italic) in a column `width`; a run is (text, bold, italic, width, spaces).
+- class `Newsprint(masthead, figures=None, paper=A2, margin=12.0, columns=4, gutter=5.0, foot=12.0)`: Columns on a sheet.
+  - `column_x(self, c)`: 
+  - `flow(self, blocks, size, cut=None)`: Lay the blocks out at body `size`; stops after `cut` pages when given.
+  - `line(self, sheet, runs, style, x, baseline, width, justified)`: One line of runs at the baseline: justified by word spacing, centred, or ragged right.
+- `fit(press, blocks, max_pages=2, sizes=None)`: The largest body size (mm) at which the blocks fit `max_pages` pages, and those pages; when even the smallest size overflows, the text is cut after `max_pages` pages.
+
+### `organigram.py`
+
+The CraftBot agent team organigram as vector lines on a `vector_pdf.Sheet`.
+
+- `arrowhead(sheet, tip, from_point, k, filled)`: A 3 mm arrowhead at `tip` pointing away from `from_point`: TikZ Stealth (filled) or an open Triangle.
+- `organigram(sheet, left, top, width)`: Draw the figure with its top-left corner at (left, top) on the sheet, `width` mm wide; returns its height.
