@@ -12,6 +12,15 @@ Hobbylista Maler, pine, 1000 mm long, ripped into strips with a 1 mm rip kerf. P
 
 Prices of 2026-09-20, on offer until 2026-10-04 (regular 4.50 and 2.50 EUR).
 
+## Stick order, 1 m sticks
+
+Ready 2x10 mm and 3x5 mm sticks, 1000 mm long, no ripping. Packing assumes 1 mm per cut. The order adds 10% spare, rounded up.
+
+| Stick | Pieces | Total length m | Sticks packed | Sticks to order |
+|---|---|---|---|---|
+| 2x10 mm | 470 | 45.9 | 47 | **52** |
+| 3x5 mm | 931 | 68.9 | 70 | **77** |
+
 ## Stick order, Karapori (reference)
 
 Mäntyrima 30 cm from https://karapori.fi/products/mantyrima-3-x-3-mm. 1401 pieces, frames [0, 1, 2, 3, 4, 5, 6].

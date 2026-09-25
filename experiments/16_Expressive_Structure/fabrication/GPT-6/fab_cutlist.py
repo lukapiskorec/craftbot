@@ -57,7 +57,14 @@ def write_slat_order():
         out.append(f'| {stock} mm | [{slat} mm]({url}) | {per_slat} | {packed} | {strips} | **{order[stock]}** | {price:.2f} | {order[stock]*price:.2f} |')
     out += [f'| | | | | | | total | **{total:.2f}** |', '',
             'Prices of 2026-09-20, on offer until 2026-10-04 (regular 4.50 and 2.50 EUR).', '',
-            '## Stick order, Karapori (reference)', '']
+            '## Stick order, 1 m sticks', '',
+            f'Ready 2x10 mm and 3x5 mm sticks, {SLAT_LENGTH} mm long, no ripping. '
+            'Packing assumes 1 mm per cut. The order adds 10% spare, rounded up.', '',
+            '| Stick | Pieces | Total length m | Sticks packed | Sticks to order |', '|---|---|---|---|---|']
+    for stock, ls in sorted(lengths.items()):
+        packed = len(pack(ls, SLAT_LENGTH, 1.0))
+        out.append(f'| {stock} mm | {len(ls)} | {sum(ls)/1000:.1f} | {packed} | **{math.ceil(packed*1.10)}** |')
+    out += ['', '## Stick order, Karapori (reference)', '']
     path = os.path.join(HERE, 'order.md')
     with open(path, encoding='utf-8') as f:
         title, _, rest = f.read().partition('\n\n')
