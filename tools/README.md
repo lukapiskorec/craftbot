@@ -341,6 +341,92 @@ experiment has more than one run folder.
 
 ## Tests
 
+### Exploded callout diagrams
+
+`python tools/callout_diagrams.py` makes one A2 SVG per authored callout and
+a combined vector PDF for each `viewer/models/*/*_callouts.json`. It uses
+the latest numeric model version for that run, preserves the label and quote,
+and translates whole baked viewer layers vertically until their projections
+are separated. Black lines highlight exact name/collection matches against
+pale model context. An isolated axonometric shows the selected elements in
+their assembled positions. Orientation is chosen by projected fit; the
+printed scale is rounded, and layer gaps are diagrammatic, not fabrication
+dimensions.
+
+Outputs live beside the exports in `callout_diagrams/<slug>/`: individual
+SVGs, `all_callouts.pdf`, a browseable `index.html`, and `manifest.json`
+recording the source hash, selection names, layer translations and scales.
+`viewer/models/callout_diagrams.html` indexes the sets;
+`viewer/models/callout_diagrams.pdf` combines them with model bookmarks.
+The source models, callouts and experiment runs are unchanged.
+
+Use `--only 16 --slug gpt6` for one run, or `--index-only` to rebuild the
+index/atlas from existing sets. Geometry caches go under ignored `outputs/`.
+The renderer uses the existing NumPy/Pillow/Chrome fabrication dependencies
+plus `pypdf` for the atlas (all available in the Codex bundled runtime).
+`python tools/check_callout_diagrams.py --render` checks complete coverage,
+selection matches, source hashes, verbatim text, page bounds, PDF dimensions
+and absence of raster images, and writes PDF contact sheets for visual review
+under `outputs/callout_diagrams_qa/`. Rendering those requires `pypdfium2`.
+
+`python tools/callout_overviews.py` adds a compact comparison: all callouts
+of a model on one A2 sheet, with the exploded model at left and the full
+labels/quotes in one column at right. Each run's `callout_diagrams/<slug>/overview/`
+contains `lines.svg/pdf`, `inverted.svg/pdf`, a two-page `comparison.pdf`,
+and a manifest. `viewer/models/callout_overviews.html` indexes the pairs and
+`callout_overviews.pdf` collects them. Original individual sheets remain.
+Callouts retain their original numbers but read in target-height order to
+reduce leader crossings. Repeated groups highlight a small local group of matching
+members; groups of eight or fewer highlight every match. The sheet explicitly
+reports how many are highlighted out of the total. Both variants use the
+same samples and layout. Inverted fills are clipped against nearer faces,
+including depth crossings, using the existing convex polygon tools; white
+edges use the hidden-line solution. A fully hidden callout is shown through
+the faded context and explicitly labelled as an internal view. `--only`, `--slug`, and `--index-only`
+work like the individual renderer. Run `python tools/check_callout_overviews.py
+--render` for coverage, full-text, selection, page-bound and vector checks,
+plus paired PDF review images under `outputs/callout_overviews_qa/`.
+
+`python tools/callout_cutaways.py` adds an assembled cutaway representation in
+`callout_diagrams/<slug>/cutaway/cutaway.svg` and `inverted.svg`, with both
+styles in `cutaway.pdf` and separate `lines.pdf` / `inverted.pdf`, indexed by
+`viewer/models/callout_cutaways.html` and combined in `callout_cutaways.pdf`.
+Members stay in their original coordinates. The renderer compares three
+rear-enclosure depths, preserves the frame, and removes members that block
+selected callout sightlines. Frame removal has a much higher selection cost
+than finishes; any necessary local frame omissions are recorded by name.
+Full-model hidden-line removal verifies every leader target without an
+X-ray fallback. All authored labels and quotes remain on each A2 sheet,
+using equal-size regular labels and quotations, with smaller references.
+Titles use bold Segoe UI throughout. Each model has two
+sheets: dark-line highlights and black fills with white edges, both against
+faded gray context lines. The experiment 01 slab is
+an exception: white fill and a bold black outline in both styles. Compound
+vector fills avoid seams between depth-clipped fragments. Experiments 03
+and 14 use translucent glass, which does not occlude framing behind it;
+the SVG opacity is preserved in the PDF. Additional cladding and roof
+patches remain unhighlighted in 04, 06, 07, 08, 11, 13, 14 and 16/gpt6.
+At least half of every roof group is retained in 11, 13, 14 and 16/gpt6,
+with protected sightlines kept open.
+The complete stair in 04 and ladder and terrace guards in 14 are restored
+without extending their highlighted selection. Becher also retains extra
+head-house/shed cladding, roof boards and deck/floor patches.
+The 16/gpt6 entrance retains both header members and a right-hand facade
+patch as unhighlighted context around its selected jambs.
+Its room-cladding highlight stays on the side wall with the leader; the
+isolated end-wall board around the corner remains unhighlighted context.
+The sheet reports retained/original member counts by layer. The manifest
+records source hashes, omitted names, the three visibility studies, the
+selected cut, and any model-specific adjustments from visual review.
+The reviewed CLT and Fable expressive-structure cuts open their enclosure
+further; Arrhenius retains the courtyard insert, west stair and plant
+housings as assemblies so these callouts remain recognizable.
+The CLT model has no baked frame layer, so its structural wall/core groups
+provide the visibility probes. `--only`, `--slug` and `--index-only` work as
+above. `python tools/check_callout_cutaways.py --render` verifies coverage,
+source hashes, omissions, exact text, vectors and page bounds, and renders
+review images under `outputs/callout_cutaways_qa/`.
+
 ```
 python -m unittest discover tools/tests                                   # pure-Python modules
 blender --background --python tools/tests/blender_smoke.py                # every Blender kit, 0 overlaps expected

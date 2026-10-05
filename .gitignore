@@ -259,3 +259,6 @@ experiments/*/*/**/layers_v*_audit.txt
 # Experiment 17: keep only the final plan drawing set.
 experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.svg
 experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.html
+
+# Generated callout drawings stay local.
+callout_diagrams/
