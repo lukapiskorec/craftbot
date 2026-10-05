@@ -127,12 +127,12 @@ class Axo:
     """Axonometric of members with exact hidden lines, drawn at `scale` times model size (pass `scale_text` to the sheet when it is not 1), `toward` pointing from the model to the viewer.
     `point(p)` gives the drawing position of a 3D model point, for tags."""
 
-    def __init__(self, members, scale, toward=(-1, -1, 0.8)):
+    def __init__(self, members, scale, toward=(-1, -1, 0.8), *, crease_only=False):
         from hidden_lines import visible_lines      # numpy only when an axonometric is drawn
         toward = unit(list(toward))
         right = unit(cross(Z, toward))
         up = cross(toward, right)
-        self.lines = [[(x*scale, y*scale) for x, y in line] for line in visible_lines(members, right, up)]
+        self.lines = [[(x*scale, y*scale) for x, y in line] for line in visible_lines(members, right, up,crease_only=crease_only)]
         self.point = lambda p: (dot(p, right)*scale, dot(p, up)*scale)      # model point on the drawing
         self.extra = []
 

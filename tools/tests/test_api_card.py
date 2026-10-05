@@ -24,7 +24,7 @@ class ApiCardTest(unittest.TestCase):
         for m in api_card.FABRICATION:
             self.assertIn(f"### `{m}.py`", text)
             self.assertIn(f"### `{m}.py`", api_card.build())      # named on the main card, without signatures
-        for fn in ("write_members(", "write_cutlist(", "visible_lines(members, right, up)", "class `SheetSet(scale, experiment, subtitle", "min_scale("):
+        for fn in ("write_members(", "write_cutlist(", "visible_lines(members, right, up, crease_only=False)", "class `SheetSet(scale, experiment, subtitle", "min_scale("):
             self.assertIn(fn, text)
         self.assertNotIn("write_cutlist(", api_card.build())
 

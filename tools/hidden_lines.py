@@ -41,13 +41,14 @@ def _project(members, right, up):
     return faces, edges
 
 
-def _inside_interval(p, d, poly):
+def _inside_interval(p, d, poly, tolerance=0.):
     """Parameter interval of the segment p + t*d, t in 0..1, inside a convex
     counter-clockwise polygon (Cyrus-Beck)."""
     t0, t1 = 0.0, 1.0
     for a, b in zip(poly, np.roll(poly, -1, axis=0)):
         ex, ey = b-a
         side = ex*(p[1]-a[1])-ey*(p[0]-a[0])       # > 0: p is inside this edge
+        side += tolerance*np.hypot(ex,ey)
         slope = ex*d[1]-ey*d[0]
         if abs(slope) < 1e-12:
             if side < 0:
@@ -63,9 +64,48 @@ def _inside_interval(p, d, poly):
     return t0, t1
 
 
-def visible_lines(members, right, up):
+def _coplanar_seams(owner, p, q, faces, groups):
+    """Intervals internal to a flat surface of one logical element.
+
+    Convex faces remain separate for occlusion. Only their shared linework
+    dissolves; explicit line_group metadata may join parts of a single member.
+    Unrelated members retain their physical joint boundaries.
+    """
+    direction=q-p
+    midpoint=(p+q)/2
+    own=[]
+    for face_owner,poly,(origin,normal) in faces:
+        if face_owner!=owner: continue
+        unit=normal/np.linalg.norm(normal)
+        if max(abs(np.dot(p-origin,unit)),abs(np.dot(q-origin,unit)))>EPS: continue
+        span=_inside_interval(p[:2],direction[:2],poly,tolerance=EPS)
+        if span is not None:
+            delta=poly.mean(axis=0)-midpoint[:2]
+            side=direction[0]*delta[1]-direction[1]*delta[0]
+            own.append((unit,side,span))
+    hidden=[]
+    for face_owner,poly,(origin,normal) in faces:
+        if groups[face_owner]!=groups[owner]: continue
+        unit=normal/np.linalg.norm(normal)
+        if max(abs(np.dot(p-origin,unit)),abs(np.dot(q-origin,unit)))>EPS: continue
+        delta=poly.mean(axis=0)-midpoint[:2]
+        side=direction[0]*delta[1]-direction[1]*delta[0]
+        span=_inside_interval(p[:2],direction[:2],poly,tolerance=EPS)
+        if span is None: continue
+        for n,s,own_span in own:
+            if np.dot(unit,n)>.999999 and side*s < -1e-8:
+                # Both faces must border this same interval. A partial flat
+                # join must not erase the exposed remainder of a long edge.
+                overlap=(max(span[0],own_span[0]),min(span[1],own_span[1]))
+                if overlap[1]>overlap[0]: hidden.append(overlap)
+    return hidden
+
+
+def visible_lines(members, right, up, *, crease_only=False):
     """Visible parts of every member edge in the view with axes `right` and `up`, as 2D segments."""
     faces, edges = _project(members, right, up)
+    groups=[m.get('line_group') or ('member',i) for i,m in enumerate(members)]
+    seam_faces={i:[f for f in faces if groups[f[0]]==group] for i,group in enumerate(groups)} if crease_only else {}
     owners = np.array([f[0] for f in faces])
     lo = np.array([f[1].min(axis=0) for f in faces])
     hi = np.array([f[1].max(axis=0) for f in faces])
@@ -77,9 +117,9 @@ def visible_lines(members, right, up):
         if np.hypot(d[0], d[1]) < EPS:
             continue
         box_lo, box_hi = np.minimum(p, q), np.maximum(p, q)
-        near = np.nonzero((owners != owner) & (lo[:, 0] < box_hi[0]) & (hi[:, 0] > box_lo[0])
+        near = np.nonzero(((owners != owner) | bool(members[owner].get('self_occlude'))) & (lo[:, 0] < box_hi[0]) & (hi[:, 0] > box_lo[0])
                           & (lo[:, 1] < box_hi[1]) & (hi[:, 1] > box_lo[1]) & (nearest > box_lo[2]+EPS))[0]
-        hidden = []
+        hidden = _coplanar_seams(owner,p,q,seam_faces[owner],groups) if crease_only else []
         for i in near:
             _, poly, (origin, normal) = faces[i]
             span = _inside_interval(p[:2], d[:2], poly)

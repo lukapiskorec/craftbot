@@ -48,7 +48,7 @@ Drafting kit for fabrication sheets: views, sections, labels, title block.
   - `bounds(self)`: (x0, y0, x1, y1) of the drawing.
   - `paint(self, sheet, ox, oy)`: Draw on the sheet with the drawing origin at (ox, oy).
 - class `Flat()`: 2D outlines that are already on the sheet plane (an unrolled surface).
-- class `Axo(members, scale, toward=(-1, -1, 0.8))`: Axonometric of members with exact hidden lines, drawn at `scale` times model size (pass `scale_text` to the sheet when it is not 1), `toward` pointing from the model to the viewer.
+- class `Axo(members, scale, toward=(-1, -1, 0.8), crease_only=False)`: Axonometric of members with exact hidden lines, drawn at `scale` times model size (pass `scale_text` to the sheet when it is not 1), `toward` pointing from the model to the viewer.
   - `bounds(self)`: (x0, y0, x1, y1) of the drawing.
   - `paint(self, sheet, ox, oy)`: Draw on the sheet with the drawing origin at (ox, oy).
 - `unroll(facets)`: Lay a folded strip flat.
@@ -123,7 +123,7 @@ Title blocks (footers) for the fabrication sheets, selectable by key.
 
 Exact hidden-line removal for convex, non-intersecting solids.
 
-- `visible_lines(members, right, up)`: Visible parts of every member edge in the view with axes `right` and `up`, as 2D segments.
+- `visible_lines(members, right, up, crease_only=False)`: Visible parts of every member edge in the view with axes `right` and `up`, as 2D segments.
 
 ### `vector_pdf.py`
 
