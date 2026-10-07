@@ -93,6 +93,8 @@ class VectorPdf(unittest.TestCase):
         self.assertTrue(body.startswith(b"%PDF-1.4") and body.rstrip().endswith(b"%%EOF"))
         self.assertIn(b"/Count 2", body)
         self.assertIn("<polygon", sheet.svg())
+        self.assertIn('fill="white"', sheet.svg())
+        self.assertNotIn('fill="white"', sheet.svg(background=False))
 
 
 class Drafting(unittest.TestCase):

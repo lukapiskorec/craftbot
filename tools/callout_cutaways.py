@@ -48,15 +48,15 @@ class CutawaySheet(cd.CalloutSheet):
             for i,(x,y) in enumerate(poly))+'Z' for poly in polygons)
         self.vector_layer(f'<path d="{path}" fill="{color}" stroke="{color}" stroke-width="0.01" stroke-linejoin="round"/>')
 
-    def svg(self):
+    def svg(self, background=True):
         if not hasattr(self,'vector_layers'):
-            return super().svg()
+            return super().svg(background=background)
         fragments,cursor = [],0
         for index,markup in self.vector_layers+[(len(self.ops),'')]:
             block = cd.CalloutSheet(self.w,self.h)
             block.ops = self.ops[cursor:index]
-            svg = block.svg().removesuffix('</svg>')
-            # Later fragments contribute no SVG root or white background.
+            # Later fragments contribute no SVG root or white background (always drawn, so the split below finds it).
+            svg = block.svg(background=background or bool(fragments)).removesuffix('</svg>')
             fragments.append(svg if not fragments else svg.split('/>',1)[1])
             fragments.append(markup)
             cursor = index

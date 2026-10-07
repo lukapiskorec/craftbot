@@ -56,8 +56,8 @@ def compact_svg(svg):
 
 
 class CalloutSheet(Sheet):
-    def svg(self):
-        return compact_svg(super().svg())
+    def svg(self, background=True):
+        return compact_svg(super().svg(background=background))
 
 
 def decode_model(model):

@@ -118,11 +118,11 @@ class Sheet:
                 out.append(f'{1 if style[5] else 0} g BT /F1 {size*k:.2f} Tf {c:.4f} {sn:.4f} {-sn:.4f} {c:.4f} {x*k:.2f} {y*k:.2f} Tm ({s}) Tj ET')
         return '\n'.join(out).encode('latin-1')
 
-    def svg(self):
-        """The page as an SVG document, for a quick look in a browser."""
+    def svg(self, background=True):
+        """The page as an SVG document, for a quick look in a browser; `background=False` leaves the page transparent."""
         grey = lambda g: '#%02x%02x%02x' % ((int(g*255),)*3)
-        out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}mm" height="{self.h}mm" '
-               f'viewBox="0 0 {self.w} {self.h}"><rect width="100%" height="100%" fill="white"/>']
+        out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}mm" height="{self.h}mm" viewBox="0 0 {self.w} {self.h}">'
+               + ('<rect width="100%" height="100%" fill="white"/>' if background else '')]
         for op in self.ops:
             if op[0] == 'poly':
                 _, pts, fill, lw, dash, stroke = op
@@ -154,10 +154,12 @@ def font_css(text):
     return ''.join(rules)
 
 
-def print_pdf(path, sheets, chrome=None):
-    """Print the sheets as the pages of one PDF with headless Chrome, each page at its sheet's size."""
+def print_pdf(path, sheets, chrome=None, background=True):
+    """Print the sheets as the pages of one PDF with headless Chrome, each page at its sheet's size.
+
+    `background=False` prints no white page, so the PDF is transparent wherever nothing is drawn."""
     from sheet_png import find_chrome
-    svgs = [sheet.svg() for sheet in sheets]
+    svgs = [sheet.svg(background=background) for sheet in sheets]
     sizes = sorted({(sheet.w, sheet.h) for sheet in sheets})
     css = ''.join('@page p%d{size:%smm %smm;margin:0}.p%d{page:p%d}' % (i, w, h, i, i) for i, (w, h) in enumerate(sizes))
     pages = ''.join('<div class="p%d">%s</div>' % (sizes.index((sheet.w, sheet.h)), svg) for sheet, svg in zip(sheets, svgs))
