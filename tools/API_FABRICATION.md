@@ -73,7 +73,7 @@ Drafting kit for fabrication sheets: views, sections, labels, title block.
   - `page(self, title, sheet)`: Append a finished sheet as it is, without border or title block (a text page); it takes a number.
   - `view(self, title, drawing, note='', labelled=(), layers=None, scale_text=None)`: One drawing centred on its own sheet, portrait or landscape to suit, with its marks and, for the `labelled` members, lengths and lollipops.
   - `title_block(self, sheet, number, title, note, scale_text=None)`: Border, note line and the title block of the set's `footer`.
-  - `write(self, pdf_dir, svg_dir=None)`: Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when `svg_dir` is given.
+  - `write(self, pdf_dir, svg_dir=None, background=False)`: Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when `svg_dir` is given.
 
 ### `title_blocks.py`
 
@@ -138,9 +138,9 @@ Vector drawing canvas that writes PDF and SVG with the standard library.
   - `text(self, x, y, s, size=2.5, anchor='start', font='Arial', weight=400, italic=False, spacing=0.0, underline=False, white=False, angle=0, width=None, word_spacing=0.0)`: Text with its baseline at (x, y); `anchor` is 'start', 'middle' or 'end'.
   - `turned(self)`: The same page a quarter turn counter-clockwise, a landscape composition on a portrait sheet: its bottom edge lies along the right edge and it is read with the sheet turned clockwise.
   - `pdf_stream(self)`: The page as an uncompressed PDF content stream.
-  - `svg(self)`: The page as an SVG document, for a quick look in a browser.
+  - `svg(self, background=True)`: The page as an SVG document, for a quick look in a browser; `background=False` leaves the page transparent.
 - `font_css(text)`: @font-face rules, fonts embedded as base64, for the FONT_FILES families named in `text`.
-- `print_pdf(path, sheets, chrome=None)`: Print the sheets as the pages of one PDF with headless Chrome, each page at its sheet's size.
+- `print_pdf(path, sheets, chrome=None, background=True)`: Print the sheets as the pages of one PDF with headless Chrome, each page at its sheet's size.
 - `write_pdf(path, sheets)`: Write the sheets as the pages of one PDF 1.4 file, standard library only, all text in Helvetica.
 
 ### `qr_code.py`

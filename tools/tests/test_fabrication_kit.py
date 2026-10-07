@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
@@ -149,6 +150,17 @@ class Drafting(unittest.TestCase):
             sheets.write(os.path.join(out, "pdf"), os.path.join(out, "svg"))
             self.assertEqual(sorted(os.listdir(os.path.join(out, "pdf"))), ["00_all_sheets.pdf", "01_plan_test.pdf"])
             self.assertEqual(os.listdir(os.path.join(out, "svg")), ["01_plan_test.svg"])
+
+    def test_sheet_set_prints_transparent_pages_by_default(self):
+        sheets = drafting.SheetSet(15, "Experiment", "subtitle")
+        sheets.view("Plan, test", drafting.Drawing([box("A", 0, 100, 0, 50, 0, 3)], drafting.X, drafting.Y))
+        printed = []
+        with mock.patch.object(drafting, "print_pdf", lambda path, pages, background: printed.append((os.path.basename(path), background))):
+            with tempfile.TemporaryDirectory() as out:
+                sheets.write(os.path.join(out, "pdf"))
+                sheets.write(os.path.join(out, "pdf"), background=True)
+        self.assertEqual(printed, [("01_plan_test.pdf", False), ("00_all_sheets.pdf", False),
+                                   ("01_plan_test.pdf", True), ("00_all_sheets.pdf", True)])
 
     def test_a_landscape_sheet_is_turned_upright_when_added(self):
         sheets = drafting.SheetSet(15, "E", "s", credits=[("SUPERVISION", "someone")])

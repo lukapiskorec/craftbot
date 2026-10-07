@@ -404,17 +404,20 @@ class SheetSet:
         FOOTERS[self.footer](sheet, Block(number, title, note, self.experiment, self.subtitle, self.scale,
                                           scale_text, self.studio, self.qr, credits=self.credits))
 
-    def write(self, pdf_dir, svg_dir=None):
+    def write(self, pdf_dir, svg_dir=None, background=False):
         """Write one PDF per sheet plus 00_all_sheets.pdf, and the SVGs when
-        `svg_dir` is given. Both folders are emptied first."""
+        `svg_dir` is given. Both folders are emptied first. The PDFs print
+        without a white page unless `background` is set, so the sheets stay
+        transparent wherever nothing is drawn; the SVGs keep their white
+        ground for a look in a browser."""
         for folder in filter(None, (pdf_dir, svg_dir)):
             os.makedirs(folder, exist_ok=True)
             for old in os.listdir(folder):
                 os.remove(os.path.join(folder, old))
         for i, (title, sheet) in enumerate(self.sheets, 1):
             slug = f'{i:02d}_' + ''.join(c if c.isalnum() else '_' for c in title.lower()).strip('_').replace('__', '_')
-            print_pdf(os.path.join(pdf_dir, slug+'.pdf'), [sheet])
+            print_pdf(os.path.join(pdf_dir, slug+'.pdf'), [sheet], background=background)
             if svg_dir:
                 with open(os.path.join(svg_dir, slug+'.svg'), 'w', encoding='utf-8') as f:
                     f.write(sheet.svg())
-        print_pdf(os.path.join(pdf_dir, '00_all_sheets.pdf'), [s for _, s in self.sheets])
+        print_pdf(os.path.join(pdf_dir, '00_all_sheets.pdf'), [s for _, s in self.sheets], background=background)
