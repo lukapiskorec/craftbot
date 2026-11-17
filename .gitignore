@@ -260,8 +260,10 @@ experiments/*/*/**/layers_v*_audit.txt
 experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.svg
 experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.html
 
-# Generated callout drawings stay local.
+# Generated callout drawings and their atlases stay local.
 callout_diagrams/
+/viewer/models/callout_*.html
+/viewer/models/callout_*.pdf
 
 # Paper drafts and research are kept outside the repo.
 /papers/
