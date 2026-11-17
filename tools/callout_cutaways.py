@@ -378,7 +378,8 @@ def make_sheet(members,lines,entries,layout,title,slug,version,counts,style,regi
     return sheet
 
 
-def render_file(source):
+def prepare(source):
+    """Select, carve and project one model: everything a sheet needs, from the caches where they exist."""
     slug = source.stem.removesuffix('_callouts')
     model_key = (source.parent.name[:2],slug)
     path = max(source.parent.glob(slug+'_v*.json'),key=lambda p:int(p.stem.rsplit('_v',1)[1]))
@@ -469,6 +470,16 @@ def render_file(source):
                         105+(layout['h']-143-(box[3]-box[1])*s)/2-box[1]*s)
     totals = Counter(m['layer'] for m in members)
     counts = {layer:dict(kept=sum(members[i]['layer']==layer for i in kept),total=totals[layer]) for layer in cd.ORDER if layer in totals}
+    return dict(slug=slug,path=path,members=members,lines=lines,entries=entries,layout=layout,counts=counts,
+                regions=regions,glass=glass,glass_regions=glass_regions,white_ids=white_ids,white_regions=white_regions,
+                kept=kept,added=added,chosen=chosen,trials=trials,selection_reason=selection_reason)
+
+
+def render_file(source):
+    p = prepare(source)
+    slug,path,members,lines,entries,layout,counts = (p[k] for k in ('slug','path','members','lines','entries','layout','counts'))
+    regions,glass,glass_regions,white_ids,white_regions = (p[k] for k in ('regions','glass','glass_regions','white_ids','white_regions'))
+    kept,added,chosen,trials,selection_reason = (p[k] for k in ('kept','added','chosen','trials','selection_reason'))
     destination = source.parent/'callout_diagrams'/slug/'cutaway'
     destination.mkdir(parents=True,exist_ok=True)
     sheets = []
