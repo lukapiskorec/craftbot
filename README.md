@@ -11,14 +11,14 @@ This repo holds the code, iteration steps, references and outputs of the experim
 ## Repository structure
 
 ```
-experiments/    14 experiments, one folder each
+experiments/    17 experiments, one folder each
 manuals/        Timber construction manuals as extracted .md summaries, with INDEX.md (the PDFs themselves are gitignored)
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
 tools/          Shared modelling kits and harness scripts (see tools/README.md)
 viewer/         Web viewer: static site plus the exported models in viewer/models/
 visuals/        Figures used in this README
 outputs/        Default folder for headless renders (gitignored)
-.claude/        Claude Code command /run-experiment, which starts an experiment run, and the six agent definitions in .claude/agents/
+.claude/        Claude Code commands /run-experiment, which starts an experiment run, and /draft-fabrication-plans, plus the six agent definitions in .claude/agents/
 .github/        GitHub Pages workflow that publishes viewer/ on every push to main
 ```
 
@@ -26,7 +26,7 @@ Each experiment folder follows the same layout:
 
 - `input/` holds everything given to the model: the prompt log (`experiment_XX_prompts_chatgpt51.txt`), reference images, and the shared Python geometry library (`craftbot_lib.py`) with an element placement template. Experiments 04, 08, 09, 11 and 13 also used a construction manual PDF; it was removed from the repository for copyright reasons, an `original_pdf_provenance.txt` in the folder names it, and the extracted summary used during the run stays next to it.
 - `ChatGPT 5.1/` holds the outputs per iteration: generated Python scripts (`vXX.py`) and Blender viewport screenshots of the resulting models.
-- `Fable/` (eleven experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation. From experiment 15 on it also holds the hand-off files of the agent team (`agent.md`, `brief.md`, `concept.md`, `sources.md`, `requirements.md`, `design_notes.md`, `version_notes.md`, inspection and close-out reports).
+- `Fable/` (thirteen experiments so far) holds the same per-iteration outputs from the Fable runs, plus the design rationale document, callouts file and archived conversation. From experiment 15 on it also holds the hand-off files of the agent team (`agent.md`, `brief.md`, `concept.md`, `sources.md`, `requirements.md`, `design_notes.md`, `version_notes.md`, inspection and close-out reports).
 - Any other run folder (`Opus 5.1/`, `Sonnet 5/`, ...) is a run of the same workflow by another model. Every subfolder except `input/` and `references/` is a run folder, named after the model, with file names carrying its slug (`experiment_NN_opus51_v01.py`); the tools and the viewer discover them from the folder names.
 - `references/` (some experiments) holds additional reference and annotation images used during the iteration loop.
 
@@ -41,6 +41,8 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 **Visual references.** 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
 
 **Hybrid references (images and text).** 04 Construction Manual (prefabricated timber house), 05 Construction Manual Meta-Prompt, 07 Gehry Deconstruction, 08 The Segal Method, 09 How to CLT (ten-story building), 10 Staircase, 11 to 13 Hip Roof, Dormer Window and Roof Sheathing, 14 Becher Studies (a timber coaling tower refurbished as a multi-storey home, from one photograph and five manuals)
+
+**Agent-team runs (from experiment 15).** 15 Koreni (work in progress: a house in concrete, steel and glass on a sloped site, in three variations), 16 Expressive Structure (a square timber room twice as tall as it is wide, run by Fable and by GPT-6), 17 Arrhenius Laboratories (a model of the existing building from eight photographs and an article, run by Astra)
 
 ## Skills
 
@@ -60,6 +62,7 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 | [extending-previous-models](skills/extending-previous-models/SKILL.md) | continuing or layering onto a previous experiment's model |
 | [writing-design-rationale](skills/writing-design-rationale/SKILL.md) | closing out a run, before archiving the transcript |
 | [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish: the agent team, its hand-off files, phases, rules and the repo mechanics |
+| [draft-fabrication-plans](skills/draft-fabrication-plans/SKILL.md) | drafting fabrication plans for a finished model: A2 drawings, glue-up templates, a cut list and stick order for building it by hand |
 
 The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the Fable render harnesses. It runs on any saved `.blend`. Its blind spot, geometry that is absent or touches nothing, is covered by [`tools/check_contacts.py`](tools/check_contacts.py) and by the Inspector agent below.
 
@@ -134,10 +137,11 @@ To use the team, run `/run-experiment NN [brief]` in Claude Code from the repo r
 | [`closeout.py`](tools/closeout.py) | one command to close out a version or a run: viewer export, layers, index, view set, screenshot, rationale and callout checks, transcript |
 | [`experiment_template.py`](tools/experiment_template.py) | starting point for a new experiment script |
 | [`export_members.py`](tools/export_members.py), [`cutlist.py`](tools/cutlist.py), [`drafting.py`](tools/drafting.py), [`hidden_lines.py`](tools/hidden_lines.py), [`vector_pdf.py`](tools/vector_pdf.py), [`qr_code.py`](tools/qr_code.py) | the fabrication kit: A2 plans, sections, axonometrics and glue-up templates as vector PDF, plus a cut list and stick order, for building a finished model by hand from stock sticks ([`API_FABRICATION.md`](tools/API_FABRICATION.md)) |
+| [`callout_diagrams.py`](tools/callout_diagrams.py), [`callout_overviews.py`](tools/callout_overviews.py), [`callout_cutaways.py`](tools/callout_cutaways.py) | A2 vector drawings of a run's rationale callouts: one exploded diagram per callout, all callouts on one sheet, and an assembled cutaway, each with a `check_callout_*.py` validator. The drawings are written to `viewer/models/` and gitignored |
 
 Point your agent at both folders in its project instructions, one line each, as described under Skills above.
 
-Drafting fabrication plans is separate from an experiment run. [`skills/draft-fabrication-plans/SKILL.md`](skills/draft-fabrication-plans/SKILL.md) is the procedure, invoked with `/draft-fabrication-plans NN` in Claude Code or `$draft-fabrication-plans NN` in Codex; Each set lives in `experiments/<NN>/fabrication/<Run>/`, one subfolder per run folder, so the models of one experiment stay apart; [`experiments/16_Expressive_Structure/fabrication/GPT-6/`](experiments/16_Expressive_Structure/fabrication/GPT-6/) is the worked example, a 1:15 stick model on 22 A2 sheets.
+Drafting fabrication plans is separate from an experiment run. [`skills/draft-fabrication-plans/SKILL.md`](skills/draft-fabrication-plans/SKILL.md) is the procedure, invoked with `/draft-fabrication-plans NN` in Claude Code or `$draft-fabrication-plans NN` in Codex. Each set lives in `experiments/<NN>/fabrication/<Run>/`, one subfolder per run folder, so the models of one experiment stay apart; [`experiments/16_Expressive_Structure/fabrication/GPT-6/`](experiments/16_Expressive_Structure/fabrication/GPT-6/) is the worked example, a 1:15 stick model on 26 A2 sheets.
 
 ## Headless execution
 
