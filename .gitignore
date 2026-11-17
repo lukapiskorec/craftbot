@@ -262,3 +262,9 @@ experiments/17_Arrhenius_Laboratories/Astra/plan_v0[3-6]*.html
 
 # Generated callout drawings stay local.
 callout_diagrams/
+
+# Paper drafts and research are kept outside the repo.
+/papers/
+
+# temp folder
+/tmp

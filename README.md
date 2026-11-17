@@ -8,14 +8,9 @@ CraftBot is an architect AI agent. It reads a design brief, grounds itself in do
 
 This repo holds the code, iteration steps, references and outputs of the experiments so far, so anyone can build on CraftBot by pointing their own agent at it. Python and Blender were chosen for ease of access: both are open source, maintained, widely used, and free for commercial use.
 
-A draft paper describing the project is in [`papers/`](papers/):
-
-> *CraftBot: An LLM Interlocutor in a Code-First Approach to Architectural Design* (short paper, submitted to ICCC 2026)
-
 ## Repository structure
 
 ```
-papers/         Draft paper PDF
 experiments/    14 experiments, one folder each
 manuals/        Timber construction manuals as extracted .md summaries, with INDEX.md (the PDFs themselves are gitignored)
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
