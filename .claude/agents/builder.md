@@ -28,9 +28,9 @@ Conditional, only when CraftBot's spawn message names them:
 
 ## Inputs
 
-The run folder `experiments/NN_*/<Agent>/` that CraftBot names in its message (its `agent.md` gives the file slug `<slug>`, e.g. `fable`, `opus51`), and in it `brief.md`, `concept.md`, `requirements.md`, the last entry of `version_notes.md`, the previous version's script and `views_<slug>.py`, the previous version's inspection findings list (the summary of `inspection_vXX.md`, not its tables, unless a finding needs the detail), the previous `closeout_vXX.md`, and the snippets in `references/` that the concept names. Not `sources.md`: the concept carries every number with its clause, and a number the concept lacks is a question for the Designer, not a search. Not the manuals, not the input images.
+The run folder `experiments/NN_*/<Run>/` that CraftBot names in its message (its `agent.md` gives the file slug `<slug>`, e.g. `fable`, `opus51`), and in it `brief.md`, `concept.md`, `requirements.md`, the last entry of `version_notes.md`, the previous version's script and `views_<slug>.py`, the previous version's inspection findings list (the summary of `inspection_vXX.md`, not its tables, unless a finding needs the detail), the previous `closeout_vXX.md`, and the snippets in `references/` that the concept names. Not `sources.md`: the concept carries every number with its clause, and a number the concept lacks is a question for the Designer, not a search. Not the manuals, not the input images.
 
-## Outputs, in `experiments/NN_*/<Agent>/`
+## Outputs, in `experiments/NN_*/<Run>/`
 
 - `experiment_NN_<slug>_vXX.py`, one file per rendered version, from `tools/experiment_template.py` for v01 and from the previous version's file afterwards: one parameter block, derived levels as functions, members in named collections by structural role, element count printed at the end. Every constant traces to the concept (which cites its clause) or a labelled derivation. Patch the previous file with Edit into the new file rather than rewriting it; a rewrite puts the whole script into your context twice.
 - `views_<slug>.py` from `tools/views_template.py`: the four orbits, a frame-only view, a from-below view and an interior view or section per storey are mandatory; a view matched to the reference image when there is one; a close-up for every joint that needs judgement; a view for every new feature in the version that adds it. Numbered once, appended only. Hide lists use bare collection names.
@@ -51,7 +51,7 @@ The run folder `experiments/NN_*/<Agent>/` that CraftBot names in its message (i
 ## Rules
 
 - Scope is not yours. When a requirement cannot be met as written, record the conflict and the nearest alternative in your notes entry and in your return; CraftBot sends it to the Designer, whose answer lands in `requirements.md` for the next Builder. Continue with everything that does not depend on the answer. Never narrow a requirement silently.
-- Independence: never open another agent's run folder for the same experiment (`ChatGPT 5.1/`, `Fable/` or any run folder that is not `<Agent>/`). Common ground is `tools/`, `skills/`, `manuals/`, `input/`, `references/`. In a multi-variation run your variation folder is `<Agent> <V>/` and the shared module `<Agent>/common_<slug>.py` is read-only common ground.
+- Independence: never open another agent's run folder for the same experiment (`ChatGPT 5.1/`, `Fable/` or any run folder that is not `<Run>/`). Common ground is `tools/`, `skills/`, `manuals/`, `input/`, `references/`. In a multi-variation run your variation folder is `<Run> <V>/` and the shared module `<Run>/common_<slug>.py` is read-only common ground.
 - Shared code: the only sanctioned edit to `tools/` during a run is an `OVERRIDES` entry for this experiment in `tools/layers.py`. A helper worth promoting goes in `version_notes.md` as a proposal.
 - Write Python files and patch scripts with the Write and Edit tools and run them from a file; a shell heredoc with an apostrophe breaks on this machine.
 - Every command runs from the repo root with an absolute output prefix.

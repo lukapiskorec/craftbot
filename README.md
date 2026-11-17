@@ -2,9 +2,9 @@
 
 ![CraftBot outputs rendered in Blender](visuals/craftbot_art-ai-fact_website_banner_2026.jpg)
 
-*CraftBot outputs made with the Fable 5 agent and rendered in Blender with parts of the cladding hidden: experiment 02 (left), experiment 06 (middle) and experiment 14 (right).*
+*CraftBot outputs made with the Fable 5 model and rendered in Blender with parts of the cladding hidden: experiment 02 (left), experiment 06 (middle) and experiment 14 (right).*
 
-CraftBot is an architect AI agent. It reads a design brief, grounds itself in domain knowledge by ingesting documents, images and other references, and outputs Python code that defines a building procedurally. Instead of producing meshes or images, CraftBot writes scripts that construct architectural geometry in Blender. From there it can produce the industry's standard representations: floorplans, sections, elevations, BIM models, bills of quantities. It can run in a fully automated loop of code generation, execution, visual feedback and revision. CraftBot is a research project asking whether large language models can take part in architectural design when they are constrained to work through executable CAD code.
+CraftBot is an open toolkit that equips a coding agent to design buildings as executable CAD code. It supplies skills, Python modelling tools, a six-agent team definition and summaries of construction manuals. An agent that loads it reads a design brief, grounds itself in domain knowledge by ingesting documents, images and other references, and outputs Python code that defines a building procedurally. Instead of producing meshes or images, the agent writes scripts that construct architectural geometry in Blender. From there it can produce the industry's standard representations: floorplans, sections, elevations, BIM models, bills of quantities. It can run in a fully automated loop of code generation, execution, visual feedback and revision. CraftBot is a research project asking whether large language models can take part in architectural design when they are constrained to work through executable CAD code.
 
 This repo holds the code, iteration steps, references and outputs of the experiments so far, so anyone can build on CraftBot by pointing their own agent at it. Python and Blender were chosen for ease of access: both are open source, maintained, widely used, and free for commercial use.
 
@@ -14,7 +14,7 @@ This repo holds the code, iteration steps, references and outputs of the experim
 experiments/    17 experiments, one folder each
 manuals/        Timber construction manuals as extracted .md summaries, with INDEX.md (the PDFs themselves are gitignored)
 skills/         Distilled modelling knowledge from the experiments, one skill per folder
-tools/          Shared modelling kits and harness scripts (see tools/README.md)
+tools/          Shared modelling kits and run scripts (see tools/README.md)
 viewer/         Web viewer: static site plus the exported models in viewer/models/
 visuals/        Figures used in this README
 outputs/        Default folder for headless renders (gitignored)
@@ -36,7 +36,7 @@ Each experiment folder follows the same layout:
 
 *Eight different experiment outputs shown with a fully clad model alongside their corresponding exposed timber frames.*
 
-The experiments started in November 2025 with ChatGPT 5.1 (runs through January 2026); other agents followed, with Fable runs added in August 2026, and the series is ongoing as of September 2026. Grouped by the type of reference material used:
+The experiments started in November 2025 with ChatGPT 5.1 (runs through January 2026); other models followed, with Fable runs added in August 2026, and the series is ongoing as of September 2026. Grouped by the type of reference material used:
 
 **Visual references.** 01 Carport (king post truss), 02 Gothic Carport (hammer beam truss), 03 VIPP Shelter, 06 Prouvé 6x6 Demountable House
 
@@ -64,11 +64,11 @@ The experiments started in November 2025 with ChatGPT 5.1 (runs through January 
 | [running-craftbot-experiment](skills/running-craftbot-experiment/SKILL.md) | running a whole experiment in this repo, start to finish: the agent team, its hand-off files, phases, rules and the repo mechanics |
 | [draft-fabrication-plans](skills/draft-fabrication-plans/SKILL.md) | drafting fabrication plans for a finished model: A2 drawings, glue-up templates, a cut list and stick order for building it by hand |
 
-The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the Fable render harnesses. It runs on any saved `.blend`. Its blind spot, geometry that is absent or touches nothing, is covered by [`tools/check_contacts.py`](tools/check_contacts.py) and by the Inspector agent below.
+The interpenetration check the skills refer to is [`tools/check_overlaps.py`](tools/check_overlaps.py), the SAT test from the render scripts of the Fable runs. It runs on any saved `.blend`. Its blind spot, geometry that is absent or touches nothing, is covered by [`tools/check_contacts.py`](tools/check_contacts.py) and by the Inspector agent below.
 
 ## Agent team
 
-From experiment 15 on, a run is done by six Claude Code sub-agents defined in [`.claude/agents/`](.claude/agents/), one file each. The split follows a context audit of the experiment 14 run: of its 455 k tokens of context, 38 percent were render screenshots, 22 percent manuals and 8 percent the tools and the script itself, all read by one agent that then needed each of them only as a few lines of decisions. Each agent file is that agent's system prompt: its role, inputs, outputs, procedure and rules, and the list of skills in `skills/` it reads at startup. The domain knowledge stays in the skills, so there is one copy of every rule.
+From experiment 15 on, a run is done by six Claude Code sub-agents defined in [`.claude/agents/`](.claude/agents/), one file each. The orchestrator agent is also named CraftBot, and in this section the name means that role. The split follows a context audit of the experiment 14 run: of its 455 k tokens of context, 38 percent were render screenshots, 22 percent manuals and 8 percent the tools and the script itself, all read by one agent that then needed each of them only as a few lines of decisions. Each agent file is that agent's system prompt: its role, inputs, outputs, procedure and rules, and the list of skills in `skills/` it reads at startup. The domain knowledge stays in the skills, so there is one copy of every rule.
 
 ```
                                                  +--------+
@@ -184,7 +184,7 @@ Since `.blend` files are not stored in the repo, each experiment script is execu
 
 Features:
 
-- A model and agent picker with an iteration slider. The camera stays put when switching iterations and only the elements that changed animate in.
+- A model and run picker with an iteration slider. The camera stays put when switching iterations and only the elements that changed animate in.
 - Seven render styles: plaster, solid, random, mono, wireframe, blueprint and 1-bit dither. Mono, wireframe and dither each have a light and a dark mode; clicking random again re-rolls its palette. The shaded styles carry screen-space ambient occlusion and thin black outlines to match the Blender Workbench renders, glazing is drawn semi-transparent, and the GUI re-themes itself with the active style.
 - GPU-driven entry animations: elements drop, rise or assemble in construction order or layer by layer.
 - Knolling: every element rearranged onto a grid, either flat (each piece on its widest face, one band of shelves per layer, seen from the top) or stacked (identical pieces bundled palette-style, seen in axo). Elements lift, turn and settle between any two states, stacks building from the bottom course up, and the camera glides to a view framed on the result while a slider scrubs the move. Hover and selection keep working on the arranged pieces, and the callouts toggle labels each layer band with its count and length range. The layouts are solved in the browser per iteration, with a progress line while they compute.
@@ -214,7 +214,7 @@ python tools/closeout.py version 14 v09         # all of the above for one versi
 python tools/closeout.py run 14 --session-id ID # run-level checks, then the transcript copy
 ```
 
-The index step also copies each run's `experiments/<exp>/<Agent>/experiment_NN_<slug>_design_rationale.md` to `viewer/models/<exp>/<slug>_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
+The index step also copies each run's `experiments/<exp>/<Run>/experiment_NN_<slug>_design_rationale.md` to `viewer/models/<exp>/<slug>_rationale.md` so the viewer can show it. The exporter re-winds meshes to face outward (some generators emit inside-out prisms); the viewer applies the same fix when parsing older exports.
 
 ### Recording a video of the viewer
 

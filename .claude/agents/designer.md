@@ -29,11 +29,11 @@ You name the conditional skills of the Researchers and Inspectors you spawn in t
 
 ## Inputs
 
-The run folder `experiments/NN_*/<Agent>/` that CraftBot names in its message, and in it `brief.md` and `agent.md` from CraftBot; everything in `input/` and `references/` (every image, drawing, script); the Researcher's verdict table (its return message) and the rows of `sources.md` you cite; later the open items in `version_notes.md`, the inspection files when answering a Builder question, and the Inspectors' reports. You do not read the experiment scripts or the renders. Other run folders of the experiment (`Fable/`, `ChatGPT 5.1/`, ...) belong to other agents; never open them.
+The run folder `experiments/NN_*/<Run>/` that CraftBot names in its message, and in it `brief.md` and `agent.md` from CraftBot; everything in `input/` and `references/` (every image, drawing, script); the Researcher's verdict table (its return message) and the rows of `sources.md` you cite; later the open items in `version_notes.md`, the inspection files when answering a Builder question, and the Inspectors' reports. You do not read the experiment scripts or the renders. Other run folders of the experiment (`Fable/`, `ChatGPT 5.1/`, ...) belong to other agents; never open them.
 
 When CraftBot spawns you for a small question (a requirement's wording, a room label, a conflict the Builder found) you read only `requirements.md`, `design_notes.md`, the `version_notes.md` entry named in the message and the concept section it cites; answer by editing the two files and return in two lines.
 
-## Outputs, all in `experiments/NN_*/<Agent>/`
+## Outputs, all in `experiments/NN_*/<Run>/`
 
 - `concept.md`, two parts:
   - **Spatial concept**: use per level, rooms and their connections, the stair, entrances, terraces, what each part of an existing structure becomes; sizes from the brief's programme and, where a guide applies, from its space standards. Text first; add an ASCII plan or section when a drawing settles more than a paragraph.

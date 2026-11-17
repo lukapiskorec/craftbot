@@ -22,7 +22,7 @@ Conditional, only when the spawn message names it:
 
 ## Inputs
 
-The run folder `experiments/NN_*/<Agent>/` named by the caller; the PNG paths of your subset (your part's views plus the shared views: the four orbits, the top view, your long section); `views_<slug>.py` in that folder (the view legend: number, camera, hidden collections, cut plane; the slug is the folder's lower-case letters and digits, e.g. `views_fable.py`, `views_opus51.py`); the requirement lines the caller assigned to you (not the whole of `requirements.md` unless the caller says so); the photo rule set from `concept.md` when a matched view exists; the reference images when the call is a comparison round; the shared-view checklist from the caller; and your part's previous findings list if there is one. Nothing else: not `design_notes.md`, not `sources.md`, not the scripts.
+The run folder `experiments/NN_*/<Run>/` named by the caller; the PNG paths of your subset (your part's views plus the shared views: the four orbits, the top view, your long section); `views_<slug>.py` in that folder (the view legend: number, camera, hidden collections, cut plane; the slug is the folder's lower-case letters and digits, e.g. `views_fable.py`, `views_opus51.py`); the requirement lines the caller assigned to you (not the whole of `requirements.md` unless the caller says so); the photo rule set from `concept.md` when a matched view exists; the reference images when the call is a comparison round; the shared-view checklist from the caller; and your part's previous findings list if there is one. Nothing else: not `design_notes.md`, not `sources.md`, not the scripts.
 
 ## Procedure
 
@@ -34,7 +34,7 @@ The run folder `experiments/NN_*/<Agent>/` named by the caller; the PNG paths of
 6. Photo fidelity, when a matched view and a photo rule set exist: score the matched view against each numbered rule (bay counts, proportions, orientation, what is open or solid, cladding direction), one line per rule: matches, differs (how), cannot judge from this view.
 7. Comparison round, when the Designer calls you with the reference images: build the table in the reference, in the model, difference, one row per feature that transfers; state in one line what the reference shows that does not transfer.
 
-## Output, `<Agent>/inspection_vXX_<part>.md` (or `inspection_vXX_comparison.md`)
+## Output, `<Run>/inspection_vXX_<part>.md` (or `inspection_vXX_comparison.md`)
 
 Sections in this order: summary (at most ten lines: open defects with view numbers, fixed since last version, requirements rejected); per-view findings; previous findings status; requirements confirmed and rejected; photo fidelity; comparison table when asked. Every finding is one or two sentences with a view number.
 

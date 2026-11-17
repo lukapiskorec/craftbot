@@ -1,4 +1,4 @@
-# Headless render harness for CraftBot experiments: runs an experiment
+# Headless render script for CraftBot experiments: runs an experiment
 # script in background Blender, renders Workbench views with object
 # outlines on (coplanar pieces stay distinguishable), saves the .blend and
 # runs the separating-axis overlap check on every pair of members, prints
@@ -38,7 +38,7 @@
 # COLORS maps collection names to (r, g, b, a) object colours; children
 # inherit their parent's colour unless listed themselves.
 #
-# Provenance: the render_fable.py harnesses of the Fable runs (experiments
+# Provenance: the render_fable.py scripts of the Fable runs (experiments
 # 01-13); exp 09's version (colours, hide lists, focus, section cuts, SAT
 # check) is the superset generalized here.
 

@@ -10,7 +10,7 @@
 # folder, named after the model that ran it ("ChatGPT 5.1", "Fable",
 # "Opus 5.1"); its file slug is the lower-case letters and digits of that name
 # ("chatgpt51", "fable", "opus51"). A run that ships a design rationale
-# (<Agent>/experiment_NN_<slug>_design_rationale.md) gets it copied next to the
+# (<Run>/experiment_NN_<slug>_design_rationale.md) gets it copied next to the
 # models as viewer/models/<exp>/<slug>_rationale.md and linked from index.json;
 # likewise experiment_NN_<slug>_callouts.json -> <slug>_callouts.json (see
 # tools/callouts.py). A multi-variation run has an orchestrator folder

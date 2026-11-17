@@ -190,7 +190,7 @@ Newsprint pages: markdown flowed into dense justified columns on a sheet.
 The CraftBot agent team organigram as vector lines on a `vector_pdf.Sheet`.
 
 
-## Harness scripts (run from the repo root)
+## Run scripts (run from the repo root)
 
 ### `render_views.py`
 

@@ -1,7 +1,7 @@
 # Design-rationale callouts: validation of the authored files.
 #
-# A run may ship experiments/<exp>/<Agent>/experiment_NN_<slug>_callouts.json
-# (<Agent> is the run folder, e.g. Fable or "Opus 5.1"; <slug> its letters and
+# A run may ship experiments/<exp>/<Run>/experiment_NN_<slug>_callouts.json
+# (<Run> is the run folder, e.g. Fable or "Opus 5.1"; <slug> its letters and
 # digits in lower case, see tools/export_all_models.py):
 #   {"callouts": [{"id": "heel",                 # unique, [a-z0-9-]
 #                  "label": "Truss heel over the full 112 binder",

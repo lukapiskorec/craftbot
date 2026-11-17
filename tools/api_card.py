@@ -20,8 +20,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODULES = ["craftbot_lib", "geometry2d", "planes", "ruled", "framing", "sheathing"]
-HARNESS = ["render_views", "sheet_png", "check_overlaps", "check_contacts", "check_bearing", "triage", "closeout",
-           "export_all_models", "layers", "callouts", "api_card"]
+RUN_SCRIPTS = ["render_views", "sheet_png", "check_overlaps", "check_contacts", "check_bearing", "triage", "closeout",
+               "export_all_models", "layers", "callouts", "api_card"]
 # Fabrication kit: runs without Blender on members.json (export_members.py writes it from Blender).
 FABRICATION = ["export_members", "cutlist", "drafting", "title_blocks", "hidden_lines", "vector_pdf", "qr_code", "drawing_assets",
                "fonts", "newsprint", "organigram"]
@@ -94,8 +94,8 @@ def build():
     out += ["## Fabrication kit (not used in an experiment run; signatures in API_FABRICATION.md)", ""]
     for m in FABRICATION:
         out += module_card(m, False)
-    out += ["## Harness scripts (run from the repo root)", ""]
-    for m in HARNESS:
+    out += ["## Run scripts (run from the repo root)", ""]
+    for m in RUN_SCRIPTS:
         if os.path.isfile(os.path.join(HERE, m + ".py")):
             out += module_card(m, m == "check_bearing")
     return "\n".join(out).rstrip() + "\n"

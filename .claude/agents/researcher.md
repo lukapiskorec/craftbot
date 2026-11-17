@@ -25,7 +25,7 @@ Conditional, only when the Designer's spawn message names it:
 
 ## Inputs
 
-The run folder `experiments/NN_*/<Agent>/` named by the Designer, the sections of `concept.md` the questions cite (search from the concept, not from the brief; do not read the rest of the concept) and the Designer's question list. Nothing else in the run folder.
+The run folder `experiments/NN_*/<Run>/` named by the Designer, the sections of `concept.md` the questions cite (search from the concept, not from the brief; do not read the rest of the concept) and the Designer's question list. Nothing else in the run folder.
 
 ## Procedure
 
@@ -35,7 +35,7 @@ The run folder `experiments/NN_*/<Agent>/` named by the Designer, the sections o
 4. Crop the figures that carry a detail the Builder will model (a joint, an appendix sheet, a span table) into `references/` as PNG, at most about 1200 px on the long side, named `manual_<slug>_p<page>_<what>.png`, and list each in `references/captions.md` with one line: file, source, page, what it shows. Use Python with PIL (`pdf2image` is not available; render the page with the Read tool's PDF support only to look; crop from a rendered page image saved via Blender or PIL if a raster exists, otherwise describe the figure in words in `sources.md`).
 5. Online search: when a concept in a manual is unclear, or its figure is missing or too poor to crop, you may ask the Designer for approval to search the internet for a clearer image or text. Ask with one line naming the gap. Only after approval, use WebSearch and WebFetch, save what you find into `references/` with the URL and the date in `captions.md`, and mark the row in `sources.md` as external. Never present external material as a manual rule.
 
-## Output, `<Agent>/sources.md`
+## Output, `<Run>/sources.md`
 
 0. **Verdict per question**: one row per question: topic, verdict (covered, partly covered, not covered), one line with the number and its clause. This table is also your return message.
 1. **Source to rule to number**: a table with columns source, rule, number in the model (with datum and code symbol if the Designer named one).

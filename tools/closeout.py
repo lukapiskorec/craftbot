@@ -7,17 +7,17 @@ never stops at the first failure, so one report shows everything.
     python tools/closeout.py version 14 v09 [--agent NAME] [--blender PATH] [--no-screenshot]
         export the version to the viewer, bake and audit layers, rebuild
         index.json, check the view set, screenshot the viewer
-        -> experiments/<exp>/<Agent>/closeout_v09.md
+        -> experiments/<exp>/<Run>/closeout_v09.md
 
     python tools/closeout.py run 14 [--agent NAME] --session-id ID [--transcript-source PATH]
         rationale sections present, hand-off files, callouts check, prompt
         file present, API card current, index rebuilt, then (last) the
         transcript copy
-        -> experiments/<exp>/<Agent>/closeout_run.md
+        -> experiments/<exp>/<Run>/closeout_run.md
 
     python tools/closeout.py run 14 [--agent NAME] --no-archive
         run checks and rebuild the index, without reading/copying a transcript
-        -> experiments/<exp>/<Agent>/closeout_preflight.md
+        -> experiments/<exp>/<Run>/closeout_preflight.md
 
 An explicit transcript source can be a Codex rollout or Claude JSONL. Its root
 session identity must match --session-id. Without a source, the legacy Claude
@@ -29,7 +29,7 @@ after the archive operation. No host-specific runtime launcher is required:
 use any working Python, including Blender's bundled interpreter.
 
 The experiment id is the two-digit prefix or the folder name under
-experiments/. <Agent> is the run folder, named after the model that ran
+experiments/. <Run> is the run folder, named after the model that ran
 the experiment ("Fable", "Opus 5.1", "ChatGPT 5.1"); --agent names it and
 is needed only when the experiment has more than one run folder. File
 names inside it use the slug (lower-case letters and digits: fable,

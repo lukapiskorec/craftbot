@@ -347,7 +347,7 @@ const selExp = secModel.addSelect("Model", [], (v) => {
   refreshPickers({ newest: true });
   loadPicked();
 });
-const selAgent = secModel.addSelect("Agent", [], (v) => {
+const selAgent = secModel.addSelect("Run", [], (v) => {
   pick.agent = v;
   refreshPickers({ newest: true });
   loadPicked();

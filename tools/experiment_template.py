@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------
 # CRAFT BOT - EXPERIMENT SCRIPT TEMPLATE
 #
-# Copy this file to experiments/<NN>_.../<Agent>/experiment_NN_<slug>_v01.py
-# (<Agent> is the run folder named after the model, <slug> its lower-case
+# Copy this file to experiments/<NN>_.../<Run>/experiment_NN_<slug>_v01.py
+# (<Run> is the run folder named after the model, <slug> its lower-case
 # letters and digits: Fable/experiment_NN_fable_v01.py, "Opus 5.1"/
 # experiment_NN_opus51_v01.py) and replace the BUILD section. It shows the
 # layout the Fable runs converged on: one parameter block, derived levels as functions, the
@@ -28,8 +28,8 @@ for _d in (os.path.join(_HERE, "..", "..", "..", "tools"), os.path.join(_HERE, "
     if os.path.isfile(os.path.join(_d, "craftbot_lib.py")) and _d not in sys.path:
         sys.path.insert(0, _d)
 
-# Multi-variation runs: a variation folder "<Agent> A" imports the shared
-# module common_<slug>.py from the orchestrator folder "<Agent>" beside it.
+# Multi-variation runs: a variation folder "<Run> A" imports the shared
+# module common_<slug>.py from the orchestrator folder "<Run>" beside it.
 # A plain run folder ("Fable", "Opus 5.1") has no such parent and skips this.
 _PARENT = os.path.normpath(os.path.join(_HERE, "..", os.path.basename(_HERE).rsplit(" ", 1)[0]))
 if " " in os.path.basename(_HERE) and os.path.isdir(_PARENT) and _PARENT not in sys.path:

@@ -1,6 +1,6 @@
 """Overlap triage: group penetrating pairs into name families (pure Python).
 
-The overlap check lists pairs deepest first and the harness prints the
+The overlap check lists pairs deepest first and render_views.py prints the
 first 80; a model with hundreds of pairs usually has three or four causes.
 `families()` collapses the pair list into (family_a, family_b, depth) rows
 with a count and one example, so the Builder reads a table of causes

@@ -2,7 +2,7 @@
 
 Code shared by CraftBot experiments. Three groups: the **modelling kits** an
 experiment script imports (extracted from the Fable runs of experiments
-01-13), the **harness scripts** that run, check and export a model, and the
+01-13), the **run scripts** that run, check and export a model, and the
 **fabrication kit** that turns a finished model into A2 drawings and a stick
 order for a physical scale model. The skills in `skills/` say when and why;
 this folder is the how.
@@ -63,7 +63,7 @@ blender --background model.blend --python tools/export_members.py -- members.jso
 python tools/sheet_png.py <set>/svg/21_axonometric.svg out.png [--zoom LEFT TOP SIZE]                 # mm from the top-left corner
 ```
 
-## Harness scripts
+## Run scripts
 
 | Script | Purpose |
 |---|---|
@@ -209,7 +209,7 @@ names fail; a model without detected foundations produces one foundation-free st
 `<prefix>_settings.json` records camera transforms, sun angles, colors, visibility
 counts, render time and quality settings for each completed PNG. The `.blend`
 retains the final camera/material/light setup with collections shown, matching
-the harness's existing save behavior. The original model script is unchanged.
+the render script's existing save behavior. The original model script is unchanged.
 
 ```bash
 blender --background --factory-startup --python-exit-code 1 --python tools/tests/cycles_smoke.py

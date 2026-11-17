@@ -13,7 +13,7 @@
 #   ruled.py        bilinear (hypar) surfaces and members along rulings
 #   framing.py      stud walls, sheet tiling, boards, walls with openings
 #   sheathing.py    roof boards on planar facets, protrusion check
-#   render_views.py headless render harness + overlap check
+#   render_views.py headless render script + overlap check
 #
 # Usage from an experiment script:
 #   import sys; sys.path.insert(0, r"<repo>/tools")

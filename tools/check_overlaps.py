@@ -1,7 +1,7 @@
 """Standalone interpenetration check for generated models.
 
 Runs the separating-axis (SAT) overlap test used by the Fable experiment
-harnesses over every pair of mesh objects in the scene: face normals plus
+render scripts over every pair of mesh objects in the scene: face normals plus
 edge-direction cross products as candidate axes, with an AABB broad phase.
 Valid for convex meshes (experiment members are boxes or convex prisms);
 non-convex meshes can report false positives. Touching faces report zero
